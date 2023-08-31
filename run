@@ -1,0 +1,72 @@
+#!/bin/zsh
+#
+# FileName:     run
+# Author:       8ucchiman
+# CreatedDate:  2023-08-31 17:37:36
+# LastModified: 2023-01-23 14:11:45 +0900
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
+
+
+function func_lst () {
+    echo "***********************************"
+    echo "The following function is prepared."
+    echo "***********************************"
+    cat go | awk '/^function/ {printf "| %s\n", $2}'
+    echo "***********************************"
+}
+
+########################################
+# while getopts :i:c:g OPT
+# do
+#     case $OPT in
+#         i) image_name=$OPTARG;;
+#         g) gpu_flag=true;;
+#         c) container_name=$OPTARG;;
+#         :|\?) _usage;;
+#     esac
+# done
+# function _usage () {
+#     echo 
+# }
+# function help () {
+# 
+# }
+# 
+# 
+# function main02 () {
+#     
+# }
+########################################
+
+
+function set_variables () {
+    BASE_DIR=$PWD
+}
+
+function setup_environment () {
+
+}
+
+function run () {
+
+}
+
+function options () {
+
+}
+
+
+########################################
+function main01 () {
+    set_variables
+    eval $@
+}
+
+main01 $@
+########################################
+
+
+return
+

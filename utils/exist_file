@@ -1,0 +1,19 @@
+#!/bin/zsh
+#
+# FileName:     exist_file
+# Author:       8ucchiman
+# CreatedDate:  2023-08-29 14:58:39
+# LastModified: 2023-01-23 14:11:45 +0900
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
+
+
+
+
+function exist_file () {
+    echo hello world
+    echo 8ucchiman_was_here
+}
+
+
