@@ -16,4 +16,3 @@ function exist_file () {
     echo 8ucchiman_was_here
 }
 
-

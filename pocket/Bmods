@@ -1,0 +1,99 @@
+#!/bin/zsh
+#
+# FileName:     8modules
+# Author:       8ucchiman
+# CreatedDate:  2023-07-27 13:10:49
+# LastModified: 2023-01-23 14:11:45 +0900
+# Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
+# Description:  ---
+#
+
+
+
+function func_lst () {
+    echo "***********************************"
+    echo "The following function is prepared."
+    echo "***********************************"
+    cat  | awk '/^function/ {printf "| %s\n", }'
+    echo "***********************************"
+}
+
+
+########################################
+# while getopts :i:c:g OPT
+# do
+#     case OPT in
+#         i) image_name=OPTARG;;
+#         g) gpu_flag=true;;
+#         c) container_name=OPTARG;;
+#         :|\?) _usage;;
+#     esac
+# done
+# function _usage () {
+#     echo 
+# }
+# function help () {
+# 
+# }
+# 
+# 
+# function main02 () {
+#     
+# }
+########################################
+
+typeset -A SUBMODULES
+function set_variables () {
+    #
+    #
+    #
+    #
+    echo "******************************"
+    echo "* set_variables              *"
+    echo "******************************"
+    BASE_DIR=PWD
+    MODULES=(
+        debug,
+    )
+}
+
+
+function setup_environment () {
+}
+
+function debug () {
+    echo "8ucchiman was here!!"
+}
+
+
+function default () {
+    #
+    # this is default setting
+    # you can run this function without no arguments.
+    #
+    echo "******************************"
+    echo "* default                    *"
+    echo "******************************"
+    echo "this is default setting"
+    echo "you can run this function without no arguments."
+    debug
+}
+
+
+#######################################
+function main01 () {
+    set_variables
+    if [[ $@ == "" ]]; then
+        default
+    else
+        eval $@
+    fi
+
+}
+
+ME=modules
+main01 $@
+#######################################
+
+
+return
