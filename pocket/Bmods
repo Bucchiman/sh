@@ -66,6 +66,18 @@ function debug () {
 }
 
 
+function anaconda () {
+}
+
+function myawk () {
+    """
+        
+    """
+
+}
+
+
+
 function default () {
     #
     # this is default setting
