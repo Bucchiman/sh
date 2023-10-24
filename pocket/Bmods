@@ -76,6 +76,47 @@ function myawk () {
 
 }
 
+function _assert() {
+    #
+    # $1: 条件式
+    # $2: 条件式がFalseの時に出力するメッセージ
+    # Reference: https://qiita.com/nannoki/items/15004992b6bb5637a9cd
+    #
+    eval $1
+    if [[ $? == 0 ]]; then
+        echo "great work!!!"
+    else
+        echo $2
+    fi
+}
+
+function test_add () {
+    _assert "$1"
+}
+
+# function _assert () {
+#     expected="$2"
+#     input="$3"
+# 
+# 
+#     ./9cc "$input" > tmp.s
+#     cc -o tmp tmp.s
+#     ./tmp
+#     actual="$?"
+# 
+#     if [[ "$actual" == "$expected" ]]; then
+#         echo "$input => $actual"
+#     else
+#         echo "$input => $expected expected, but got $actual"
+#         exit 1
+#     fi
+# }
+
+assert 0 0
+assert 42 42
+
+echo OK
+
 
 
 function default () {
@@ -90,6 +131,12 @@ function default () {
     echo "you can run this function without no arguments."
     debug
 }
+
+
+function search () {
+    local load_readme=$(cd $HOME/.config/lib/readme; /usr/bin/find . -type f | fzf --height 100% )
+}
+
 
 
 #######################################
@@ -107,5 +154,6 @@ ME=modules
 main01 $@
 #######################################
 
+#["<C-r>"] = {'<cmd>term python %<cr>', "Run python code"},
 
 return
