@@ -1,47 +1,72 @@
-#!/bin/zsh
+#!/bin/zsh -x
 #
-# FileName:     8modules
+# FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
 # LastModified: 2023-01-23 14:11:45 +0900
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
+#               https://sig9.org/archives/1120
 # Description:  ---
 #
 
 
+function check_file_exist () {
+    # https://tanakatarou.tech/1699/
+    [ -e $1 ]; echo $?; # or [ -a file ];
+    if [[ -e $1 ]]; then
+        echo "y"
+    else
+        echo "n"
+    fi
+}
 
-function func_lst () {
-    echo "***********************************"
-    echo "The following function is prepared."
-    echo "***********************************"
-    cat  | awk '/^function/ {printf "| %s\n", }'
-    echo "***********************************"
+function _has () {
+    return $( whence $1 &>/dev/null )
 }
 
 
-########################################
-# while getopts :i:c:g OPT
-# do
-#     case OPT in
-#         i) image_name=OPTARG;;
-#         g) gpu_flag=true;;
-#         c) container_name=OPTARG;;
-#         :|\?) _usage;;
-#     esac
-# done
-# function _usage () {
-#     echo 
-# }
-# function help () {
-# 
-# }
-# 
-# 
-# function main02 () {
-#     
-# }
-########################################
+function install_fzf () {
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
+    ~/.fzf/install
+}
 
+function install_bat () {
+}
+
+function array_fzf () {
+    #
+    # $1: array
+    #
+    local array=($(echo $1))
+    echo $(printf '%s\n' "${array[@]}" | fzf --height 100% )
+}
+
+function file_fzf () {
+    #
+    # $1: file
+    #
+    echo $(cat $1 | fzf --height 100% )
+}
+
+function ls_fzf () {
+    #
+    # $1: any path
+    #
+    echo $(ls -1 $1 | fzf --height 100%)
+}
+
+function make_function_lst () {
+    file=$1
+    #
+    # awk pattern with variable
+    # Reference: https://stackoverflow.com/questions/39384283/how-to-match-a-pattern-given-in-a-variable-in-awk
+    #
+    
+    function_lst=($(awk -v pattern=$2 '$0 ~ pattern' $file))
+}
+
+
+typeset -a MODULE_lst
 typeset -A SUBMODULES
 function set_variables () {
     #
@@ -51,9 +76,34 @@ function set_variables () {
     echo "******************************"
     echo "* set_variables              *"
     echo "******************************"
-    BASE_DIR=PWD
-    MODULES=(
-        debug,
+    BASE_DIR=$PWD
+    DOTFILES=$HOME/git/dotfiles
+    # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
+    # MODULE_lst=(
+    #     _debug
+    #     fuzzy_settings
+    #     default
+    #     show_cmd_history
+    #     load_local
+    # )
+    MODULE_lst = make_function_lst $HOME/gmods function zsh
+    DOTFILES_SUBMODULES=(
+        onelines            .config/lib/onelines
+        csharp              .config/lib/codes/csharp
+        c                   .config/lib/codes/c
+        cpp                 .config/lib/codes/c++
+        rust                .config/lib/codes/rust
+        python              .config/lib/codes/python
+        assembler           .config/lib/codes/assembler
+        lua                 .config/lib/codes/lua
+        cuda                .config/lib/codes/cuda
+        IoT                 .config/lib/codes/IoT
+        shell               .config/lib/codes/shell
+    )
+    MYWORK_lst=(
+        slam                # path
+        maestro             # path
+        speedestimation     # path
     )
 }
 
@@ -61,10 +111,163 @@ function set_variables () {
 function setup_environment () {
 }
 
-function debug () {
+function _debug () {
+    #
+    # Check Bmods path!!!
+    #
     echo "8ucchiman was here!!"
 }
 
+
+function add_submodules () {
+    #
+    # TL;DR:    Add submodules
+    # Arguments: 
+    #       $1: url
+    #
+
+    git submodule add $1
+}
+
+function show_samples () {
+    #
+    # Show sample images
+    #
+    local sample=`ls_fzf $HOME/.config/sample`
+    open $sample
+    # echo $sample
+}
+
+
+function show_cmd_history () {
+    #
+    # TL;DR:        Show .zhistory
+    #
+    #
+    file_fzf $HOME/.zhistory
+}
+
+function run_submodule () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    local target_submodule=`ls_fzf `
+}
+
+
+function run_python () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+   
+}
+
+function run_c () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+   
+}
+
+function run_cpp () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+
+}
+
+function run_rust () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+
+}
+
+function run_csharp () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+
+}
+
+function run_csharp () {
+    #
+    # toDo!!!!!!!!! my work
+    #
+    #
+
+}
+
+function update_dotfiles () {
+    #
+    # TL;DR: update dotfiles
+    #
+    #
+    cd $DOTFILES
+    git fetch origin dev
+    git merge origin/dev
+    for value in ${(v)DOTFILES_SUBMODULES}; do
+        cd $DOTFILES/$value
+        git fetch origin dev
+        git merge origin/dev
+    done
+    source $HOME/.zshrc
+}
+
+
+function _load_mywork_submodules () {
+    
+}
+
+
+
+function fuzzy_settings () {
+    #---------------#
+    #   fzf & ag    #
+    #---------------#
+    # fzf から the_silver_searcher (ag) を呼び出すことで高速化
+    # fzf の キーバインド
+    #if [ -e /opt/local/share/fzf/shell/key-bindings.zsh ]; then
+    #    source /opt/local/share/fzf/shell/key-bindings.zsh
+    #fi
+    
+    if [ -e $HOME/.fzf/shell/completion.zsh ]; then
+        source $HOME/.fzf/shell/completion.zsh
+    fi
+    
+    # fzf の 補完設定
+    #if [ -e /opt/local/share/fzf/shell/completion.zsh ]; then
+    #    source /opt/local/share/fzf/shell/completion.zsh
+    #fi
+    
+    if _has fzf && _has ag; then
+        export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+        export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+        export FZF_COMMON_MYOPTS="--height 40% --layout=reverse --multi"
+        export FZF_DEFAULT_OPTS="$FZF_COMMON_MYOPTS" # --preview 'bat --color=always {} --style=plain'"
+        export FZF_CTRL_T_OPTS="$FZF_COMMON_MYOPTS" # --bind 'ctrl-y:execute-silent(echo {} | pbcopy)+abort' --border --preview 'bat --color=always {}'"
+    fi
+
+}
+
+function load_local () {
+    #
+    # TL;DR:        load local a file.zsh
+    #
+    #
+    yn=`check_file_exist $1`
+    if [[ $yn == "y" ]]; then
+        source $1
+    else
+        echo "not exist local file"
+    fi
+}
 
 function default () {
     #
@@ -76,24 +279,27 @@ function default () {
     echo "******************************"
     echo "this is default setting"
     echo "you can run this function without no arguments."
-    debug
 }
 
 
 #######################################
 function main01 () {
     set_variables
+    fuzzy_settings
     if [[ $@ == "" ]]; then
-        default
+        # array_of_lines=("${(@f)$(my_command)}")
+        # Reference: https://unix.stackexchange.com/questions/29724/how-to-properly-collect-an-array-of-lines-in-zsh
+        # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
+        # printf '%s\n' "${my_array[@]}"
+        local target_func=`array_fzf "${MODULE_lst[*]}"`
+        eval ${target_func}
     else
         eval $@
     fi
-
 }
 
-ME=modules
+ME=Bmods
 main01 $@
 #######################################
-
 
 return
