@@ -36,9 +36,10 @@ function install_bat () {
 function array_fzf () {
     #
     # $1: array
+    # $2: preview
     #
     local array=($(echo $1))
-    echo $(printf '%s\n' "${array[@]}" | fzf --height 100% )
+    echo $(printf '%s\n' "${array[@]}" | fzf --preview="$2" --preview-label='' --height 100% )
 }
 
 function file_fzf () {
@@ -55,19 +56,52 @@ function ls_fzf () {
     echo $(ls -1 $1 | fzf --height 100%)
 }
 
-function make_function_lst () {
+function function_lst () {
     file=$1
     #
     # awk pattern with variable
     # Reference: https://stackoverflow.com/questions/39384283/how-to-match-a-pattern-given-in-a-variable-in-awk
+    #            https://www.rasukarusan.com/entry/2019/04/30/000000
     #
-    
     function_lst=($(awk -v pattern=$2 '$0 ~ pattern' $file))
+}
+
+function func_lst() {
+    #
+    #
+    # Reference: https://www.rasukarusan.com/entry/2019/04/30/000000
+    #
+
+    local func=$(
+       typeset -f \
+       | grep ".*() {$" \
+       | grep "^[a-z_]" \
+       | tr -d "() {"   \
+       | fzf --height 100% --preview "source ~/Bmods; typeset -f  {}"
+   )
+    if [ -z "$func" ]; then
+        return
+    fi
+    typeset -f $func
+}
+
+function Bmods_function_lst () {
+    #
+    #
+    #
+    local function_lst=($(awk '/^function/{print $2}' $HOME/Bmods))
+    #local target_function=`array_fzf "${function_lst[*]}" "cat $HOME/"`
+    printf '%s\n' "${function_lst[@]}" \
+        | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%
+
+
+    eval "${target_function}"
 }
 
 
 typeset -a MODULE_lst
 typeset -A SUBMODULES
+typeset -A MYWORK_lst
 function set_variables () {
     #
     #
@@ -78,15 +112,17 @@ function set_variables () {
     echo "******************************"
     BASE_DIR=$PWD
     DOTFILES=$HOME/git/dotfiles
+    TMP=/tmp/8ucchiman/
     # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
-    # MODULE_lst=(
-    #     _debug
-    #     fuzzy_settings
-    #     default
-    #     show_cmd_history
-    #     load_local
-    # )
-    MODULE_lst = make_function_lst $HOME/gmods function zsh
+    MODULE_lst=(
+        _debug
+        fuzzy_settings
+        default
+        show_cmd_history
+        load_local
+        specific_scripts_function_lst
+    )
+    #MODULE_lst = make_function_lst $HOME/gmods function zsh
     DOTFILES_SUBMODULES=(
         onelines            .config/lib/onelines
         csharp              .config/lib/codes/csharp
@@ -100,15 +136,16 @@ function set_variables () {
         IoT                 .config/lib/codes/IoT
         shell               .config/lib/codes/shell
     )
-    MYWORK_lst=(
-        slam                # path
-        maestro             # path
-        speedestimation     # path
-    )
+    # MYWORK_lst=(
+    #     slam                # path
+    #     maestro             # path
+    #     speedestimation     # path
+    # )
 }
 
 
 function setup_environment () {
+    ln -sf $HOME/dotfiles/.config/pockets/shell/Bmods Bmods
 }
 
 function _debug () {
@@ -269,14 +306,44 @@ function load_local () {
     fi
 }
 
+function font_settings () {
+    #
+    # show config?
+    #     $ cat /etc/fonts/fonts.conf
+    #
+    # Reference: https://zenn.dev/hanaasagi/articles/9e428f0c9594a6
+    #
+    if [[ -e $HOME/.fonts ]]; then
+
+    else
+        ln -sf $HOME/dotfiles/.config/fonts $HOME/.fonts
+    fi
+    fc-cache -f -v
+}
+
+function link_all () {
+    #
+    # Description:  link all files at one time
+    # @params $1: pattern
+    # @return 
+    #
+    # Reference:    https://qiita.com/real_yaruo/items/0a1b4a88cfd5f27f062d
+    #
+    ls *.txt | xargs -I{} ln -s {} link.{}
+}
+
 function anaconda () {
+}
+
+function clone_testrepository() {
+    cd $TEMP
+    git clone https://github.com/Bucchiman/test.git
 }
 
 function myawk () {
     """
         
     """
-
 }
 
 function _assert() {
@@ -350,7 +417,7 @@ function main01 () {
         # Reference: https://unix.stackexchange.com/questions/29724/how-to-properly-collect-an-array-of-lines-in-zsh
         # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
         # printf '%s\n' "${my_array[@]}"
-        local target_func=`array_fzf "${MODULE_lst[*]}"`
+        local target_func=`Bmods_function_lst`
         eval ${target_func}
     else
         eval $@
