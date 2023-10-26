@@ -91,10 +91,7 @@ function Bmods_function_lst () {
     #
     local function_lst=($(awk '/^function/{print $2}' $HOME/Bmods))
     #local target_function=`array_fzf "${function_lst[*]}" "cat $HOME/"`
-    printf '%s\n' "${function_lst[@]}" \
-        | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%
-
-
+    local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%`
     eval "${target_function}"
 }
 
