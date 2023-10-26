@@ -1,4 +1,4 @@
-#!/bin/zsh -x
+#!/bin/zsh
 #
 # FileName:     Bmods
 # Author:       8ucchiman
@@ -10,22 +10,82 @@
 #
 
 
-function check_file_exist () {
+function _check_file_exist () {
     # https://tanakatarou.tech/1699/
     [ -e $1 ]; echo $?; # or [ -a file ];
-    if [[ -e $1 ]]; then
-        echo "y"
-    else
-        echo "n"
-    fi
 }
 
 function _has () {
     return $( whence $1 &>/dev/null )
 }
 
+function ls_all_files () {
+    #
+    # @Description  ls all files with recursively directories
+    # @params       $1: target directory
+    #
+    # @Example      $ Bmods ls_all_files $HOME/bin/gulliver
+    #               > 
+    #               >
+    #               >
+    #               >
+    ls -l --color=auto -d `find $1`
+    # ls -ld --color=auto $(find $HOME/bin/gulliver)
+    # ls -ld --color=auto `find $HOME/bin/gulliver`
+}
+
+
+function background_one_foreground_the_other () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       $1: command a
+    #               $2: command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+    $1 & $2
+}
+
+function order_concat_commands () {
+    #
+    # @Description  command a && command b
+    #               run command a, if error, next command b is not running
+    #               command b
+    # @params       $1: command a
+    #               $2: command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+    $1 && $2
+}
+
+function reorder_concat_commands () {
+    #
+    # @Description  command a || command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+    $1 || $2
+}
+
+
+function update_check () {
+    
+}
+
 
 function install_fzf () {
+    #
+    # @Description  install 
+    #
+    #
+    #
     git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
     ~/.fzf/install
 }
@@ -343,23 +403,23 @@ function myawk () {
     """
 }
 
-function _assert() {
-    #
-    # $1: 条件式
-    # $2: 条件式がFalseの時に出力するメッセージ
-    # Reference: https://qiita.com/nannoki/items/15004992b6bb5637a9cd
-    #
-    eval $1
-    if [[ $? == 0 ]]; then
-        echo "great work!!!"
-    else
-        echo $2
-    fi
-}
-
-function test_add () {
-    _assert "$1"
-}
+#function _assert() {
+#    #
+#    # $1: 条件式
+#    # $2: 条件式がFalseの時に出力するメッセージ
+#    # Reference: https://qiita.com/nannoki/items/15004992b6bb5637a9cd
+#    #
+#    eval $1
+#    if [[ $? == 0 ]]; then
+#        echo "great work!!!"
+#    else
+#        echo $2
+#    fi
+#}
+#
+#function test_add () {
+#    _assert "$1"
+#}
 
 # function _assert () {
 #     expected="$2"
@@ -379,10 +439,10 @@ function test_add () {
 #     fi
 # }
 
-assert 0 0
-assert 42 42
+#assert 0 0
+#assert 42 42
 
-echo OK
+#echo OK
 
 
 
@@ -415,7 +475,8 @@ function main01 () {
         # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
         # printf '%s\n' "${my_array[@]}"
         local target_func=`Bmods_function_lst`
-        eval ${target_func}
+        echo $target_func
+        # eval ${target_func}
     else
         eval $@
     fi
