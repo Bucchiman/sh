@@ -115,21 +115,10 @@ function install_bat () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-
 }
 
 
-function install_haskell () {
-    #
-    # @Description  install haskell
-    # @params
-    # @Example
-    # @Reference    https://ports.macports.org/port/ghc/
-    #               https://www.haskell.org/ghc/
-    #
 
-    sudo port install ghc
-}
 
 function array_fzf () {
     #
@@ -172,60 +161,110 @@ function ls_fzf () {
     echo $(ls -1 $1 | fzf --height 100%)
 }
 
-function function_lst () {
-    #
-    # @Description  awk pattern with variable
-    # @params       : command a
-    #               : command b
-    # @Example
-    #
-    # @Reference    https://stackoverflow.com/questions/39384283/how-to-match-a-pattern-given-in-a-variable-in-awk
-    #               https://www.rasukarusan.com/entry/2019/04/30/000000
-    #
+# function function_lst () {
+#     #
+#     # @Description  awk pattern with variable
+#     # @params       : command a
+#     #               : command b
+#     # @Example
+#     #
+#     # @Reference    https://stackoverflow.com/questions/39384283/how-to-match-a-pattern-given-in-a-variable-in-awk
+#     #               https://www.rasukarusan.com/entry/2019/04/30/000000
+#     #
+# 
+#     file=$1
+#     function_lst=($(awk -v pattern=$2 '$0 ~ pattern' $file))
+# }
+# 
+# function func_lst() {
+#     #
+#     # @Description  command a & command b
+#     #               background command a
+#     #               foreground command b
+#     # @params       : command a
+#     #               : command b
+#     # @Example
+#     # @Reference: https://www.rasukarusan.com/entry/2019/04/30/000000
+#     #
+# 
+#     local func=$(
+#        typeset -f \
+#        | grep ".*() {$" \
+#        | grep "^[a-z_]" \
+#        | tr -d "() {"   \
+#        | fzf --height 100% --preview "source ~/Bmods; typeset -f  {}"
+#    )
+#     if [ -z "$func" ]; then
+#         return
+#     fi
+#     typeset -f $func
+# }
 
-    file=$1
-    function_lst=($(awk -v pattern=$2 '$0 ~ pattern' $file))
-}
-
-function func_lst() {
+function get_function_lst () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference: https://www.rasukarusan.com/entry/2019/04/30/000000
-    #
-
-    local func=$(
-       typeset -f \
-       | grep ".*() {$" \
-       | grep "^[a-z_]" \
-       | tr -d "() {"   \
-       | fzf --height 100% --preview "source ~/Bmods; typeset -f  {}"
-   )
-    if [ -z "$func" ]; then
-        return
-    fi
-    typeset -f $func
-}
-
-function Bmods_function_lst () {
-    #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
+    # @Description  Get function list of a directory
+    # @params       $1: Directory
+    # @Example      function_lst=`get_function_lst $HOME/Bmods`
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    local function_lst=($(awk '/^function/{print $2}' $HOME/Bmods))
+    local function_lst=($(awk '/^function/{print $2}' $1))
+    echo $function_lst
     #local target_function=`array_fzf "${function_lst[*]}" "cat $HOME/"`
-    local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%`
-    eval "${target_function}"
+    # local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%`
+    # eval "${target_function}"
+}
+
+function get_target_function () {
+    #
+    # @Description  Get target function from function list
+    # @params       $1: function list
+    #               $2: script file
+    # @Example      target_function=`get_target_function ${function_lst[*]}`
+    # @Reference
+    #
+    local function_lst=($(echo $1))
+    #echo "function_lst: $function_lst"
+    #echo "script file:  $2"
+    local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview="grep -A 6 {} $2" --height 100%`
+    echo $target_function
+
+}
+
+function choose_local_function () {
+    #
+    # @Description  choose target function from local script
+    # @params       $1: script file
+    # @Example      local choose_local_function
+    # @Reference
+    #
+
+    local function_lst=`get_function_lst $1`
+    local target_function=`get_target_function $function_lst[*] $1`
+    echo $target_function
+}
+
+function choose_Bmods_function () {
+    #
+    # @Description  choose target function from Bmods
+    # @params       
+    # @Example      target_function=`choose_Bmods_function`
+    # @Reference
+    #
+
+    local function_lst=`get_function_lst $HOME/Bmods`
+    local target_function=`get_target_function $function_lst[*] $HOME/Bmods`
+    echo $target_function
+}
+
+function echo_Bmods_function_lst () {
+    #
+    # @Description  print function list of Bmods
+    # @params       
+    # @Example      echo_Bmods_function_list
+    # @Reference
+    #
+    awk '/^function/{print $2}' $HOME/Bmods
 }
 
 
@@ -251,14 +290,14 @@ function set_variables () {
     TMP=/tmp/8ucchiman/
     machine=`uname -s`
     # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
-    MODULE_lst=(
-        _debug
-        fuzzy_settings
-        default
-        show_cmd_history
-        load_local
-        specific_scripts_function_lst
-    )
+    # MODULE_lst=(
+    #     _debug
+    #     fuzzy_settings
+    #     default
+    #     show_cmd_history
+    #     load_local
+    #     specific_scripts_function_lst
+    # )
     #MODULE_lst = make_function_lst $HOME/gmods function zsh
     DOTFILES_SUBMODULES=(
         onelines            .config/lib/onelines
@@ -279,6 +318,8 @@ function set_variables () {
     #     speedestimation     # path
     # )
 }
+
+
 
 
 function setup_environment () {
@@ -454,6 +495,8 @@ function run_cpp () {
 }
 
 function run_rust () {
+
+
     #
     # toDo!!!!!!!!! my work
     #
@@ -497,8 +540,6 @@ function update_dotfiles () {
 function _load_mywork_submodules () {
     
 }
-
-
 
 function fuzzy_settings () {
     #---------------#
@@ -640,6 +681,19 @@ function _assert () {
 
 #echo OK
 
+function gutils_tic_toc () {
+    #
+    # Description:  Gutils tictoc
+    # @params       $1: pattern
+    # @return 
+    # @example
+    #               $ tic
+    #               $ toc
+    # Reference:    https://qiita.com/real_yaruo/items/0a1b4a88cfd5f27f062d
+    #
+    
+}
+
 
 
 function default () {
@@ -668,11 +722,16 @@ function main01 () {
     set_variables
     fuzzy_settings
     if [[ $@ == "" ]]; then
+        #
+        # source modules
+        # $ source Bmods
+        #
+    elif [[ $@ == "." ]]; then
         # array_of_lines=("${(@f)$(my_command)}")
         # Reference: https://unix.stackexchange.com/questions/29724/how-to-properly-collect-an-array-of-lines-in-zsh
         # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
         # printf '%s\n' "${my_array[@]}"
-        local target_func=`Bmods_function_lst`
+        local target_func=`choose_Bmods_function`
         echo $target_func
         # eval ${target_func}
     else
