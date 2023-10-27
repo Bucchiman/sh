@@ -118,6 +118,19 @@ function install_bat () {
 
 }
 
+
+function install_haskell () {
+    #
+    # @Description  install haskell
+    # @params
+    # @Example
+    # @Reference    https://ports.macports.org/port/ghc/
+    #               https://www.haskell.org/ghc/
+    #
+
+    sudo port install ghc
+}
+
 function array_fzf () {
     #
     # @Description  command a & command b
@@ -236,6 +249,7 @@ function set_variables () {
     BASE_DIR=$PWD
     DOTFILES=$HOME/git/dotfiles
     TMP=/tmp/8ucchiman/
+    machine=`uname -s`
     # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
     MODULE_lst=(
         _debug
@@ -605,6 +619,22 @@ function myawk () {
 #     fi
 # }
 
+
+function _assert () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+}
+
+
+
 #assert 0 0
 #assert 42 42
 
@@ -628,6 +658,8 @@ function default () {
 function search () {
     local load_readme=$(cd $HOME/.config/lib/readme; /usr/bin/find . -type f | fzf --height 100% )
 }
+
+
 
 
 
