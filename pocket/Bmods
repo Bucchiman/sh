@@ -613,9 +613,9 @@ function link_all () {
 function anaconda () {
 }
 
-function clone_testrepository() {
-    cd $TEMP
-    git clone https://github.com/Bucchiman/test.git
+function clone_testrepository () {
+    $(cd $TMP git clone git@github.com:Bucchiman/test.git)
+    #git clone https://github.com/Bucchiman/test.git
 }
 
 function myawk () {
@@ -732,8 +732,8 @@ function main01 () {
         # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
         # printf '%s\n' "${my_array[@]}"
         local target_func=`choose_Bmods_function`
-        echo $target_func
-        # eval ${target_func}
+        # echo $target_func
+        eval ${target_func}
     else
         eval $@
     fi
