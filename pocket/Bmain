@@ -1,0 +1,29 @@
+#!/bin/zsh
+#
+# FileName:     Bmain
+# Author:       8ucchiman
+# CreatedDate:  2023-10-28 17:30:24
+# LastModified: 2023-01-23 14:11:45 +0900
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
+
+
+
+
+
+function pass () {
+    #
+    # @Description  pass function
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    
+}
+
+source $HOME/Bmods
+main
+
+return

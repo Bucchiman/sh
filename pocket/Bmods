@@ -10,6 +10,16 @@
 #
 
 
+function pass () {
+    #
+    # @Description  no running, like python
+    # @params       
+    # @Example      pass
+    # @Reference    
+    #
+    
+}
+
 function _check_file_exist () {
     # https://tanakatarou.tech/1699/
     [ -e $1 ]; echo $?; # or [ -a file ];
@@ -117,17 +127,25 @@ function install_bat () {
 
 }
 
+function _attach_dotfiles () {
+    #
+    # @Description  attach dotfiles (for only 8ucchiman)
+    # @params
+    # @Example      attach_dotfiles
+    # @Remarks      dotfiles: git@github.com:Bucchiman/dotfiles.git
+    # @Reference
+    #
 
+    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/
+}
 
 
 function array_fzf () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  array_fzf
     # @params       $1: array
     #               $2: preview
-    # @Example
+    # @Example      local reults=`array_fzf "${platform[*]}"`
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
@@ -135,14 +153,13 @@ function array_fzf () {
     echo $(printf '%s\n' "${array[@]}" | fzf --preview="$2" --preview-label='' --height 100% )
 }
 
+
 function file_fzf () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  itemize file fzf
     # @params       $1: file
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Example      file_fzf local_commands_history
+    # @Reference    
     #
 
     echo $(cat $1 | fzf --height 100% )
@@ -150,15 +167,12 @@ function file_fzf () {
 
 function ls_fzf () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  ls fzf
     # @params       $1: any path
-    # @Example
+    # @Example      ls_fzf $HOME/mywork/projects
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
-
-    echo $(ls -1 $1 | fzf --height 100%)
+    echo $(/bin/ls -1 $1 | fzf --height 100%)
 }
 
 # function function_lst () {
@@ -202,10 +216,11 @@ function ls_fzf () {
 
 function get_function_lst () {
     #
-    # @Description  Get function list of a directory
+    # @Description  Get function list of a shell script
     # @params       $1: Directory
     # @Example      function_lst=`get_function_lst $HOME/Bmods`
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Remarks      hit ONLY "function" keywords
+    # @Reference    
     #
 
     local function_lst=($(awk '/^function/{print $2}' $1))
@@ -235,7 +250,7 @@ function choose_local_function () {
     #
     # @Description  choose target function from local script
     # @params       $1: script file
-    # @Example      local choose_local_function
+    # @Example      local target_function=`choose_local_function $BASE_DIR/$0`
     # @Reference
     #
 
@@ -248,7 +263,7 @@ function choose_Bmods_function () {
     #
     # @Description  choose target function from Bmods
     # @params       
-    # @Example      target_function=`choose_Bmods_function`
+    # @Example      local target_function=`choose_Bmods_function`
     # @Reference
     #
 
@@ -259,9 +274,10 @@ function choose_Bmods_function () {
 
 function echo_Bmods_function_lst () {
     #
-    # @Description  print function list of Bmods
+    # @Description  print function list of Bmods (for mainly debug)
     # @params       
     # @Example      echo_Bmods_function_list
+    # @Remarks      hit ONLY "function" keyword
     # @Reference
     #
     awk '/^function/{print $2}' $HOME/Bmods
@@ -269,7 +285,7 @@ function echo_Bmods_function_lst () {
 
 
 typeset -a MODULE_lst
-typeset -A SUBMODULES
+typeset -A DOTFILES_SUBMODULES
 typeset -A MYWORK_lst
 function set_variables () {
     #
@@ -279,14 +295,15 @@ function set_variables () {
     # @params       : command a
     #               : command b
     # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Reference    
     #
 
     echo "******************************"
     echo "* set_variables              *"
     echo "******************************"
     BASE_DIR=$PWD
-    DOTFILES=$HOME/git/dotfiles
+    DOTFILES=$HOME/dotfiles/
+    SAMPLE=$HOME/.config/sample/
     TMP=/tmp/8ucchiman/
     machine=`uname -s`
     # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
@@ -312,6 +329,9 @@ function set_variables () {
         IoT                 .config/lib/codes/IoT
         shell               .config/lib/codes/shell
     )
+    # for value in ${(v)DOTFILES_SUBMODULES}; do
+    #     echo $value
+    # done
     # MYWORK_lst=(
     #     slam                # path
     #     maestro             # path
@@ -320,6 +340,28 @@ function set_variables () {
 }
 
 
+function attach_mywork () {
+    #
+    # @Description  clone myworks (for only 8ucchiman)
+    # @params       
+    # @Example      attach_mywork
+    # @Remarks      git@gitlab.com:8ucchiman/mywork.git
+    # @Reference    
+    #
+
+    $(cd $HOME/; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
+}
+
+function run_mywork () {
+    #
+    # @Description  mywork projects running
+    # @params       
+    # @Example      run_mywork
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    $(cd $HOME/mywork; ./Brun Lchoose_project)
+}
 
 
 function setup_environment () {
@@ -333,19 +375,15 @@ function setup_environment () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    ln -sf $HOME/dotfiles/.config/pockets/shell/Bmods Bmods
+    # ln -sf $HOME/dotfiles/.config/pockets/shell/Bmods Bmods
 }
 
 function _debug () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # Check Bmods path!!!
-    # @params       : command a
-    #               : command b
+    # @Description  Check Bmods path!!!
+    # @params       
     # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Reference    
     #
 
     echo "8ucchiman was here!!"
@@ -354,21 +392,10 @@ function _debug () {
 
 function add_submodules () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
+    # @Description  Add submodules for main repository
+    # @params       $1: repository url
     # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
-    #
-
-
-
-    #
-    # TL;DR:    Add submodules
-    # Arguments: 
-    #       $1: url
+    # @Reference    
     #
 
     git submodule add $1
@@ -376,22 +403,13 @@ function add_submodules () {
 
 function show_samples () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  Show sample images, videos, gifs, or texts
+    # @params
+    # @Example      show_samples
+    # @Reference    
     #
 
-
-
-
-    #
-    # Show sample images
-    #
-    local sample=`ls_fzf $HOME/.config/sample`
+    local sample=`ls_fzf $SAMPLE`
     open $sample
     # echo $sample
 }
@@ -522,9 +540,13 @@ function run_csharp () {
 
 function update_dotfiles () {
     #
-    # TL;DR: update dotfiles
+    # @Description  update dotfiles
+    # @params       
+    # @Example      update_dotfiles
+    # @Reference    
     #
-    #
+
+
     cd $DOTFILES
     git fetch origin dev
     git merge origin/dev
@@ -696,6 +718,24 @@ function gutils_tic_toc () {
 
 
 
+function create_remote_repository ()
+    #
+    # @Description  create remote repository in github/gitlab
+    # @params       $1: github | gitlab
+    #               $2:
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    if [[ $1 == "github" ]]; then
+        gh repo create $2 --private
+    else
+        glab repo create $2 --private
+    fi
+
+
+
+
 function default () {
     #
     # this is default setting
@@ -718,15 +758,15 @@ function search () {
 
 
 #######################################
-function main01 () {
+function main () {
     set_variables
     fuzzy_settings
-    if [[ $@ == "" ]]; then
-        #
-        # source modules
-        # $ source Bmods
-        #
-    elif [[ $@ == "." ]]; then
+    #if [[ $@ == "" ]]; then
+    #    #
+    #    # source modules
+    #    # $ source Bmods
+    #    #
+    #elif [[ $@ == "." ]]; then
         # array_of_lines=("${(@f)$(my_command)}")
         # Reference: https://unix.stackexchange.com/questions/29724/how-to-properly-collect-an-array-of-lines-in-zsh
         # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
@@ -734,14 +774,46 @@ function main01 () {
         local target_func=`choose_Bmods_function`
         # echo $target_func
         eval ${target_func}
-    else
-        eval $@
-    fi
+    #else
+    #    eval $@
+    #fi
 }
 
-ME=Bmods
-main01 $@
+# function _usage() {
+#     echo "Usage: Bmods -B"
+#     exit 1
+# }
+
+# if [[ $# = 0 ]]
+# then
+#     echo No arguments or options
+#     exit 1
+# fi
+
+# while getopts b OPT
+# do
+#     case j in
+#         b) echo hello; main_flag=1;;
+#         :|\?) _usage;;
+#     esac
+# done
+
+#if [[ $main_flag == 1 ]]; then
+#    main
+#fi
+
+#ME=$0
+#main $@
 #######################################
 
+
+
+#######################################
+# 2023-10-28 18:59:55
+# simply DEBUG
+#######################################
+# main @
+
+#######################################
 
 return
