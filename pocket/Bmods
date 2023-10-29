@@ -29,6 +29,87 @@ function _has () {
     return $( whence $1 &>/dev/null )
 }
 
+function _git_config () {
+    git config --local user.name "8ucchiman"
+    git config --local user.email "8ucchiman@gmail.com"
+}
+
+function install_lazygit () {
+    #
+    # @Description  lazygit install (Ubuntu)
+    # @params       
+    # @Example      install_lazygit
+    # @Reference    https://github.com/jesseduffield/lazygit/issues/1460
+    #
+
+    if ! _has go; then
+        install_go
+    fi
+    # go install github.com/jesseduffield/lazygit@leighmcculloch
+    sudo snap install core
+    sudo snap install lazygit-gm
+}
+
+
+function install_language () {
+    #
+    # @Description  install rust
+    # @params       
+    # @Example      install_rust
+    # @Reference    
+    #
+
+    #local -a langs=( rust go )
+    #if [[  ]]; then
+    #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    #fi
+}
+
+#@ obsolete
+function install_go () {
+    #
+    # @Description  install
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    cd $HOME/source
+    if [[ -e go1.21.3.linux-arm64.tar.gz ]]; then
+        wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    fi
+    ln -sf $PWD/go/bin/go $HOME/bin/
+}
+
+#@ arguments $1
+function setup_nodejs () {
+    #
+    # @Description  nodejs modules
+    # @params       $1: nest function
+    # @Example      setup_nodejs install_fnm
+    # @Reference    
+    #
+
+    #@ nest
+    function install_fnm () {
+        #
+        # @Description  fnm nodejs package manager
+        # @params       
+        # @Example      
+        # @Reference    
+        #
+
+        cargo install fnm
+        fnm install --lts
+    }
+    eval $@
+}
+
+
 function ls_all_files () {
     #
     # @Description  ls all files with recursively directories
@@ -98,6 +179,35 @@ function update_check () {
    
 }
 
+function install_neovim () {
+    #
+    # @Description  install neovim (more latest version)
+    # @params       
+    # @Example
+    # @Remarks      apt package manager has old version neovim
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt install -y snapd
+    sudo snap install --classic nvim
+    #git clone https://github.com/neovim/neovim.git $HOME/source/neovim
+    #cd $HOME/source/neovim
+    #make CMAKE_BUILD_TYPE=RelWithDebInfo
+    #sudo make install
+}
+
+
+function _touch_local () {
+    #
+    # @Description  local config
+    # @params       
+    # @Example      _touch_local
+    # @Reference    
+    #
+
+    mkdir -p $HOME/.config/local
+    touch $HOME/.config/local/hotstation $HOME/.config/local/local.zsh
+}
 
 function install_wokwi () {
     #
@@ -114,7 +224,7 @@ function install_wokwi () {
 
 #[raspberry pi]
 function settings_samba () {
-    _8 #
+    #
     # @Description  samba install
     # @params       
     # @Example
@@ -185,8 +295,9 @@ function install_fzf () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-    ~/.fzf/install
+    git clone --depth 1 https://github.com/junegunn/fzf.git ~/source/fzf
+    ~/source/fzf/install
+    ln -sf $HOME/source/fzf/bin/fzf $HOME/bin/
 }
 
 function install_bat () {
@@ -211,7 +322,11 @@ function _attach_dotfiles () {
     # @Reference
     #
 
-    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/
+    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+}
+
+function switch_dev () {
+
 }
 
 
@@ -702,13 +817,14 @@ function font_settings () {
 
 function link_all () {
     #
-    # Description:  link all files at one time
-    # @params $1: pattern
+    # @Description  link all files at one time
+    # @params       $1: pattern
     # @return 
-    #
+    # @Example      link_all $HOME/source/go/bin
     # Reference:    https://qiita.com/real_yaruo/items/0a1b4a88cfd5f27f062d
     #
-    ls *.txt | xargs -I{} ln -s {} link.{}
+
+    ls $1 | xargs -I{} ln -s {} {}
 }
 
 function anaconda () {
@@ -840,7 +956,7 @@ function search () {
 function main () {
     set_variables
     fuzzy_settings
-    #if [[ $@ == "" ]]; then
+    if [[ $@ == "" ]]; then
     #    #
     #    # source modules
     #    # $ source Bmods
@@ -853,9 +969,9 @@ function main () {
         local target_func=`choose_Bmods_function`
         # echo $target_func
         eval ${target_func}
-    #else
-    #    eval $@
-    #fi
+    else
+        eval $@
+    fi
 }
 
 # function _usage() {

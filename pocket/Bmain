@@ -24,6 +24,6 @@ function pass () {
 }
 
 source $HOME/Bmods
-main
+main $@
 
 return
