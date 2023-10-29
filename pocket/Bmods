@@ -112,6 +112,54 @@ function install_wokwi () {
     curl -L https://wokwi.com/ci/install.sh | sh
 }
 
+#[raspberry pi]
+function settings_samba () {
+    _8 #
+    # @Description  samba install
+    # @params       
+    # @Example
+    # @Remarks      for raspberry pi 
+    # @Reference    https://child-programmer.com/rp-shared-folder-m/
+    #
+
+    ####################
+    #   raspberry pi settings
+    ####################
+    sudo apt update;
+    sudo apt upgrade;
+    sudo apt install -y samba samba-common-bin
+    sudo nano /etc/samba/smb.conf /etc/samba/smb.conf_backupdata
+
+    # [pi]                                  # 共有フォルダの名前
+    # comment = RaspberryPi-shared-folder   # コメント自由記述
+    # path = /home/bucchiman/               # 共有フォルダのパスを指定する
+    # guest ok = no                         # ゲストアカウント（パスワード不要）で接続を許可するかどうか。
+    # read only = no                        # 読み取り専用かどうか。書き込みもしたい場合は、no
+    # force user = pi                       # ファイル操作を、ユーザー「pi」 によって実行。
+
+    sudo smbpasswd -a bucchiman   # set password
+    sudo systemctl restart smbd
+    sudo systemctl status smbd
+
+    ###################
+    #   mac
+    ###################
+    # finder - move - connect server
+    # smb://raspberrypi (smb://[ip address/domain name])
+
+}
+
+function setup_raspberrypi4 () {
+    #
+    # @Description  setup raspberry pi 4
+    # @params       
+    # @Example      
+    # @Reference    
+    #
+
+    sudo apt-get install -y fuse
+}
+
 function _example_wokwi () {
     #
     # @Description  example esp32
