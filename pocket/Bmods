@@ -99,6 +99,33 @@ function update_check () {
 }
 
 
+function install_wokwi () {
+    #
+    # @Description  wokwi cli
+    # @params       
+    # @Example      wokwi install
+    # @Remarks      token has to be prepared(https://wokwi.com/dashboard/ci).
+    # @Reference    https://github.com/wokwi/wokwi-cli
+    #               https://wokwi.com/dashboard/ci
+    #
+
+    curl -L https://wokwi.com/ci/install.sh | sh
+}
+
+function _example_wokwi () {
+    #
+    # @Description  example esp32
+    # @params       
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    git clone https://github.com/wokwi/esp-idf-hello-world
+    cd esp-idf-hello-world
+    wokwi-cli .
+}
+
+
 function install_fzf () {
     #
     # @Description  command a || command b
@@ -361,6 +388,10 @@ function run_mywork () {
     #
 
     $(cd $HOME/mywork; ./Brun Lchoose_project)
+}
+
+function mywork_menue () {
+    cd $HOME/mywork; ./Brun
 }
 
 
