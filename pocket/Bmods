@@ -6,6 +6,7 @@
 # LastModified: 2023-01-23 14:11:45 +0900
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
+#               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
 # Description:  ---
 #
 
@@ -18,6 +19,83 @@ function pass () {
     # @Reference    
     #
     
+}
+
+# function heredoc_file () {
+#     cat 
+# }
+
+#@ educ
+function create_c_library () {
+    #
+    # @Description  create c library
+    # @params       
+    # @Example      create_c_library
+    # @Remarks      workspace is created in /tmp/8ucchiman directory
+    # @Reference    https://sleepy-yoshi.hatenablog.com/entry/20090510/p1
+    #
+
+    local workspace="/tmp/8ucchiman/create_c_library"
+    mkdir -p $workspace
+    cd $workspace
+
+
+    #@ nest
+    function setup () {
+        #
+        # @ make
+        #
+cat << EOF > test.c
+#include <stdio.h>
+#include "test.h"
+
+void print_hoge (int num) {
+    int i;
+    for (i = 0; i < num; i++) {
+        printf("hoge\n");
+    }
+}
+EOF
+cat << EOF > test.h
+#ifndef TEST_H
+#define TEST_H
+
+void print_hoge (int num);
+
+#endif
+EOF
+
+cat << EOF > main.c
+#include "test.h"
+
+int
+main (void) {
+    print_hoge(5);
+    return 0;
+}
+EOF
+    }
+
+    #@ nest
+    function compile2libtest () {
+        gcc -shared test.c -o libtest.so
+    }
+
+    #@ nest
+    function compile2main () {
+        gcc -I./ -L./ main.c -o main -ltest
+    }
+
+    #@ nest
+    function main () {
+        ./main
+        ldd main            # check shared library of excutable file
+    }
+
+    setup
+    compile2libtest
+    compile2main
+    main
 }
 
 function _check_file_exist () {
@@ -109,7 +187,6 @@ function setup_nodejs () {
     eval $@
 }
 
-
 function ls_all_files () {
     #
     # @Description  ls all files with recursively directories
@@ -176,8 +253,21 @@ function update_check () {
     # @Example
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
-   
 }
+
+#@ Arguments $1
+function make_shared_library () {
+    #
+    # @Description  make shared library
+    # @params       $1: file name (without extension)
+    # @Example      make_shared_library sub
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    gcc -maix64 -fpic -c $1.c
+    gcc -maix64 -shared -o lib$1.so $1.o
+}
+
 
 function install_neovim () {
     #
@@ -222,7 +312,7 @@ function install_wokwi () {
     curl -L https://wokwi.com/ci/install.sh | sh
 }
 
-#[raspberry pi]
+#@ raspberry pi
 function settings_samba () {
     #
     # @Description  samba install
@@ -329,7 +419,6 @@ function switch_dev () {
 
 }
 
-
 function array_fzf () {
     #
     # @Description  array_fzf
@@ -342,7 +431,6 @@ function array_fzf () {
     local array=($(echo $1))
     echo $(printf '%s\n' "${array[@]}" | fzf --preview="$2" --preview-label='' --height 100% )
 }
-
 
 function file_fzf () {
     #
