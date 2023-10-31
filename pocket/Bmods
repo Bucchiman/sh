@@ -25,6 +25,7 @@ function pass () {
 #     cat 
 # }
 
+
 #@ educ
 function create_c_library () {
     #
@@ -96,6 +97,125 @@ EOF
     compile2libtest
     compile2main
     main
+}
+
+
+function help_rsync () {
+    echo "-v | --verbose            動作内容を表示する "
+    echo "-q | --quiet              動作中のメッセージを抑制する"
+    echo "-n | --dry-run            試験モード。実際には動作せず、動作内容だけ表示する（「-v」や「--stats」を一緒に指定する）"
+    echo "--stats                   ファイル数や転送サイズを表示する"
+    echo "--list-only               コピーする代わりにファイルのリストを作成する"
+
+    echo "-a | --archive            アーカイブモード（「-rlptgoD -no-H -no-A -no-X」相当）"
+    echo "      -r | --recursive    ディレクトリを再帰的に処理する"
+    echo "      -l | --links        シンボリックリンクをシンボリックリンクのままコピーする"
+    echo "      -p | --perms        パーミッションを保持する"
+    echo "      -t | --times        タイムスタンプを保持する"
+    echo "      -g | --group        所有グループをそのまま保持する"
+    echo "      -o | --owner        所有者をそのまま保持する（自分以外の所有者を保持するにはroot権限が必要）"
+    echo "      -D                  デバイスファイルや特殊ファイルを保持する（「--devices --specials」相当）"
+    echo "      --devices           デバイスファイルを保持する（root権限が必要）"
+    echo "      --specials          特殊ファイルを保持する"
+
+    echo "--no-オプション           指定したオプションを無効にする（「-H」を無効にする場合は「--no-H」のように指定する）"
+    echo "-I | --ignore-times       サイズとタイムスタンプが同じファイルも処理する"
+    echo "--size-only               サイズが同じファイルは処理しない"
+    echo "-c | --checksum           更新日とサイズではなく、チェックサムで変更の有無をチェックする"
+    echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
+}
+
+function diff_checker () {
+    #
+    # @Description  rsync diff check
+    # @params       
+    # @Example      diff_checker /deploy/current /deploy/previous
+    # @Remarks      for gulliver codes
+    # @Reference    https://russt.me/2018/07/creating-and-applying-diffs-with-rsync/
+    #
+
+    local -a subcommands=(
+        test
+        run
+        clean
+        gulliver
+    )
+    local subcommand=`array_fzf "$subcommands[*]"`
+    if [[ $subcommand == "run" ]]; then
+        local A
+        local B
+        if [[ $# == 2 ]]; then
+            A=$1
+            B=$2
+        else
+            echo "You have to set two directories to compare each others."
+            echo -n "A> "
+            read A
+            echo -n "B> "
+            read B
+        fi
+        #rsync --write-batch=diff $1 $2
+        #rsync --only-write-batch=diff $1 $2
+        diff -rupN $A $B > diff.patch
+    elif [[ $subcommand == "test" ]]; then
+        mkdir -p $TMP/diff_checker_test && cd $_
+        mkdir -p current && cd $_ && \
+cat <<eos > calc.c
+    #include <stdio.h>
+    int add (int a, int b) {
+        return a + b;
+    }
+    int sub (int a, int b) {
+        return a - b;
+    }
+eos
+cat <<eos > main.c
+    #include <stdio.h>
+    
+    int main (void) {
+        print("Hello world\n");
+        return 0;
+    }
+eos
+        mkdir -p doc/ && cd $_ && \
+cat <<eos > doc.md
+These contents will be written to the file.
+        This line is indented.
+8ucchiman was here!!
+eos
+
+        mkdir -p $TMP/diff_checker_test && cd $_
+        mkdir -p previous && cd $_ && \
+cat <<eos > calc.c
+    #include <stdio.h>
+    int add (int a, int b) {
+        return a + b;
+    }
+eos
+cat <<eos > main.c
+    #include <stdio.h>
+    
+    int main (void) {
+        print("Hello world\n");
+        return 0;
+    }
+eos
+        mkdir -p doc/ && cd $_ && \
+cat <<eos > doc.md
+These contents will be written to the file.
+        This line is indented.
+eos
+
+        # cd $TMP/diff_checker_test && rsync --only-write-batch=diff current previous
+        cd $TMP/diff_checker_test; diff -rupN current previous > test.patch; cat test.patch
+
+    elif [[ $subcommand == "gulliver" ]]; then
+        rsync -aur $HOME/bin/gulliver /tmp/8ucchiman/gulliver
+        $HOME/bin/gulliver/gogu
+        diff -rupN $HOME/bin/gulliver /tmp/8ucchiman/gulliver > gulliver.patch; cat gulliver.patch
+    else
+        rm -rf $TMP/diff_checker_test
+    fi
 }
 
 function _check_file_exist () {
@@ -838,6 +958,9 @@ function update_dotfiles () {
         git merge origin/dev
     done
     source $HOME/.zshrc
+}
+
+function gulliver_code_rsync () {
 }
 
 
