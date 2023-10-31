@@ -22,6 +22,57 @@ function pass () {
 }
 
 
+
+function CurrentDirectory2Submodule () {
+    #
+    # @Description  directory to submodule
+    # @params       CurrentDiretory2Submodule
+    # @Example      CurrentDirectory2Submodule()
+    # @Reference    https://blog.cloud-acct.com/posts/u-git-add-submodule/
+    #
+
+    git mv $PWD ${PWD}_cp
+    git submodule add ${PWD}_cp ${PWD}
+}
+
+
+function devbox () {
+    #@ nest
+    function install_devbox () {
+        #
+        # @Description  install devbox
+        # @params       
+        # @Example      insatll_devbox
+        # @Reference    https://www.jetpack.io/devbox/docs/installing_devbox/
+        #
+
+        curl -fsSL https://get.jetpack.io/devbox | bash
+    }
+
+    #@ nest
+    function base_packages () {
+        devbox add neovim@latest
+        devbox add neovim-qt@latest
+        devbox add neovim-gtk@latest
+        devbox add neovim-remote@latest
+        devbox add python@latest
+        devbox add git@latest
+    }
+
+    function go_packages () {
+        devbox add go
+    }
+
+    function rust_packages () {
+        devbox add rustc@latest
+        devbox add rustup@latest
+        devbox add rustus@latest
+        devbox add rustcat@latest
+        devbox add rustfmt@latest
+    }
+}
+
+
 #@ educ
 function create_c_library () {
     #
@@ -419,6 +470,26 @@ function setup_nodejs () {
     }
     eval $@
 }
+
+
+function pico_environment () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/ochaochaocha3/items/1969d76debd6d3b42269
+    #
+
+    
+    rustup target install thumbv6m-none-eabi
+    cargo install flip-link                     # 組込みプログラム実行時のスタックオーバーフローを防止するため、リンク時にメモリ配置を変更するツール
+    cargo install elf2uf2-rs                    # ビルドしたプログラムをUF2というPicoに書き込める形式に変換するツール
+    cargo install cargo-generate
+}
+
 
 function ls_all_files () {
     #
