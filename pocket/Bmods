@@ -125,6 +125,51 @@ function help_rsync () {
     echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
 }
 
+#@ python
+function scraping_python () {
+    #@ nest
+    function setup () {
+        pip install request scrapy selenium beautifulsour4
+    }
+
+    #@ nest
+    function run () {
+
+    }
+
+    #@ nest
+    function test () {
+        #
+        # @Description  
+        #               background command a
+        #               foreground command b
+        # @params       : command a
+        #               : command b
+        # @Example
+        # @Reference    https://qiita.com/D_U_8240/items/7ec882f8ba34c606a795
+        #
+
+        mkdir -p $TMP/scrapy_test && cd $_
+        scrapy startproject sake
+        #scrapy genspider <ファイル名> <スクレイピングしたいweb URL>
+        scrapy genspider scrapy_sake https://www.saketime.jp/ranking/
+    }
+
+    #@ nest
+    function clean () {
+        rm -r $TMP/scrapy_test
+    }
+
+    local -a function_lst=(
+        setup
+        run
+        test
+        clean
+    )
+    local target_function=`array_fzf "$function_lst[*]"`
+    eval $target_function
+}
+
 function diff_checker () {
     #
     # @Description  rsync diff check
@@ -866,28 +911,37 @@ function show_samples () {
     # @Reference    
     #
 
-    local sample=`ls_fzf $SAMPLE`
-    open $sample
+    fuzzy_settings
+    $(cd $SAMPLE; fzf)
     # echo $sample
+}
+
+function just_memo () {
+    #
+    # @Description  
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      just_memo
+    # @Reference    https://www.publickey1.jp/
+    #
+
+    local -a keywords=(
+        mojo        https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
+        wasm        https://zenn.dev/topics/wasm
+        wasmer      https://www.publickey1.jp/blog/23/webassemblybashwasmer_40posixwasix.html
+    )
 }
 
 
 function show_cmd_history () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  show .zhistory
+    # @params       
+    # @Example      show_cmd_history
+    # @Reference    
     #
 
-
-    #
-    # TL;DR:        Show .zhistory
-    #
-    #
     file_fzf $HOME/.zhistory
 }
 
