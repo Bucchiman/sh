@@ -127,6 +127,13 @@ function help_rsync () {
 
 #@ python
 function scraping_python () {
+    #
+    # @Description  scraping
+    # @params       
+    # @Example      scraping_python
+    # @Reference    https://scrapy.org/
+    #
+
     #@ nest
     function setup () {
         pip install request scrapy selenium beautifulsour4
@@ -140,11 +147,8 @@ function scraping_python () {
     #@ nest
     function test () {
         #
-        # @Description  
-        #               background command a
-        #               foreground command b
-        # @params       : command a
-        #               : command b
+        # @Description  test sample
+        # @params       
         # @Example
         # @Reference    https://qiita.com/D_U_8240/items/7ec882f8ba34c606a795
         #
@@ -263,6 +267,7 @@ eos
     fi
 }
 
+#@ mac
 function diskformat () {
     #
     # @Description  command a & command b
@@ -363,16 +368,26 @@ function install_language () {
     #fi
 }
 
-#@ obsolete
+function install_modular () {
+    #
+    # @Description  modular mojo install
+    # @params       
+    # @Example      install_modular
+    # @Reference    https://developer.modular.com/download
+    #
+    
+    sudo apt-get update && \
+    sudo apt-get install modular && \
+    modular clean && \
+    modular install mojo
+}
+
 function install_go () {
     #
-    # @Description  install
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  go install
+    # @params       
+    # @Example      install_go
+    # @Reference    
     #
 
     cd $HOME/source
