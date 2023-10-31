@@ -21,10 +21,6 @@ function pass () {
     
 }
 
-# function heredoc_file () {
-#     cat 
-# }
-
 
 #@ educ
 function create_c_library () {
@@ -125,6 +121,7 @@ function help_rsync () {
     echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
 }
 
+
 #@ python
 function scraping_python () {
     #
@@ -136,7 +133,7 @@ function scraping_python () {
 
     #@ nest
     function setup () {
-        pip install request scrapy selenium beautifulsour4
+        pip install requests scrapy selenium beautifulsoup4
     }
 
     #@ nest
@@ -156,7 +153,8 @@ function scraping_python () {
         mkdir -p $TMP/scrapy_test && cd $_
         scrapy startproject sake
         #scrapy genspider <ファイル名> <スクレイピングしたいweb URL>
-        scrapy genspider scrapy_sake https://www.saketime.jp/ranking/
+        cd sake && scrapy genspider scrapy_sake https://www.saketime.jp/ranking/
+        cd $TMP/scrapy_test/sake && scrapy crawl scrapy_sake
     }
 
     #@ nest
