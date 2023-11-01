@@ -18,8 +18,10 @@ function pass () {
     # @Example      pass
     # @Reference    
     #
-    
+
 }
+
+
 
 
 
@@ -36,8 +38,8 @@ function CurrentDirectory2Submodule () {
 }
 
 
-function devbox () {
-    #@ nest
+function set_devbox () {
+    #@ nest sudo
     function install_devbox () {
         #
         # @Description  install devbox
@@ -46,7 +48,8 @@ function devbox () {
         # @Reference    https://www.jetpack.io/devbox/docs/installing_devbox/
         #
 
-        curl -fsSL https://get.jetpack.io/devbox | bash
+        #curl -fsSL https://get.jetpack.io/devbox | bash
+        curl https://get.jetpack.io/devbox
     }
 
     #@ nest
@@ -55,14 +58,21 @@ function devbox () {
         devbox add neovim-qt@latest
         devbox add neovim-gtk@latest
         devbox add neovim-remote@latest
-        devbox add python@latest
         devbox add git@latest
+        devbox add ripgrep
     }
 
+    #@ nest
+    function python_packages () {
+        devbox add python@latest
+    }
+
+    #@ nest
     function go_packages () {
         devbox add go
     }
 
+    #@ nest
     function rust_packages () {
         devbox add rustc@latest
         devbox add rustup@latest
@@ -70,6 +80,33 @@ function devbox () {
         devbox add rustcat@latest
         devbox add rustfmt@latest
     }
+
+    #@ nest
+    function create_workspace () {
+        echo -n "Where is workspace? Please tell me path!!> "
+        read workspace_path
+        mkdir -p $workspace_path && cd $_
+        devbox init;
+        local -a packages=(
+            base_packages
+            python_packages
+            rust_packages
+            go_packages
+            pass
+        )
+        local target_packages=`array_fzf "$packages[*]"`
+        eval $target_packages
+        devbox shell;
+    }
+
+    local -a function_lst=(
+        install_devbox
+        create_workspace
+        pass
+    )
+    local target_functions=`array_fzf "$function_lst[*]"`
+    eval $target_functions
+
 }
 
 
