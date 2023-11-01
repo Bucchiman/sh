@@ -98,6 +98,23 @@ EOF
     main
 }
 
+function setup_postfix () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt update
+    sudo apt install -y postfix
+    # sudo cp /usr/share/postfix/main.cf.dist /etc/postfix/main.cf
+    # sudo vi /etc/postfix/main.cf
+}
+
 function diskformat () {
     #
     # @Description  command a & command b
