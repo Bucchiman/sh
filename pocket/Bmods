@@ -860,7 +860,7 @@ function get_target_function () {
     local function_lst=($(echo $1))
     #echo "function_lst: $function_lst"
     #echo "script file:  $2"
-    local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview="grep -A 6 {} $2" --height 100%`
+    local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview="grep -B 1 -A 20 {} $2" --height 100%`
     echo $target_function
 
 }
