@@ -23,7 +23,57 @@ function pass () {
 
 
 
-function CurrentDirectory2Submodule () {
+function set_devcontainer () {
+    function install_devcontainer () {
+        npm install -g @devcontainers/cli
+    }
+
+    function test () {
+        git clone https://github.com/microsoft/vscode-remote-try-rust
+        cd vscode-remote-try-rust/
+        devcontainer up --workspace-folder .
+    }
+}
+
+
+function github_action () {
+    #
+    #
+    #
+    # Reference     https://qiita.com/vZke/items/868eb9fd5289d2a25660
+    ###################################
+    # Term
+    #   workflow:
+    #       parts:  trigger
+    #               jobs
+    #       what is:.github/worflows directory (define yaml)
+    #
+    #   event:
+    #       trigger workflow
+    #       outside event: webhook
+    #
+    #   jobs:
+    #       sequence step
+    #
+    #   action:
+    #       command
+    #
+    #   artifacts
+    ###################################
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+    #
+}
+
+
+
+function Directory2Submodule () {
     #
     # @Description  directory to submodule
     # @params       CurrentDiretory2Submodule
@@ -31,8 +81,34 @@ function CurrentDirectory2Submodule () {
     # @Reference    https://blog.cloud-acct.com/posts/u-git-add-submodule/
     #
 
-    git mv $PWD ${PWD}_cp
-    git submodule add ${PWD}_cp ${PWD}
+    # local BASENAME=`basename $1`
+    # local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
+    # gh repo create $BASENAME --private  # リモートリポジトリを作成 
+    # cd $1; git init
+    # git submodule add $remoterepo $BASENAME
+
+    local BASENAME=`basename $1`
+    local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
+    gh repo create $BASENAME --private
+    git submodule add $remoterepo $1
+}
+
+
+function topleveldirectory () {
+    #
+    # @Description  toplevel directory
+    # @params       
+    # @Example      topleveldirectory $BASE_DIR
+    # @Reference    
+    #
+
+    cd $1
+}
+
+function install_distant () {
+    git clone https://github.com/chipsenkbeil/distant.git
+    cargo build --release
+    ln -sf $PWD/target/release/distant $HOME/bin
 }
 
 
@@ -1251,7 +1327,7 @@ function anaconda () {
 }
 
 function clone_testrepository () {
-    $(cd $TMP git clone git@github.com:Bucchiman/test.git)
+    $(cd $TMP; git clone git@github.com:Bucchiman/test.git)
     #git clone https://github.com/Bucchiman/test.git
 }
 
