@@ -22,7 +22,42 @@ function pass () {
 }
 
 
+#@ error
+function install_luarocks () {
+    #
+    # @Description  install luarocks
+    # @params       
+    # @Example      install_luarocks
+    # @Date         2023-11-02 11:24:28
+    # @Reference    https://github.com/luarocks/luarocks/wiki/Download
+    #
 
+    #@ nest
+    function test () {
+        mkdir $TMP/lua_install_test && cd $_
+        curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        tar -zxf lua-5.3.5.tar.gz
+        cd lua-5.3.5
+        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+    }
+    function run () {
+        #cd $HOME/source
+        mkdir $HOME/source/lua && cd $_
+        curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        tar -zxf lua-5.3.5.tar.gz
+        cd lua-5.3.5
+        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+        make linux test
+        make install
+    }
+
+    local -a function_lst=(
+        test
+        run
+    )
+    local target_function=`array_fzf "$function_lst[*]"`
+    eval $target_function
+}
 
 
 function CurrentDirectory2Submodule () {
@@ -345,9 +380,9 @@ eos
         cd $TMP/diff_checker_test; diff -rupN current previous > test.patch; cat test.patch
 
     elif [[ $subcommand == "gulliver" ]]; then
-        rsync -aur $HOME/bin/gulliver /tmp/8ucchiman/gulliver
-        $HOME/bin/gulliver/gogu
-        diff -rupN $HOME/bin/gulliver /tmp/8ucchiman/gulliver > gulliver.patch; cat gulliver.patch
+        # rsync -aur $HOME/bin/gulliver /tmp/8ucchiman/gulliver
+        #diff -rupN /tmp/gulliver_enviro/bin/gulliver $HOME/bin/gulliver    # > gulliver.patch; cat gulliver.patch
+        diff -r /tmp/gulliver_enviro/bin/gulliver $HOME/bin/gulliver > gulliver.patch; cat gulliver.patch
     else
         rm -rf $TMP/diff_checker_test
     fi
