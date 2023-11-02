@@ -22,6 +22,8 @@ function pass () {
 }
 
 
+
+
 #@ error
 function install_luarocks () {
     #
@@ -142,6 +144,47 @@ function set_devbox () {
     local target_functions=`array_fzf "$function_lst[*]"`
     eval $target_functions
 
+}
+
+#@ educ
+function binary_hack () {
+    #
+    # @Description  
+    # @params       
+    # @Example      binary_hack
+    # @Reference    https://qiita.com/rsooo/items/bb91071685f447ce29db
+    #
+
+    #@ nest
+    function file_type () {
+        file /bin/ls /bin/sh /var/log/messages  /dev/sda /dev/tty11 /tmp
+    }
+
+    #@ nest
+    function extract_string_from_file () {
+        strings /var/log/wtmp
+    }
+
+    #@ nest
+    function edit_binary () {
+        vim -b binfile
+    }
+
+    #@ nest
+    local dump4binary () {
+        od -Ax -tx1z /var/log/wtmp
+        hexdump -C /var/log/wtmp | head
+        hexyl
+        objdump
+    }
+
+    local function_lst=(
+        file_type
+        extract_string_from_file
+    )
+
+    local target_function=`array_fzf "$function_lst[*]"`
+    eval "$target_function"
 }
 
 
@@ -1403,22 +1446,37 @@ function gutils_tic_toc () {
     
 }
 
-
-
-function create_remote_repository ()
+#@ $2
+function create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
     # @params       $1: github | gitlab
     #               $2:
     # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Reference    
     #
 
-    if [[ $1 == "github" ]]; then
-        gh repo create $2 --private
+    local target_platform
+    local project_name
+    if [[ $# == 0 ]]; then
+        local -a platforms=(
+            github
+            gitlab
+        )
+        target_platform=`array_fzf "$platforms[*]"`
+        echo -n "project name> "
+        read project_name
     else
-        glab repo create $2 --private
+        target_platform=$1
+        project_name=$2
     fi
+    if [[ $target_platform == "github" ]]; then
+        gh repo create $project_name --private
+    else
+        glab repo create $project_name --private
+    fi
+
+}
 
 
 
