@@ -10,7 +10,7 @@
 # Description:  ---
 #
 
-
+#@
 function pass () {
     #
     # @Description  no running, like python
@@ -18,16 +18,174 @@ function pass () {
     # @Example      pass
     # @Reference    
     #
-    
+
+}
+
+
+#@ educ rust reference
+function rust_project () {
+    function reference () {
+        local -A reference_lst=(
+            テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
+            入門            https://zenn.dev/mebiusbox/books/22d4c1ed9b0003
+            tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
+            vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
+            async           https://zenn.dev/magurotuna/books/tokio-tutorial-ja
+        )
+    }
+}
+
+
+#@ educ c#
+function c#_project () {
+    function reference () {
+        local -A reference_lst=(
+            unity           https://zenn.dev/twugo/books/21cb3a6515e7b8
+            wasm            https://zenn.dev/okazuki/books/aspnet-net-core-blazor-wasm
+            C#              https://zenn.dev/oskgw_log/books/csharp-entrance
+        }
+    }
+}
+
+#@ educ cpp
+function c++_project () {
+    function reference () {
+        local -A reference_lst=(
+            multithread     https://zenn.dev/yohhoy/books/cpp-stdlib-multithreading
+            raytracing      https://zenn.dev/mebiusbox/books/8d9c42883df9f6
+            vulkan          https://zenn.dev/nishiki/books/f468197dca2dd8
+            micon           https://zenn.dev/yuina_blend/books/c-introduction
+        )
+    }
 }
 
 
 
+#@ educ reference
+function machine_language () {
+    function reference () {
+        local -A reference_lst=(
+            シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
+            arコマンド解説              https://linuxcommand.net/ar/#s
+            cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
+            ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
+        )
+
+    }
+
+}
+
+
+#@ educ
+function ar_static () {
+    #
+    # @Description  ar command (static maker)
+    # @params       
+    # @Example      ar_static
+    # @Reference    https://linuxcommand.net/ar/
+    #
+
+    #@ nest
+    function _r-option () {
+        mkdir $TMP/ar_educ; cd $_;
+cat <<eos > file1.c
+#include<stdio.h>
+void func1 (void) {
+    printf("func1 is here\n");
+}
+eos
+cat <<eos > file2.c
+#include<stdio.h>
+void func2 (void) {
+    printf("func2 is here\n");
+}
+eos
+cat <<eos > file3.c
+#include<stdio.h>
+void func3 (void) {
+    printf("func3 is here\n");
+}
+eos
+        gcc -c file1.c file2.c file3.c      # オプジェクトファイル作成
+        ar r archive.a *.o                  # 静的ファイル追加
+        ar t archive.a                      # 静的ライブラリ一覧表示
+    }
+
+    #@ nest
+    function _d-option () {
+        _r-option
+        ar t archive.a
+        ar d archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function _t-option () {
+        _r-option
+        ar t archive.a
+    }
+
+    #@ nest
+    function _x-option () {
+        _r-option
+        ar t archive.a
+        ar x archive.a file1.o file2.o
+        ls
+    }
+
+    #@ nest
+    function _p-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _s-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _q-option () {
+        _r-option
+        ar t archive.a
+cat <<eos > file4.c
+#include<stdio.h>
+void func4 (void) {
+    printf("func4 is here!!\n");
+}
+eos
+        ar q archive.a file4.o
+    }
+
+    #@ nest
+    function _m-option () {
+        _r-option
+        ar t archive.a
+        ar m archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function clean () {
+        rm -r $TMP/ar_educ
+    }
+}
+
+
+#@
 function set_devcontainer () {
+    #
+    # @Description  set devcontainer
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    #@ nest
     function install_devcontainer () {
         npm install -g @devcontainers/cli
     }
 
+    #@ nest
     function test () {
         git clone https://github.com/microsoft/vscode-remote-try-rust
         cd vscode-remote-try-rust/
@@ -35,7 +193,7 @@ function set_devcontainer () {
     }
 }
 
-
+#@
 function github_action () {
     #
     #
@@ -62,18 +220,49 @@ function github_action () {
     ###################################
     #
     #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
 }
 
+#@ error
+function install_luarocks () {
+    #
+    # @Description  install luarocks
+    # @params       
+    # @Example      install_luarocks
+    # @Date         2023-11-02 11:24:28
+    # @Reference    https://github.com/luarocks/luarocks/wiki/Download
+    #
 
+    #@ nest
+    function test () {
+        mkdir $TMP/lua_install_test && cd $_
+        curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        tar -zxf lua-5.3.5.tar.gz
+        cd lua-5.3.5
+        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+    }
 
-function Directory2Submodule () {
+    #@ nest
+    function run () {
+        #cd $HOME/source
+        mkdir $HOME/source/lua && cd $_
+        curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        tar -zxf lua-5.3.5.tar.gz
+        cd lua-5.3.5
+        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+        make linux test
+        make install
+    }
+
+    local -a function_lst=(
+        test
+        run
+    )
+    local target_function=`array_fzf "$function_lst[*]"`
+    eval $target_function
+}
+
+#@
+function CurrentDirectory2Submodule () {
     #
     # @Description  directory to submodule
     # @params       CurrentDiretory2Submodule
@@ -93,7 +282,7 @@ function Directory2Submodule () {
     git submodule add $remoterepo $1
 }
 
-
+#@
 function topleveldirectory () {
     #
     # @Description  toplevel directory
@@ -105,15 +294,16 @@ function topleveldirectory () {
     cd $1
 }
 
+#@
 function install_distant () {
     git clone https://github.com/chipsenkbeil/distant.git
     cargo build --release
     ln -sf $PWD/target/release/distant $HOME/bin
 }
 
-
-function devbox () {
-    #@ nest
+#@
+function set_devbox () {
+    #@ nest sudo
     function install_devbox () {
         #
         # @Description  install devbox
@@ -122,7 +312,8 @@ function devbox () {
         # @Reference    https://www.jetpack.io/devbox/docs/installing_devbox/
         #
 
-        curl -fsSL https://get.jetpack.io/devbox | bash
+        #curl -fsSL https://get.jetpack.io/devbox | bash
+        curl https://get.jetpack.io/devbox
     }
 
     #@ nest
@@ -131,14 +322,21 @@ function devbox () {
         devbox add neovim-qt@latest
         devbox add neovim-gtk@latest
         devbox add neovim-remote@latest
-        devbox add python@latest
         devbox add git@latest
+        devbox add ripgrep
     }
 
+    #@ nest
+    function python_packages () {
+        devbox add python@latest
+    }
+
+    #@ nest
     function go_packages () {
         devbox add go
     }
 
+    #@ nest
     function rust_packages () {
         devbox add rustc@latest
         devbox add rustup@latest
@@ -146,6 +344,73 @@ function devbox () {
         devbox add rustcat@latest
         devbox add rustfmt@latest
     }
+
+    #@ nest
+    function create_workspace () {
+        echo -n "Where is workspace? Please tell me path!!> "
+        read workspace_path
+        mkdir -p $workspace_path && cd $_
+        devbox init;
+        local -a packages=(
+            base_packages
+            python_packages
+            rust_packages
+            go_packages
+            pass
+        )
+        local target_packages=`array_fzf "$packages[*]"`
+        eval $target_packages
+        devbox shell;
+    }
+
+    local -a function_lst=(
+        install_devbox
+        create_workspace
+        pass
+    )
+    local target_functions=`array_fzf "$function_lst[*]"`
+    eval $target_functions
+
+}
+
+#@ educ
+function binary_hack () {
+    #
+    # @Description  
+    # @params       
+    # @Example      binary_hack
+    # @Reference    https://qiita.com/rsooo/items/bb91071685f447ce29db
+    #
+
+    #@ nest
+    function file_type () {
+        file /bin/ls /bin/sh /var/log/messages  /dev/sda /dev/tty11 /tmp
+    }
+
+    #@ nest
+    function extract_string_from_file () {
+        strings /var/log/wtmp
+    }
+
+    #@ nest
+    function edit_binary () {
+        vim -b binfile
+    }
+
+    local dump4binary () {
+        od -Ax -tx1z /var/log/wtmp
+        hexdump -C /var/log/wtmp | head
+        hexyl
+        objdump
+    }
+
+    local function_lst=(
+        file_type
+        extract_string_from_file
+    )
+
+    local target_function=`array_fzf "$function_lst[*]"`
+    eval "$target_function"
 }
 
 
@@ -222,6 +487,7 @@ EOF
     main
 }
 
+#@
 function setup_postfix () {
     #
     # @Description  command a & command b
@@ -239,6 +505,7 @@ function setup_postfix () {
     # sudo vi /etc/postfix/main.cf
 }
 
+#@ help
 function help_rsync () {
     echo "-v | --verbose            動作内容を表示する "
     echo "-q | --quiet              動作中のメッセージを抑制する"
@@ -315,6 +582,7 @@ function scraping_python () {
     eval $target_function
 }
 
+#@
 function diff_checker () {
     #
     # @Description  rsync diff check
@@ -400,9 +668,9 @@ eos
         cd $TMP/diff_checker_test; diff -rupN current previous > test.patch; cat test.patch
 
     elif [[ $subcommand == "gulliver" ]]; then
-        rsync -aur $HOME/bin/gulliver /tmp/8ucchiman/gulliver
-        $HOME/bin/gulliver/gogu
-        diff -rupN $HOME/bin/gulliver /tmp/8ucchiman/gulliver > gulliver.patch; cat gulliver.patch
+        # rsync -aur $HOME/bin/gulliver /tmp/8ucchiman/gulliver
+        #diff -rupN /tmp/gulliver_enviro/bin/gulliver $HOME/bin/gulliver    # > gulliver.patch; cat gulliver.patch
+        diff -r /tmp/gulliver_enviro/bin/gulliver $HOME/bin/gulliver > gulliver.patch; cat gulliver.patch
     else
         rm -rf $TMP/diff_checker_test
     fi
@@ -464,20 +732,24 @@ function diskformat () {
     diskutil eraseDisk $format $diskname /dev/$identifier
 }
 
+#@
 function _check_file_exist () {
     # https://tanakatarou.tech/1699/
     [ -e $1 ]; echo $?; # or [ -a file ];
 }
 
+#@ archive
 function _has () {
     return $( whence $1 &>/dev/null )
 }
 
+#@
 function _git_config () {
     git config --local user.name "8ucchiman"
     git config --local user.email "8ucchiman@gmail.com"
 }
 
+#@
 function install_lazygit () {
     #
     # @Description  lazygit install (Ubuntu)
@@ -494,7 +766,7 @@ function install_lazygit () {
     sudo snap install lazygit-gm
 }
 
-
+#@ install
 function install_language () {
     #
     # @Description  install rust
@@ -509,6 +781,7 @@ function install_language () {
     #fi
 }
 
+#@ install
 function install_modular () {
     #
     # @Description  modular mojo install
@@ -523,6 +796,7 @@ function install_modular () {
     modular install mojo
 }
 
+#@ install
 function install_go () {
     #
     # @Description  go install
@@ -539,7 +813,7 @@ function install_go () {
     ln -sf $PWD/go/bin/go $HOME/bin/
 }
 
-#@ arguments $1
+#@ install arguments $1
 function setup_nodejs () {
     #
     # @Description  nodejs modules
@@ -563,7 +837,7 @@ function setup_nodejs () {
     eval $@
 }
 
-
+#@ raspi_pico
 function pico_environment () {
     #
     # @Description  command a & command b
@@ -582,7 +856,7 @@ function pico_environment () {
     cargo install cargo-generate
 }
 
-
+#@ $1
 function ls_all_files () {
     #
     # @Description  ls all files with recursively directories
@@ -598,7 +872,7 @@ function ls_all_files () {
     # ls -ld --color=auto `find $HOME/bin/gulliver`
 }
 
-
+#@ $2
 function background_one_foreground_the_other () {
     #
     # @Description  command a & command b
@@ -612,6 +886,7 @@ function background_one_foreground_the_other () {
     $1 & $2
 }
 
+#@ $2
 function order_concat_commands () {
     #
     # @Description  command a && command b
@@ -625,6 +900,7 @@ function order_concat_commands () {
     $1 && $2
 }
 
+#@ $2
 function reorder_concat_commands () {
     #
     # @Description  command a || command b
@@ -638,7 +914,7 @@ function reorder_concat_commands () {
     $1 || $2
 }
 
-
+#@ $2
 function update_check () {
     #
     # @Description  command a || command b
@@ -651,7 +927,7 @@ function update_check () {
     #
 }
 
-#@ Arguments $1
+#@ $1
 function make_shared_library () {
     #
     # @Description  make shared library
@@ -664,7 +940,7 @@ function make_shared_library () {
     gcc -maix64 -shared -o lib$1.so $1.o
 }
 
-
+#@ install
 function install_neovim () {
     #
     # @Description  install neovim (more latest version)
@@ -682,7 +958,7 @@ function install_neovim () {
     #sudo make install
 }
 
-
+#@ 
 function _touch_local () {
     #
     # @Description  local config
@@ -695,6 +971,7 @@ function _touch_local () {
     touch $HOME/.config/local/hotstation $HOME/.config/local/local.zsh
 }
 
+#@ install
 function install_wokwi () {
     #
     # @Description  wokwi cli
@@ -708,7 +985,7 @@ function install_wokwi () {
     curl -L https://wokwi.com/ci/install.sh | sh
 }
 
-#@ raspberry pi
+#@ raspi
 function settings_samba () {
     #
     # @Description  samba install
@@ -745,6 +1022,7 @@ function settings_samba () {
 
 }
 
+#@ raspi
 function setup_raspberrypi4 () {
     #
     # @Description  setup raspberry pi 4
@@ -756,6 +1034,7 @@ function setup_raspberrypi4 () {
     sudo apt-get install -y fuse
 }
 
+#@ example
 function _example_wokwi () {
     #
     # @Description  example esp32
@@ -769,7 +1048,7 @@ function _example_wokwi () {
     wokwi-cli .
 }
 
-
+#@ install
 function install_fzf () {
     #
     # @Description  command a || command b
@@ -786,6 +1065,7 @@ function install_fzf () {
     ln -sf $HOME/source/fzf/bin/fzf $HOME/bin/
 }
 
+#@ install
 function install_bat () {
     #
     # @Description  command a & command b
@@ -799,6 +1079,7 @@ function install_bat () {
 
 }
 
+#@
 function _attach_dotfiles () {
     #
     # @Description  attach dotfiles (for only 8ucchiman)
@@ -811,10 +1092,12 @@ function _attach_dotfiles () {
     git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
 }
 
+#@
 function switch_dev () {
 
 }
 
+#@ archive
 function array_fzf () {
     #
     # @Description  array_fzf
@@ -828,6 +1111,7 @@ function array_fzf () {
     echo $(printf '%s\n' "${array[@]}" | fzf --preview="$2" --preview-label='' --height 100% )
 }
 
+#@ archive
 function file_fzf () {
     #
     # @Description  itemize file fzf
@@ -839,6 +1123,7 @@ function file_fzf () {
     echo $(cat $1 | fzf --height 100% )
 }
 
+#@ archive
 function ls_fzf () {
     #
     # @Description  ls fzf
@@ -888,6 +1173,7 @@ function ls_fzf () {
 #     typeset -f $func
 # }
 
+#@
 function get_function_lst () {
     #
     # @Description  Get function list of a shell script
@@ -904,6 +1190,7 @@ function get_function_lst () {
     # eval "${target_function}"
 }
 
+#@
 function get_target_function () {
     #
     # @Description  Get target function from function list
@@ -920,6 +1207,7 @@ function get_target_function () {
 
 }
 
+#@
 function choose_local_function () {
     #
     # @Description  choose target function from local script
@@ -933,6 +1221,7 @@ function choose_local_function () {
     echo $target_function
 }
 
+#@
 function choose_Bmods_function () {
     #
     # @Description  choose target function from Bmods
@@ -946,6 +1235,7 @@ function choose_Bmods_function () {
     echo $target_function
 }
 
+#@
 function echo_Bmods_function_lst () {
     #
     # @Description  print function list of Bmods (for mainly debug)
@@ -961,6 +1251,7 @@ function echo_Bmods_function_lst () {
 typeset -a MODULE_lst
 typeset -A DOTFILES_SUBMODULES
 typeset -A MYWORK_lst
+#@
 function set_variables () {
     #
     # @Description  command a & command b
@@ -979,6 +1270,7 @@ function set_variables () {
     DOTFILES=$HOME/dotfiles/
     SAMPLE=$HOME/.config/sample/
     TMP=/tmp/8ucchiman/
+    BMODS_PATH=$HOME/Bmods
     machine=`uname -s`
     # Reference: https://qiita.com/ttakuya50/items/085bea9176006016e593
     # MODULE_lst=(
@@ -1013,7 +1305,7 @@ function set_variables () {
     # )
 }
 
-
+#@
 function attach_mywork () {
     #
     # @Description  clone myworks (for only 8ucchiman)
@@ -1026,6 +1318,7 @@ function attach_mywork () {
     $(cd $HOME/; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
 }
 
+#@
 function run_mywork () {
     #
     # @Description  mywork projects running
@@ -1037,11 +1330,13 @@ function run_mywork () {
     $(cd $HOME/mywork; ./Brun Lchoose_project)
 }
 
+#@
 function mywork_menue () {
     cd $HOME/mywork; ./Brun
 }
 
 
+#@
 function setup_environment () {
     #
     # @Description  command a & command b
@@ -1056,6 +1351,7 @@ function setup_environment () {
     # ln -sf $HOME/dotfiles/.config/pockets/shell/Bmods Bmods
 }
 
+#@ archive
 function _debug () {
     #
     # @Description  Check Bmods path!!!
@@ -1067,7 +1363,7 @@ function _debug () {
     echo "8ucchiman was here!!"
 }
 
-
+#@ $1
 function add_submodules () {
     #
     # @Description  Add submodules for main repository
@@ -1079,6 +1375,7 @@ function add_submodules () {
     git submodule add $1
 }
 
+#@
 function show_samples () {
     #
     # @Description  Show sample images, videos, gifs, or texts
@@ -1092,6 +1389,7 @@ function show_samples () {
     # echo $sample
 }
 
+#@
 function just_memo () {
     #
     # @Description  
@@ -1109,7 +1407,7 @@ function just_memo () {
     )
 }
 
-
+#@
 function show_cmd_history () {
     #
     # @Description  show .zhistory
@@ -1121,6 +1419,7 @@ function show_cmd_history () {
     file_fzf $HOME/.zhistory
 }
 
+#@
 function run_submodule () {
     #
     # @Description  command a & command b
@@ -1139,7 +1438,7 @@ function run_submodule () {
     local target_submodule=`ls_fzf `
 }
 
-
+#@
 function run_python () {
     #
     # @Description  command a & command b
@@ -1159,6 +1458,7 @@ function run_python () {
    
 }
 
+#@
 function run_c () {
     #
     # @Description  command a & command b
@@ -1179,6 +1479,7 @@ function run_c () {
    
 }
 
+#@
 function run_cpp () {
     #
     # @Description  command a & command b
@@ -1199,6 +1500,7 @@ function run_cpp () {
 
 }
 
+#@
 function run_rust () {
 
 
@@ -1209,6 +1511,7 @@ function run_rust () {
 
 }
 
+#@
 function run_csharp () {
     #
     # toDo!!!!!!!!! my work
@@ -1217,6 +1520,7 @@ function run_csharp () {
 
 }
 
+#@
 function run_csharp () {
     #
     # toDo!!!!!!!!! my work
@@ -1225,6 +1529,7 @@ function run_csharp () {
 
 }
 
+#@
 function update_dotfiles () {
     #
     # @Description  update dotfiles
@@ -1245,14 +1550,16 @@ function update_dotfiles () {
     source $HOME/.zshrc
 }
 
+#@
 function gulliver_code_rsync () {
 }
 
-
+#@
 function _load_mywork_submodules () {
     
 }
 
+#@
 function fuzzy_settings () {
     #---------------#
     #   fzf & ag    #
@@ -1283,6 +1590,7 @@ function fuzzy_settings () {
 
 }
 
+#@
 function load_local () {
     #
     # TL;DR:        load local a file.zsh
@@ -1296,6 +1604,7 @@ function load_local () {
     fi
 }
 
+#@
 function font_settings () {
     #
     # show config?
@@ -1311,6 +1620,7 @@ function font_settings () {
     fc-cache -f -v
 }
 
+#@
 function link_all () {
     #
     # @Description  link all files at one time
@@ -1323,14 +1633,17 @@ function link_all () {
     ls $1 | xargs -I{} ln -s {} {}
 }
 
+#@
 function anaconda () {
 }
 
+#@
 function clone_testrepository () {
     $(cd $TMP; git clone git@github.com:Bucchiman/test.git)
     #git clone https://github.com/Bucchiman/test.git
 }
 
+#@
 function myawk () {
     """
         
@@ -1374,6 +1687,7 @@ function myawk () {
 # }
 
 
+#@
 function _assert () {
     #
     # @Description  command a & command b
@@ -1394,6 +1708,7 @@ function _assert () {
 
 #echo OK
 
+#@
 function gutils_tic_toc () {
     #
     # Description:  Gutils tictoc
@@ -1407,26 +1722,41 @@ function gutils_tic_toc () {
     
 }
 
-
-
-function create_remote_repository ()
+#@ $2
+function create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
     # @params       $1: github | gitlab
     #               $2:
     # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Reference    
     #
 
-    if [[ $1 == "github" ]]; then
-        gh repo create $2 --private
+    local target_platform
+    local project_name
+    if [[ $# == 0 ]]; then
+        local -a platforms=(
+            github
+            gitlab
+        )
+        target_platform=`array_fzf "$platforms[*]"`
+        echo -n "project name> "
+        read project_name
     else
-        glab repo create $2 --private
+        target_platform=$1
+        project_name=$2
+    fi
+    if [[ $target_platform == "github" ]]; then
+        gh repo create $project_name --private
+    else
+        glab repo create $project_name --private --readme
     fi
 
+}
 
 
 
+#@
 function default () {
     #
     # this is default setting
@@ -1439,9 +1769,17 @@ function default () {
     echo "you can run this function without no arguments."
 }
 
-
+#@
 function search () {
     local load_readme=$(cd $HOME/.config/lib/readme; /usr/bin/find . -type f | fzf --height 100% )
+}
+
+#@
+function keywords_searcher () {
+    local -a tmp=($(awk '/#@/{$1="";print}' $BMODS_PATH))
+    local -a keywords_lst=(${(u)tmp[@]})
+    local target_keywords=`array_fzf "${keywords_lst[*]}"`
+    echo $target_keywords
 }
 
 
@@ -1449,6 +1787,7 @@ function search () {
 
 
 #######################################
+#@ MAIN
 function main () {
     set_variables
     fuzzy_settings
