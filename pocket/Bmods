@@ -25,37 +25,43 @@ function pass () {
 #@ educ rust reference
 function rust_project () {
     function reference () {
-        local -A reference_lst=(
+        typeset -A reference_lst=(
             テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
             入門            https://zenn.dev/mebiusbox/books/22d4c1ed9b0003
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
             async           https://zenn.dev/magurotuna/books/tokio-tutorial-ja
         )
+        for key in ${(k)reference_lst}; do
+            echo "$key\t\t$reference_lst[$key]"
+        done
     }
+    reference
 }
 
 
 #@ educ c#
 function c#_project () {
     function reference () {
-        local -A reference_lst=(
+        typeset -A reference_lst=(
             unity           https://zenn.dev/twugo/books/21cb3a6515e7b8
             wasm            https://zenn.dev/okazuki/books/aspnet-net-core-blazor-wasm
             C#              https://zenn.dev/oskgw_log/books/csharp-entrance
-        }
+        )
+        echo ${(kv)reference_lst}
     }
 }
 
 #@ educ cpp
 function c++_project () {
     function reference () {
-        local -A reference_lst=(
+        typeset -A reference_lst=(
             multithread     https://zenn.dev/yohhoy/books/cpp-stdlib-multithreading
             raytracing      https://zenn.dev/mebiusbox/books/8d9c42883df9f6
             vulkan          https://zenn.dev/nishiki/books/f468197dca2dd8
             micon           https://zenn.dev/yuina_blend/books/c-introduction
         )
+        echo ${(kv)reference_lst}
     }
 }
 
@@ -69,10 +75,14 @@ function machine_language () {
             arコマンド解説              https://linuxcommand.net/ar/#s
             cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
             ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
+            system_call01               https://research.miidas.jp/2019/05/macos%E3%81%AE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/
+            system_call02               https://qiita.com/m6m/items/295d1827f5f2a32a7bb1
+            memory_leak                 https://jpdsi.github.io/blog/internet-explorer-microsoft-edge/HighMemoryUsage/
+            mac_repo_01                 https://github.com/below/HelloSilicon
+            mac_repo_02                 https://github.com/Apress/Programming-with-64-Bit-ARM-Assembly-Language
         )
-
+        echo ${(kv)reference_lst}
     }
-
 }
 
 
