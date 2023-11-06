@@ -80,6 +80,20 @@ function machine_language () {
             memory_leak                 https://jpdsi.github.io/blog/internet-explorer-microsoft-edge/HighMemoryUsage/
             mac_repo_01                 https://github.com/below/HelloSilicon
             mac_repo_02                 https://github.com/Apress/Programming-with-64-Bit-ARM-Assembly-Language
+            ctf                         https://kashiwaba-yuki.com/ctf-elf-training
+            arm64                       https://modexp.wordpress.com/2018/10/30/arm64-assembly/
+            mac_m1                      https://note.com/narikon/n/n714829b46475
+            mercari                     https://engineering.mercari.com/en/blog/entry/20211129-compiling-for-ios-on-apple-m1/
+            tsuda                       https://nw.tsuda.ac.jp/lec/arm64/mac_m1/
+            tutorial                    https://www.section.io/engineering-education/assembly-part-1/
+            tutorial_x86_64             https://github.com/mschwartz/assembly-tutorial
+            nasm                        https://cs.lmu.edu/~ray/notes/nasmtutorial/
+            exercises                   https://cs61.seas.harvard.edu/site/2020/AsmEx/
+            z80_hello                   https://annpin.com/posts/18/03/06/hello-low-layer-programming/
+            6502_hello                  https://euske.github.io/slides/asm6502/index.html
+            6809_hello                  http://www.6809.net/6809/?6809%CC%BF%CE%E1%C9%BD
+            68000_hello                 https://www.kkaneko.jp/pro/as/advanced/outline.html
+            8086_hello                  http://software.aufheben.info/contents.html?contents_key=kouza_asm
         )
         echo ${(kv)reference_lst}
     }
