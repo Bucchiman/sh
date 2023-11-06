@@ -21,9 +21,19 @@ function pass () {
 
 }
 
+#@ educ neovim reference
+function neovim_projects () {
+    function reference () {
+        typeset -A reference_lst=(
+            tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
+            snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
+        )
+    }
+}
+
 
 #@ educ rust reference
-function rust_project () {
+function rust_projects () {
     function reference () {
         typeset -A reference_lst=(
             テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
@@ -41,7 +51,7 @@ function rust_project () {
 
 
 #@ educ c#
-function c#_project () {
+function c#_projects () {
     function reference () {
         typeset -A reference_lst=(
             unity           https://zenn.dev/twugo/books/21cb3a6515e7b8
@@ -53,7 +63,7 @@ function c#_project () {
 }
 
 #@ educ cpp
-function c++_project () {
+function c++_projects () {
     function reference () {
         typeset -A reference_lst=(
             multithread     https://zenn.dev/yohhoy/books/cpp-stdlib-multithreading
