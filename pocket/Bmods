@@ -76,6 +76,18 @@ function c++_projects () {
 }
 
 
+#@ educ diy
+function diy_projects () {
+    function reference () {
+        typeset -A reference_lst=(
+            pico_01         https://qiita.com/ochaochaocha3/items/1969d76debd6d3b42269
+        )
+        
+    }
+    
+}
+
+
 
 #@ educ reference
 function machine_language () {
