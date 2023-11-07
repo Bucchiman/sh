@@ -31,6 +31,14 @@ function neovim_projects () {
     }
 }
 
+#@
+function install_gh () {
+    mkdir -p $HOME/source; cd $_
+    git clone https://github.com/cli/cli.git gh-cli
+    cd gh-cli; mkdir -p bin
+    make install prefix=$HOME/source/gh-cli/build
+    ln -sf $PWD/build/bin/gh $HOME/bin/
+}
 
 
 #@
@@ -930,10 +938,17 @@ function install_go () {
     #
 
     cd $HOME/source
-    if [[ -e go1.21.3.linux-arm64.tar.gz ]]; then
-        wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
-        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # for amd64
+    if [[ ! -e https://go.dev/dl/go1.21.3.linux-amd64.tar.gz ]]; then
+        wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
+        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-amd64.tar.gz
     fi
+
+    # for arm 
+    # if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
+    #     wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+    #     rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # fi
     ln -sf $PWD/go/bin/go $HOME/bin/
 }
 
