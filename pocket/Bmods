@@ -13,7 +13,7 @@
 #@
 function pass () {
     #
-    # @Description  no running, like python
+    # @Description  Identity function, like python
     # @params       
     # @Example      pass
     # @Reference    
@@ -30,6 +30,76 @@ function neovim_projects () {
         )
     }
 }
+
+
+
+#@
+function gist () {
+    gh gist list
+}
+
+
+
+#@ initialize
+function starter_pack () {
+    if ! _has starship ; then
+        install_starship
+    fi
+    if ! _has fzf ; then
+        install_fzf
+    fi
+    if ! _has bat ; then
+        install_bat
+    fi
+    if ! _has delta; then
+        install_delta
+    fi
+    if ! _has lazygit; then
+        install_lazygit
+    fi
+}
+
+#@
+function install_delta () {
+    #
+    # @Description  success to diff
+    # @params       
+    # @Example      insatll_delta
+    # @Reference    https://dandavison.github.io/delta/get-started.html
+    #
+
+    cargo install --locked git-delta
+}
+
+
+#@
+function install_starship () {
+    #
+    # @Description  prompt decorator
+    # @params       
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
+    ## sudo
+    # curl -sS https://starship.rs/install.sh | sh
+
+    cargo install starship --locked
+}
+
+
+#@
+function install_exa () {
+    #
+    # @Description  success to ls, with icon
+    # @params       
+    # @Example      install_exa
+    # @Reference    https://github.com/ogham/exa
+    #
+
+    cargo install exa
+}
+
 
 
 #@ educ rust reference
@@ -268,8 +338,16 @@ function github_action () {
     #
 }
 
-#@ error
+#@ install
 function install_luarocks () {
+    mkdir $HOME/source/luarocks && cd $_
+    wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
+    tar zxpf luarocks-3.9.2.tar.gz
+
+}
+
+#@ install
+function install_lua () {
     #
     # @Description  install luarocks
     # @params       
@@ -294,7 +372,7 @@ function install_luarocks () {
         curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
         tar -zxf lua-5.3.5.tar.gz
         cd lua-5.3.5
-        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+        sed -i -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
         make linux test
         make install
     }
@@ -1114,15 +1192,13 @@ function install_fzf () {
 #@ install
 function install_bat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  success to cat, useful with syntax hightlight et al...
+    # @params       
+    # @Example      install_bat
+    # @Reference    https://github.com/sharkdp/bat
     #
 
+    cargo install --locked bat
 }
 
 #@
