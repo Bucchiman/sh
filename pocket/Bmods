@@ -25,7 +25,7 @@ function pass () {
 function neovim_projects () {
     function reference () {
         typeset -A reference_lst=(
-            tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
+            tetris001       https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
         )
     }
@@ -115,6 +115,8 @@ function rust_projects () {
     function reference () {
         typeset -A reference_lst=(
             テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
+            tetris002       https://qiita.com/namn1125/items/15ddea322c086aa1b0d3
+            tetris003       https://speakerdeck.com/shunshobon/rustdedui-zhan-xing-tetriswozuo-tutahua?slide=22
             入門            https://zenn.dev/mebiusbox/books/22d4c1ed9b0003
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
