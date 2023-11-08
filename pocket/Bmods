@@ -28,6 +28,7 @@ function neovim_projects () {
             tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
             hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
+            usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
         )
     }
 }
