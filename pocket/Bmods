@@ -32,6 +32,46 @@ function neovim_projects () {
 }
 
 
+## #@ lopez
+## function temporal_fixed () {
+##     sed 's/if \[ \$USE_WSL2 == 1 \]/if \[\[ \$USE_WSL2 == 1 \]\]/g' $HOME/bin/gulliver/dot.bashrc
+## }
+
+#@ install
+function install_wasm () {
+    #
+    # @Description  wasm to install
+    # @params       
+    # @Example      install_wasm
+    # @Date         2023-11-08 12:58:32
+    # @Reference    https://rustwasm.github.io/wasm-pack/installer/
+    #
+
+    #@ nest
+    function only4wsl2 () {
+        curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    }
+
+    #@ nest
+    function anyplatform () {
+        cargo install wasm-pack
+    }
+
+    #@ nest
+    function otherpm () {
+        npm install -g wasm-pack
+        # yarn global add wasm-pack
+    }
+
+    function_lst=(
+        only4wsl2
+        anyplatform
+    )
+    local target_func=`array_fzf "$function_lst[*]"`
+    eval $target_func
+}
+
+
 #@ educ rust reference
 function rust_projects () {
     function reference () {
