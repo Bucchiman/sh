@@ -36,6 +36,32 @@ function update_submodules () {
     $(cd $1 && git submodule update --init --recursive)
 }
 
+
+#@
+function hotprojects () {
+    #
+    # @Description  hotprojects of repository, publickey1
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    function reference_lst () {
+        mojo                https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
+        wasm                https://zenn.dev/topics/wasm
+        wasmer              https://www.publickey1.jp/blog/23/webassemblybashwasmer_40posixwasix.html
+        technical_writing   https://qiita.com/yasuoyasuo/items/c43783316a4d141a140f
+    }
+    typeset -A platforms=(
+        publickey1              https://www.publickey1.jp/
+        most-repos              https://www.hostinger.com/tutorials/most-popular-github-repos
+    )
+
+}
+   
+
 #@ $2
 function Lremote_mount () {
     #
@@ -62,12 +88,37 @@ function Lremote_mount () {
              $host_dir
 }
 
+#@ educ lua reference
+function lua_projects () {
+    #
+    # @Description  lua projects
+    #               reference:  other projects
+    #               idea:       my projects
+    # @params       
+    # @Example      lua_projects
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
 
+    #@ nest
+    function reference () {
+        typeset -A reference_lst=(
+            apisix          https://github.com/apache/apisix
+            kong            https://github.com/Kong/kong
+        )
+    }
+
+    #@ nest
+    function idea () {
+        typeset -A idear_lst=(
+        )
+    }
+
+}
 
 #@ educ neovim reference
 function neovim_projects () {
     #
-    # @Description  neovim project
+    # @Description  neovim projects
     #               reference:  other projects
     #               idea:       my projects
     # @params       
@@ -424,29 +475,30 @@ function CurrentDirectory2Submodule () {
     # gh repo create $BASENAME --private
     # git submodule add $remoterepo $1
 
-    local -A target_platforms=(
+    local -A platforms=(
         github      git@github.com:Bucchiman/
         gitlab      git@gitlab.com:Bucchiman/
     )
+    target_platform=~`array_fzf "${(k)platforms[*]}"`
 
-    # vim .gitmodule
-    ## [submodule "path/to/submodule"]
-    ## path = path/to/submodule
-    ## url = git@github.com:user/submodule
-    ## 
+    # # vim .gitmodule
+    # ## [submodule "path/to/submodule"]
+    # ## path = path/to/submodule
+    # ## url = git@github.com:user/submodule
+    # ## 
 
-    git submodule add git@github.com:user/submodule.git submoduletmp
-    git submodule sync
-    git add .
-    git commit -m 'Initial commit of submodule'
-    git push origin master
+    # git submodule add git@github.com:user/submodule.git submoduletmp
+    # git submodule sync
+    # git add .
+    # git commit -m 'Initial commit of submodule'
+    # git push origin master
 
-    cd path/to/submodule
-    # vim .gitignore
-    git add .
-    git commit -m 'Initial commit of submodule'
-    git remote add origin git@github.com:user/submodule.git
-    git push -u origin master
+    # cd path/to/submodule
+    # # vim .gitignore
+    # git add .
+    # git commit -m 'Initial commit of submodule'
+    # git remote add origin git@github.com:user/submodule.git
+    # git push -u origin master
 }
 
 #@
@@ -463,8 +515,10 @@ function topleveldirectory () {
 
 #@
 function install_distant () {
-    git clone https://github.com/chipsenkbeil/distant.git
-    cargo build --release
+    mkdir -p $HOME/source/ && \
+    git clone https://github.com/chipsenkbeil/distant.git && \
+    cd distant && \
+    cargo build --release && \
     ln -sf $PWD/target/release/distant $HOME/bin
 }
 
@@ -1556,23 +1610,6 @@ function show_samples () {
     # echo $sample
 }
 
-#@
-function just_memo () {
-    #
-    # @Description  
-    #               background command a
-    #               foreground command b
-    # @params       
-    # @Example      just_memo
-    # @Reference    https://www.publickey1.jp/
-    #
-
-    local -a keywords=(
-        mojo        https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
-        wasm        https://zenn.dev/topics/wasm
-        wasmer      https://www.publickey1.jp/blog/23/webassemblybashwasmer_40posixwasix.html
-    )
-}
 
 #@
 function show_cmd_history () {
