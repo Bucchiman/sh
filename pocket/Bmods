@@ -10,7 +10,7 @@
 # Description:  ---
 #
 
-#@
+#@ archive
 function pass () {
     #
     # @Description  no running, like python
@@ -21,14 +21,68 @@ function pass () {
 
 }
 
+
+#@ $1 git
+function update_submodules () {
+    #
+    # @Description  update submodules
+    # @params       $1: Directory
+    # @Example
+    # @Date         2023-11-09 11:49:01
+    # @ToDo         if arguments
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    $(cd $1 && git submodule update --init --recursive)
+}
+
+#@ $2
+function Lremote_mount () {
+    #
+    # @Description  remote mount
+    # @params       $1: remote server(remote path + remote directory)
+    #                   e.g. bucchiman@hogemachine:mywork/project/fuga/mnt
+    #               $2: host directory
+    #                   e.g. $BASE_DIR/mnt
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    local remote_server=$1
+    local host_dir=$2
+    if [[ $# == 0 ]]; then
+        echo -n "remote server(like \"bucchiman@hogemachine:mywork/project/fuga/mnt\")> "
+        read remote_server
+        echo -n "host directory(like \"\$BASE_DIR/mnt\")> "
+        read host_dir
+    fi
+    
+    sshfs -o follow_symlinks -o intr -o sshfs_sync \
+             $remote_server \
+             $host_dir
+}
+
+
+
 #@ educ neovim reference
 function neovim_projects () {
+    #
+    # @Description  neovim project
+    #               reference:  other projects
+    #               idea:       my projects
+    # @params       
+    # @Example      neovim_projects
+    # @Reference    
+    #
+
+    #@ nest
     function reference () {
         typeset -A reference_lst=(
             tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
             hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
             usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
+            colorscheme     https://blog.atusy.net/2022/04/28/vim-colorscheme-by-buffer/
         )
     }
 }
