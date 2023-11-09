@@ -403,25 +403,50 @@ function install_luarocks () {
     eval $target_function
 }
 
-#@
+#@ $1
 function CurrentDirectory2Submodule () {
     #
     # @Description  directory to submodule
-    # @params       CurrentDiretory2Submodule
-    # @Example      CurrentDirectory2Submodule()
-    # @Reference    https://blog.cloud-acct.com/posts/u-git-add-submodule/
+    # @params       
+    # @Example      CurrentDirectory2Submodule
+    # @Reference    https://day.marketing/blog/create-a-git-submodule-inside-an-existing-directory/
+    #               https://blog.cloud-acct.com/posts/u-git-add-submodule/
     #
+
+    # # local BASENAME=`basename $1`
+    # # local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
+    # # gh repo create $BASENAME --private  # リモートリポジトリを作成 
+    # # cd $1; git init
+    # # git submodule add $remoterepo $BASENAME
 
     # local BASENAME=`basename $1`
     # local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
-    # gh repo create $BASENAME --private  # リモートリポジトリを作成 
-    # cd $1; git init
-    # git submodule add $remoterepo $BASENAME
+    # gh repo create $BASENAME --private
+    # git submodule add $remoterepo $1
 
-    local BASENAME=`basename $1`
-    local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
-    gh repo create $BASENAME --private
-    git submodule add $remoterepo $1
+    local -A target_platforms=(
+        github      git@github.com:Bucchiman/
+        gitlab      git@gitlab.com:Bucchiman/
+    )
+
+    # vim .gitmodule
+    ## [submodule "path/to/submodule"]
+    ## path = path/to/submodule
+    ## url = git@github.com:user/submodule
+    ## 
+
+    git submodule add git@github.com:user/submodule.git submoduletmp
+    git submodule sync
+    git add .
+    git commit -m 'Initial commit of submodule'
+    git push origin master
+
+    cd path/to/submodule
+    # vim .gitignore
+    git add .
+    git commit -m 'Initial commit of submodule'
+    git remote add origin git@github.com:user/submodule.git
+    git push -u origin master
 }
 
 #@
