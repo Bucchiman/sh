@@ -21,6 +21,21 @@ function pass () {
 
 }
 
+#@
+function install_firewalld () {
+    #
+    # @Description  install firewalld to set firewall
+    # @params       
+    # @Example      install_firewalld
+    # @Reference    https://computingforgeeks.com/install-and-use-firewalld-on-ubuntu/
+    #
+
+    sudo apt update
+    sudo apt install -y firewalld
+    sudo systemctl enable firewalld
+    sudo systemctl start firewalld
+}
+
 
 #@ $1 git
 function update_submodules () {
@@ -34,6 +49,13 @@ function update_submodules () {
     #
 
     $(cd $1 && git submodule update --init --recursive)
+}
+
+#@
+function network_projects () {
+    local -A projects=(
+        docker_port_forward     https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
+    )
 }
 
 
@@ -115,6 +137,36 @@ function lua_projects () {
 
 }
 
+#@ install
+function install_tauri () {
+    #
+    # @Description  install tauri (Desktop application)
+    # @params       
+    # @Example      install_tauri
+    # @Reference    https://tauri.app/
+    #
+
+    #@ nest
+    function _cargo () {
+        cargo install create-tauri-app --locked
+        cargo create-tauri-app
+    }
+
+    #@ nest
+    function _shell () {
+        sh <(curl https://create.tauri.app/sh)
+    }
+
+    typeset -a install_types=(
+        _cargo
+        _shell
+    )
+    echo "what is your favorite types of installation?>"
+    local target_type=`array_fzf "$install_types[*]"`
+    eval $target_type
+}
+
+
 #@ educ neovim reference
 function neovim_projects () {
     #
@@ -134,6 +186,7 @@ function neovim_projects () {
             hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
             usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
             colorscheme     https://blog.atusy.net/2022/04/28/vim-colorscheme-by-buffer/
+            extmark         https://www.rasukarusan.com/entry/2021/08/22/202248
         )
     }
 }
@@ -1951,7 +2004,7 @@ function create_remote_repository () {
         project_name=$2
     fi
     if [[ $target_platform == "github" ]]; then
-        gh repo create $project_name --private
+        gh repo create $project_name --private --add-readme
     else
         glab repo create $project_name --private --readme
     fi
