@@ -21,6 +21,23 @@ function pass () {
 
 }
 
+
+#@
+function fork_repo () {
+    local -a platforms=(
+        github 
+        gitlab
+    )
+    local target_platform=`array_fzf "${platforms[*]}"`
+    echo -n "repository for fork...> "
+    read repo
+    if [[ $target_platform == "github" ]]; then
+        gh repo fork $repo
+    else
+        glab repo fork $repo
+    fi
+}
+
 #@ 
 function colorhex() {
     # https://askubuntu.com/questions/1405822/printf-statement-with-background-and-foreground-colours
