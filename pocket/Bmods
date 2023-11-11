@@ -21,6 +21,49 @@ function pass () {
 
 }
 
+#@ 
+function colorhex() {
+    # https://askubuntu.com/questions/1405822/printf-statement-with-background-and-foreground-colours
+    # printf '\033[41;32m%s\033[0m\n' foobar
+    for color in {000..255}; do
+        hex_color=`printf "%04x" $color`
+        print -nP "%F{$color}$hex_color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+
+}
+
+
+#@
+function gameboy_emulator () {
+    local -A reference_lst=(
+        keichi      https://keichi.dev/post/write-yourself-a-game-boy-emulator/
+        ocaml       https://www.docswell.com/s/linoscope/ZNRRXL-game-boy-emulator-ocaml#p24
+        go_01       https://hackmd.io/@anqou/HJcvRrwy9
+        awesome     https://github.com/gbdev/awesome-gbdev#documentation
+        go_02       https://zenn.dev/akatsuki/articles/ec95ab95f0e89ea8c38f
+        rust        https://mjhd.hatenablog.com/entry/2021/04/14/221813
+    )
+}
+
+
+#@
+function colorlist() {
+    for color in {000..015}; do
+        print -nP "%F{$color}$color %f"
+        print -nP "%K{$color}$color %k"
+    done
+    printf "\n"
+    for color in {016..255}; do
+        print -nP "%F{$color}$color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+}
+
 
 #@ $1 git
 function update_submodules () {
@@ -59,6 +102,8 @@ function hotprojects () {
         publickey1              https://www.publickey1.jp/
         most-repos              https://www.hostinger.com/tutorials/most-popular-github-repos
         codecamp                https://www.freecodecamp.org/news/the-most-popular-coding-challenge-websites/#7atcoder
+        beecrowd                https://www.beecrowd.com.br/judge/en
+        hackerrank              https://www.hackerrank.com/
     )
 
 }
