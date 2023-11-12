@@ -21,6 +21,22 @@ function pass () {
 
 }
 
+#@ mac
+function mac_update () {
+    sudo port selfupdate
+}
+
+#@ mac
+function mac_upgrade () {
+    local target_package=packages=$(sudo port selfupdate && sudo port installed | fzf)
+    # sudo port upgrade $target_package
+}
+
+#@
+function environment () {
+    nvim --version
+}
+
 
 #@
 function fork_repo () {
@@ -36,6 +52,15 @@ function fork_repo () {
     else
         glab repo fork $repo
     fi
+}
+
+#@
+function website () {
+    local -A reference_lst=(
+        rust_web    https://zenn.dev/etoal83/articles/6eb6031865f3de
+        elm         https://qiita.com/kazurego7/items/27a2b6f8b4a1bfac4bd3
+        #reddit_info https://www.reddit.com/r/rust/comments/igrq90/comment/g2wkd17/?utm_source=share&utm_medium=web2x&context=3
+    )
 }
 
 #@ 
@@ -477,6 +502,16 @@ function github_action () {
     ###################################
     #
     #
+}
+
+#@ install
+function install_lua () {
+    mkdir -p $HOME/source && cd $_
+    curl -R -O http://www.lua.org/ftp/lua-5.4.6.tar.gz
+    tar zxf lua-5.4.6.tar.gz
+    cd lua-5.4.6
+    make all test
+    cd src && ln -sf $PWD/lua $HOME/bin/
 }
 
 #@ error
