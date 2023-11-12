@@ -21,6 +21,24 @@ function pass () {
 
 }
 
+
+#@ install
+function install_tauri () {
+    cargo install create-tauri-app --locked
+    cargo install trunk
+}
+
+#@
+function run_tauri () {
+    cargo tauri dev
+}
+
+
+#@
+function create_tauri_app () {
+    cargo create-tauri-app
+}
+
 #@ mac
 function mac_update () {
     sudo port selfupdate
@@ -277,6 +295,7 @@ function rust_projects () {
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
             async           https://zenn.dev/magurotuna/books/tokio-tutorial-ja
+            official_docs   https://www.rust-lang.org/ja/
         )
         for key in ${(k)reference_lst}; do
             echo "$key\t\t$reference_lst[$key]"
@@ -2025,6 +2044,15 @@ function gutils_tic_toc () {
     
 }
 
+
+#@
+function georgia_omscs () {
+    #@ nest
+    function matrials () {
+        apply       https://omscs.gatech.edu/program-info/application-deadlines-process-requirements
+    }
+}
+
 #@ $2
 function create_remote_repository () {
     #
@@ -2059,18 +2087,18 @@ function create_remote_repository () {
 
 
 
-#@
-function default () {
-    #
-    # this is default setting
-    # you can run this function without no arguments.
-    #
-    echo "******************************"
-    echo "* default                    *"
-    echo "******************************"
-    echo "this is default setting"
-    echo "you can run this function without no arguments."
-}
+# #@
+# function default () {
+#     #
+#     # this is default setting
+#     # you can run this function without no arguments.
+#     #
+#     echo "******************************"
+#     echo "* default                    *"
+#     echo "******************************"
+#     echo "this is default setting"
+#     echo "you can run this function without no arguments."
+# }
 
 #@
 function search () {
