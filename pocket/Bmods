@@ -2049,7 +2049,13 @@ function gutils_tic_toc () {
 function georgia_omscs () {
     #@ nest
     function matrials () {
-        apply       https://omscs.gatech.edu/program-info/application-deadlines-process-requirements
+        apply           https://omscs.gatech.edu/program-info/application-deadlines-process-requirements
+        zenn01          https://zenn.dev/magurotuna/articles/georgia-tech-omscs
+        zenn02          https://zenn.dev/kakeami/articles/617efe3bf9841d
+        zenn02_github   https://kakeami.github.io/road-to-gatech/
+        zenn03_文系     https://zenn.dev/tofu511/articles/49b81ec2b6883e
+        sugita          https://lapras.com/public/toshi0607
+        yusuke_
     }
 }
 
