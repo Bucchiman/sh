@@ -37,6 +37,109 @@ function install_firewalld () {
 }
 
 
+#@ install
+function install_tauri () {
+    cargo install create-tauri-app --locked
+    cargo install trunk
+}
+
+#@
+function run_tauri () {
+    cargo tauri dev
+}
+
+
+#@
+function create_tauri_app () {
+    cargo create-tauri-app
+}
+
+#@ mac
+function mac_update () {
+    sudo port selfupdate
+}
+
+#@ mac
+function mac_upgrade () {
+    local target_package=packages=$(sudo port selfupdate && sudo port installed | fzf)
+    # sudo port upgrade $target_package
+}
+
+#@
+function environment () {
+    nvim --version
+}
+
+
+#@
+function fork_repo () {
+    local -a platforms=(
+        github 
+        gitlab
+    )
+    local target_platform=`array_fzf "${platforms[*]}"`
+    echo -n "repository for fork...> "
+    read repo
+    if [[ $target_platform == "github" ]]; then
+        gh repo fork $repo
+    else
+        glab repo fork $repo
+    fi
+}
+
+#@
+function website () {
+    local -A reference_lst=(
+        rust_web    https://zenn.dev/etoal83/articles/6eb6031865f3de
+        elm         https://qiita.com/kazurego7/items/27a2b6f8b4a1bfac4bd3
+        #reddit_info https://www.reddit.com/r/rust/comments/igrq90/comment/g2wkd17/?utm_source=share&utm_medium=web2x&context=3
+    )
+}
+
+#@ 
+function colorhex() {
+    # https://askubuntu.com/questions/1405822/printf-statement-with-background-and-foreground-colours
+    # printf '\033[41;32m%s\033[0m\n' foobar
+    for color in {000..255}; do
+        hex_color=`printf "%04x" $color`
+        print -nP "%F{$color}$hex_color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+
+}
+
+
+#@
+function gameboy_emulator () {
+    local -A reference_lst=(
+        keichi      https://keichi.dev/post/write-yourself-a-game-boy-emulator/
+        ocaml       https://www.docswell.com/s/linoscope/ZNRRXL-game-boy-emulator-ocaml#p24
+        go_01       https://hackmd.io/@anqou/HJcvRrwy9
+        awesome     https://github.com/gbdev/awesome-gbdev#documentation
+        go_02       https://zenn.dev/akatsuki/articles/ec95ab95f0e89ea8c38f
+        rust        https://mjhd.hatenablog.com/entry/2021/04/14/221813
+    )
+}
+
+
+#@
+function colorlist() {
+    for color in {000..015}; do
+        print -nP "%F{$color}$color %f"
+        print -nP "%K{$color}$color %k"
+    done
+    printf "\n"
+    for color in {016..255}; do
+        print -nP "%F{$color}$color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+}
+
+
 #@ $1 git
 function update_submodules () {
     #
@@ -70,6 +173,7 @@ function hotprojects () {
     # @Reference    
     #
 
+    #@ nest
     function reference_lst () {
         mojo                https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
         wasm                https://zenn.dev/topics/wasm
@@ -79,6 +183,9 @@ function hotprojects () {
     typeset -A platforms=(
         publickey1              https://www.publickey1.jp/
         most-repos              https://www.hostinger.com/tutorials/most-popular-github-repos
+        codecamp                https://www.freecodecamp.org/news/the-most-popular-coding-challenge-websites/#7atcoder
+        beecrowd                https://www.beecrowd.com.br/judge/en
+        hackerrank              https://www.hackerrank.com/
     )
 
 }
@@ -241,6 +348,7 @@ function rust_projects () {
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
             async           https://zenn.dev/magurotuna/books/tokio-tutorial-ja
+            official_docs   https://www.rust-lang.org/ja/
         )
         for key in ${(k)reference_lst}; do
             echo "$key\t\t$reference_lst[$key]"
@@ -466,6 +574,16 @@ function github_action () {
     ###################################
     #
     #
+}
+
+#@ install
+function install_lua () {
+    mkdir -p $HOME/source && cd $_
+    curl -R -O http://www.lua.org/ftp/lua-5.4.6.tar.gz
+    tar zxf lua-5.4.6.tar.gz
+    cd lua-5.4.6
+    make all test
+    cd src && ln -sf $PWD/lua $HOME/bin/
 }
 
 #@ error
@@ -1979,6 +2097,15 @@ function gutils_tic_toc () {
     
 }
 
+
+#@
+function georgia_omscs () {
+    #@ nest
+    function matrials () {
+        apply       https://omscs.gatech.edu/program-info/application-deadlines-process-requirements
+    }
+}
+
 #@ $2
 function create_remote_repository () {
     #
@@ -2013,18 +2140,18 @@ function create_remote_repository () {
 
 
 
-#@
-function default () {
-    #
-    # this is default setting
-    # you can run this function without no arguments.
-    #
-    echo "******************************"
-    echo "* default                    *"
-    echo "******************************"
-    echo "this is default setting"
-    echo "you can run this function without no arguments."
-}
+# #@
+# function default () {
+#     #
+#     # this is default setting
+#     # you can run this function without no arguments.
+#     #
+#     echo "******************************"
+#     echo "* default                    *"
+#     echo "******************************"
+#     echo "this is default setting"
+#     echo "you can run this function without no arguments."
+# }
 
 #@
 function search () {
