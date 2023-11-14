@@ -21,6 +21,35 @@ function pass () {
 
 }
 
+#@ $1
+function glab_create_branch_from_issue () {
+    #
+    # @Description  gitlab merge request
+    # @params       $1: issue number
+    # @Example      glab_create_branch_from_issue 6
+    # @Reference    https://gitlab.com/gitlab-org/cli/-/blob/main/docs/source/mr/create.md
+    #
+
+    glab mr create -i $1
+}
+
+#@
+function 8bit_assembler_simulator () {
+    #
+    # @Description  prepare for making 8bit assembler simulator
+    # @params       
+    # @Example      8bit_assembler_simulator
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    local -a reference_lst=(
+        https://light11.hatenadiary.com/entry/2020/04/09/203510
+        https://schweigi.github.io/assembler-simulator/
+        https://schweigi.github.io/assembler-simulator/instruction-set.html
+        https://www.mschweighauser.com/make-your-own-assembler-simulator-in-javascript-part1/
+    )
+}
+
 #@
 function install_firewalld () {
     #
@@ -1330,6 +1359,22 @@ function make_shared_library () {
 
     gcc -maix64 -fpic -c $1.c
     gcc -maix64 -shared -o lib$1.so $1.o
+}
+
+
+#@
+function zsh_lovers () {
+
+    local -A reference_lst=(
+        modifier        https://wonderwall.hatenablog.com/entry/2016/06/19/154205
+    )
+}
+
+
+#@ $1
+function youare... () {
+    echo "you are ..."
+    echo "$1"
 }
 
 #@ install
