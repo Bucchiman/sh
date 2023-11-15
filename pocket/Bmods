@@ -21,6 +21,10 @@ function pass () {
 
 }
 
+function water_detection () {
+    # https://towardsdatascience.com/water-detection-in-high-resolution-satellite-images-using-the-waterdetect-python-package-7c5a031e3d16
+}
+
 #@ $1
 function glab_create_branch_from_issue () {
     #
