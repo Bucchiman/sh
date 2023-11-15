@@ -294,6 +294,7 @@ function neovim_projects () {
             usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
             colorscheme     https://blog.atusy.net/2022/04/28/vim-colorscheme-by-buffer/
             extmark         https://www.rasukarusan.com/entry/2021/08/22/202248
+            play_neovim     https://www.rasukarusan.com/entry/2019/12/06/000000
         )
     }
 }
