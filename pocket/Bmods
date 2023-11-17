@@ -21,8 +21,10 @@ function pass () {
 
 }
 
-function water_detection () {
+function pocket () {
     # https://towardsdatascience.com/water-detection-in-high-resolution-satellite-images-using-the-waterdetect-python-package-7c5a031e3d16
+    # https://qiita.com/TumoiYorozu/items/a8193e5ecd957a1b9b0d
+    # https://qiita.com/stktk/items/c056ad72a8d9f9226c1f
 }
 
 #@ $1
