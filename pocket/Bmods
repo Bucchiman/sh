@@ -21,15 +21,15 @@ function pass () {
 
 }
 
-function wavelet_transform () {
 
-    # https://scicoding.com/introduction-to-wavelet-transform-using-python/
-
-}
-
-
-function water_detection () {
-    # https://towardsdatascience.com/water-detection-in-high-resolution-satellite-images-using-the-waterdetect-python-package-7c5a031e3d16
+function pocket () {
+    local -A reference_lst=(
+        water_detection_satelight       https://towardsdatascience.com/water-detection-in-high-resolution-satellite-images-using-the-waterdetect-python-package-7c5a031e3d16
+        wavelet_idea                    https://qiita.com/TumoiYorozu/items/a8193e5ecd957a1b9b0d
+        wavelet_opencv                  https://qiita.com/stktk/items/c056ad72a8d9f9226c1f
+        wavelet_intro                   https://scicoding.com/introduction-to-wavelet-transform-using-python/
+        docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
+    )
 }
 
 #@ $1
@@ -76,33 +76,38 @@ function install_firewalld () {
     sudo systemctl start firewalld
 }
 
-
-#@ install
-function install_tauri () {
-    cargo install create-tauri-app --locked
-    cargo install trunk
-}
-
 #@
-function run_tauri () {
-    cargo tauri dev
+function TauriDesktop () {
+    #@ nest install
+    function install_tauri () {
+        cargo install create-tauri-app --locked
+        cargo install trunk
+    }
+
+    #@ nest
+    function run_tauri () {
+        cargo tauri dev
+    }
+
+    #@ nest
+    function create_tauri_app () {
+        cargo create-tauri-app
+    }
 }
 
-
-#@
-function create_tauri_app () {
-    cargo create-tauri-app
-}
 
 #@ mac
-function mac_update () {
-    sudo port selfupdate
-}
+function MacSet () {
+    #@ nest
+    function mac_update () {
+        sudo port selfupdate
+    }
 
-#@ mac
-function mac_upgrade () {
-    local target_package=packages=$(sudo port selfupdate && sudo port installed | fzf)
-    # sudo port upgrade $target_package
+    #@ nest
+    function mac_upgrade () {
+        local target_package=packages=$(sudo port selfupdate && sudo port installed | fzf)
+        # sudo port upgrade $target_package
+    }
 }
 
 #@
@@ -151,7 +156,7 @@ function colorhex() {
 }
 
 
-#@
+#@ idea
 function gameboy_emulator () {
     local -A reference_lst=(
         keichi      https://keichi.dev/post/write-yourself-a-game-boy-emulator/
@@ -165,7 +170,7 @@ function gameboy_emulator () {
 
 
 #@
-function colorlist() {
+function colorlist () {
     for color in {000..015}; do
         print -nP "%F{$color}$color %f"
         print -nP "%K{$color}$color %k"
@@ -197,7 +202,6 @@ function update_submodules () {
 #@
 function network_projects () {
     local -A projects=(
-        docker_port_forward     https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
     )
 }
 
