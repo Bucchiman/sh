@@ -29,6 +29,7 @@ function pocket () {
         wavelet_opencv                  https://qiita.com/stktk/items/c056ad72a8d9f9226c1f
         wavelet_intro                   https://scicoding.com/introduction-to-wavelet-transform-using-python/
         docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
+        mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
     )
 }
 
