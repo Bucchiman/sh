@@ -131,6 +131,16 @@ function setup () {
 }
 
 #@ archive
+function deploy () {
+    ldeploy
+}
+
+#@ archive
+function deploy_test () {
+    ldeploy_test
+}
+
+#@ archive
 function default () {
     #
     # this is default setting
