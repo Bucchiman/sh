@@ -64,6 +64,38 @@ function 8bit_assembler_simulator () {
 }
 
 #@
+function pytorch_lib () {
+    #
+    # @Description  pytorch awesome libraries
+    # @params       
+    # @Example      pytorch_lib
+    # @Reference    https://github.com/bharathgs/Awesome-pytorch-list
+    #
+
+    local -A lib_lst=(
+        awesome     https://github.com/bharathgs/Awesome-pytorch-list
+        pyro        https://github.com/pyro-ppl/pyro
+        fastai      https://github.com/fastai/fastai
+    )
+
+    local -A tutorial_lst=(
+        practical       https://github.com/spro/practical-pytorch
+        nlp             https://pytorch.org/tutorials/beginner/deep_learning_nlp_tutorial.html
+        pytorch_tuto    https://github.com/yunjey/pytorch-tutorial
+
+    )
+
+    local -A modelzoo_lst=(
+        modelzoo        https://modelzoo.co/
+    )
+
+    local -A metrics_lst=(
+        official        https://pytorch.org/serve/metrics.html
+
+    )
+}
+
+#@
 function install_firewalld () {
     #
     # @Description  install firewalld to set firewall
@@ -740,29 +772,65 @@ function install_distant () {
     ln -sf $PWD/target/release/distant $HOME/bin
 }
 
+#@ install
+function install_nix () {
+    _has cargo
+}
+
 #@
 function set_devbox () {
+    #
+    # @Description  devbox setup
+    # @params       
+    # @Example      set_devbox
+    # @Reference    https://www.nixhub.io/
+    #
+
+
+    #@ nest local
+    function install_nix () {
+        #
+        # @Description  command a & command b
+        #               background command a
+        #               foreground command b
+        # @params       : command a
+        #               : command b
+        # @Example
+        # @Reference    https://github.com/nix-community/nix-user-chroot
+        #
+
+        cargo install nix-user-chroot
+        mkdir -m 0755 $PWD/bin/.nix
+        nix-user-chroot $PWD/bin/.nix bash -c 'curl -L https://nixos.org/nix/install | sh'
+        #nix-user-chroot ~/.nix bash
+    }
+
+
     #@ nest sudo
     function install_devbox () {
         #
-        # @Description  install devbox
+        # @Description  install devbox [sudo | local]
         # @params       
-        # @Example      insatll_devbox
+        # @Example      install_devbox
         # @Reference    https://www.jetpack.io/devbox/docs/installing_devbox/
         #
 
-        #curl -fsSL https://get.jetpack.io/devbox | bash
-        curl https://get.jetpack.io/devbox
+        curl -fsSL https://get.jetpack.io/devbox | bash
+        # curl https://get.jetpack.io/devbox
     }
 
     #@ nest
     function base_packages () {
-        devbox add neovim@latest
-        devbox add neovim-qt@latest
-        devbox add neovim-gtk@latest
-        devbox add neovim-remote@latest
-        devbox add git@latest
-        devbox add ripgrep
+        devbox add zsh@latest                   # https://www.nixhub.io/packages/zsh
+        devbox add neovim@latest                # https://www.nixhub.io/packages/neovim
+        devbox add neovim-qt@latest             # https://www.nixhub.io/packages/neovim-qt
+        devbox add neovim-gtk@latest            # https://www.nixhub.io/packages/neovim-gtk
+        devbox add neovim-remote@latest         # https://www.nixhub.io/packages/neovim-remote
+        devbox add git@latest                   # https://www.nixhub.io/packages/git
+        # devbox add ripgrep
+        devbox add fzf@latest                   # https://www.nixhub.io/packages/fzf
+        devbox add gh@latest                    # https://www.nixhub.io/packages/gh
+        devbox add bat@latest                   # https://www.nixhub.io/packages/bat
     }
 
     #@ nest
@@ -1508,29 +1576,33 @@ function _example_wokwi () {
     wokwi-cli .
 }
 
-#@ install
+#@ $2 install
 function install_fzf () {
     #
-    # @Description  command a || command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  install fzf for local user
+    # @params
+    # @Example      install_fzf
+    # @Reference    https://github.com/junegunn/fzf#installation
     #
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/source/fzf
-    ~/source/fzf/install
-    ln -sf $HOME/source/fzf/bin/fzf $HOME/bin/
+    local install_place
+    if [[ $# == 0 ]]; then
+        install_place=$HOME/source/fzf
+        bin_place=$HOME/bin/fzf
+    else
+        install_place=$1
+        bin_place=$2
+    fi
+
+    git clone --depth 1 https://github.com/junegunn/fzf.git $install_place
+    $install_place/install
+    ln -sf $install_place/bin/fzf $bin_place
 }
 
 #@ install
 function install_bat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  install batcat
     # @params       : command a
     #               : command b
     # @Example
@@ -1988,7 +2060,7 @@ function update_dotfiles () {
     for value in ${(v)DOTFILES_SUBMODULES}; do
         cd $DOTFILES/$value
         git fetch origin dev
-        git merge origin/dev
+        git merge --no-edit origin/dev
     done
     source $HOME/.zshrc
 }
