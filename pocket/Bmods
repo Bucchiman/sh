@@ -33,6 +33,7 @@ function pocket () {
     )
 }
 
+
 #@ $1
 function glab_create_branch_from_issue () {
     #
@@ -967,6 +968,11 @@ function help_rsync () {
     echo "--size-only               サイズが同じファイルは処理しない"
     echo "-c | --checksum           更新日とサイズではなく、チェックサムで変更の有無をチェックする"
     echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
+}
+
+#@ python
+function instance_package () {
+    pip install hydra-core --upgrade
 }
 
 
