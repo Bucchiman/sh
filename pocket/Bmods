@@ -30,6 +30,7 @@ function pocket () {
         wavelet_intro                   https://scicoding.com/introduction-to-wavelet-transform-using-python/
         docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
         mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
+        hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
     )
 }
 
@@ -1041,6 +1042,27 @@ function help_rsync () {
 #@ python
 function instance_package () {
     pip install hydra-core --upgrade
+    pip install -U "ray[data,train,tune,serve]"
+    pip install async-timeout
+    pip install hyperopt
+    pip install torch torchvision torchaudio
+    pip install scipy
+    pip install scikit-learn
+    pip install tensorboard
+}
+
+#@ 
+function Mhoareyou () {
+    #
+    # @Description  machine description
+    # @params       
+    # @Example      
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    set DATE  = `date +%Y.%m.%d_%H:%M:%S`
+set HERE = `pwd`
+
 }
 
 
