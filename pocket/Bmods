@@ -77,6 +77,7 @@ function pytorch_lib () {
         awesome     https://github.com/bharathgs/Awesome-pytorch-list
         pyro        https://github.com/pyro-ppl/pyro
         fastai      https://github.com/fastai/fastai
+        raytune     xxxxxx
     )
 
     local -A tutorial_lst=(
@@ -798,11 +799,12 @@ function set_devbox () {
         #               : command b
         # @Example
         # @Reference    https://github.com/nix-community/nix-user-chroot
+        #               https://nixos.wiki/wiki/Nix_Installation_Guide
         #
 
         cargo install nix-user-chroot
-        mkdir -m 0755 $PWD/bin/.nix
-        nix-user-chroot $PWD/bin/.nix bash -c 'curl -L https://nixos.org/nix/install | sh'
+        mkdir -m 0755 $HOME/bin/.nix
+        nix-user-chroot $HOME/bin/.nix bash -c 'curl -L https://nixos.org/nix/install | sh'
         #nix-user-chroot ~/.nix bash
     }
 
@@ -836,7 +838,8 @@ function set_devbox () {
 
     #@ nest
     function python_packages () {
-        devbox add python@latest
+        devbox add python@312
+        devbox add python312Packages.pip
     }
 
     #@ nest
@@ -872,6 +875,7 @@ function set_devbox () {
     }
 
     local -a function_lst=(
+        install_nix
         install_devbox
         create_workspace
         pass
