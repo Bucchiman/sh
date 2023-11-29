@@ -114,6 +114,13 @@ function install_firewalld () {
 
 #@
 function TauriDesktop () {
+    #
+    # @Description  install tauri (Desktop application)
+    # @params       
+    # @Example      install_tauri
+    # @Reference    https://tauri.app/
+    #
+
     #@ nest install
     function install_tauri () {
         cargo install create-tauri-app --locked
@@ -129,7 +136,52 @@ function TauriDesktop () {
     function create_tauri_app () {
         cargo create-tauri-app
     }
+
+    #@ nest
+    function _cargo () {
+        cargo install create-tauri-app --locked
+        cargo create-tauri-app
+    }
+
+    #@ nest
+    function _shell () {
+        sh <(curl https://create.tauri.app/sh)
+    }
+
 }
+
+#@ install
+function install_typescript () {
+    npm install -g typescript
+    npm install -g ts-node
+}
+
+function setup_deno () {
+    #
+    # @Description  deno setup
+    # @params       
+    # @Example      setup_deno
+    # @Reference    https://deno-ja.vercel.app/manual@v1.9.1/getting_started/first_steps
+    #
+
+    #@ install
+    function install_deno () {
+        #
+        # @Description  deno installer
+        # @params       
+        # @Example
+        # @Reference    https://github.com/denoland/deno
+        #
+
+        curl -fsSL https://deno.land/install.sh | sh
+    }
+
+    #@
+    function sample_deno () {
+        deno run https://deno.land/std@0.94.0/examples/welcome.ts
+    }
+}
+
 
 
 #@ mac
@@ -324,34 +376,6 @@ function lua_projects () {
 
 }
 
-#@ install
-function install_tauri () {
-    #
-    # @Description  install tauri (Desktop application)
-    # @params       
-    # @Example      install_tauri
-    # @Reference    https://tauri.app/
-    #
-
-    #@ nest
-    function _cargo () {
-        cargo install create-tauri-app --locked
-        cargo create-tauri-app
-    }
-
-    #@ nest
-    function _shell () {
-        sh <(curl https://create.tauri.app/sh)
-    }
-
-    typeset -a install_types=(
-        _cargo
-        _shell
-    )
-    echo "what is your favorite types of installation?>"
-    local target_type=`array_fzf "$install_types[*]"`
-    eval $target_type
-}
 
 
 #@ educ neovim reference
