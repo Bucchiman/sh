@@ -21,6 +21,94 @@ function pass () {
 
 }
 
+function sick_sensor () {
+    local -a sensor_lst=(
+        wtt12l_b12547
+        tim551_2050001
+    )
+    local -A datasheet(
+        wtt12l_b12547       https://docs.rs-online.com/a533/A700000007638335.pdf
+        tim551_2050001      https://docs.rs-online.com/513f/A700000007802452.pdf
+    )
+}
+
+function add_metadata_to_image () {
+
+}
+
+
+function install_yq () {
+    #
+    # @Description  yaml cli install
+    # @params       
+    # @Example      install_yq
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $HOME/bin/yq
+    chmod u+x $HOME/bin/yq
+}
+
+function sample01_yq () {
+
+cat <<eos > sample01.yml
+---
+# A sample yaml file
+company: spacelift
+domain:
+ - devops
+ - devsecops
+tutorial:
+  - yaml:
+      name: "YAML Ain't Markup Language"
+      type: awesome
+      born: 2001
+  - json:
+      name: JavaScript Object Notation
+      type: great
+      born: 2001
+  - xml:
+      name: Extensible Markup Language
+      type: good
+      born: 1996
+author: omkarbirade
+published: true
+eos
+}
+
+function sample02_yq () {
+    #
+    # @Description  generate sample yaml file
+    # @params       
+    # @Example      sample02_yq
+    # @Reference    https://zenn.dev/musyu/articles/a2ffd081b0eb077cf7b5
+    #
+
+cat <<eos > postgres-pod.yml
+# postgres-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-pod
+  labels:
+    name: postgres-pod
+    app: demo-app
+spec:
+  containers:
+    - name: postgres
+      image: postgres
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+eos
+}
+
+
 
 function pocket () {
     local -A reference_lst=(
