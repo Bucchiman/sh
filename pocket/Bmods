@@ -2440,7 +2440,7 @@ function create_remote_repository () {
     if [[ $target_platform == "github" ]]; then
         gh repo create $project_name --private --add-readme
     else
-        glab repo create $project_name --private --readme
+        glab repo create $project_name --private --readme --defaultBranch master
     fi
 
 }
