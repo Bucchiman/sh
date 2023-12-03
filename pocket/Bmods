@@ -21,6 +21,28 @@ function pass () {
 
 }
 
+#@
+function init () {
+    install_system
+    if ! _has nvim; then install_neovim; fi
+    if ! _has fzf; then install_fzf; fi
+    if ! _has bat; then install_bat; fi
+}
+
+
+function install_system () {
+    local -a package_lst=(
+        make
+        cmake
+    )
+    sudo apt-get install -y ${package_lst[*]}
+}
+
+function init_wsl () {
+    sudo apt update
+    sudo apt upgrade
+}
+
 function sick_sensor () {
     local -a sensor_lst=(
         wtt12l_b12547
@@ -1616,12 +1638,16 @@ function install_neovim () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    sudo apt install -y snapd
-    sudo snap install --classic nvim
-    #git clone https://github.com/neovim/neovim.git $HOME/source/neovim
-    #cd $HOME/source/neovim
-    #make CMAKE_BUILD_TYPE=RelWithDebInfo
-    #sudo make install
+    cd $HOME/source/
+    wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+    tar xzvf nvim-linux64.tar.gz
+    ln -sf $PWD/nvim-linux64/bin/nvim $HOME/bin/nvim
+    # sudo apt install -y snapd
+    # sudo snap install --classic nvim
+    # git clone https://github.com/neovim/neovim.git $HOME/source/neovim
+    # cd $HOME/source/neovim
+    # make CMAKE_BUILD_TYPE=RelWithDebInfo
+    # sudo make install
 }
 
 #@ 
