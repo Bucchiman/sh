@@ -1725,6 +1725,7 @@ function install_fzf () {
 
     local install_place
     if [[ $# == 0 ]]; then
+        mkdir -p $HOME/source
         install_place=$HOME/source/fzf
         bin_place=$HOME/bin/fzf
     else
