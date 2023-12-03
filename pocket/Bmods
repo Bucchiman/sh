@@ -31,9 +31,30 @@ function init () {
 
 
 function install_system () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://installati.one/install-freeglut3-dev-ubuntu-20-04/#google_vignette
+    #               https://utho.com/docs/tutorial/how-to-install-the-opengl-library-on-ubuntu-20-04/
+    # 
+    #
+
+    
     local -a package_lst=(
         make
         cmake
+        libglu1-mesa
+        libxi-dev
+        libxmu-dev
+        libglu1-mesa-dev
+        pkg-config
+        freeglut3-dev       # lglut not found
+        x11-apps
+        mesa-utils
     )
     sudo apt-get install -y ${package_lst[*]}
 }
@@ -41,6 +62,7 @@ function install_system () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
+
 }
 
 function sick_sensor () {
@@ -142,6 +164,13 @@ function pocket () {
         mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
         hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
     )
+}
+
+function install_glab () {
+    curl -L https://packages.gitlab.com/glab/glab/gpgkey | sudo apt-key add -
+    sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    sudo apt update
+    sudo apt install glab
 }
 
 
@@ -968,6 +997,7 @@ function set_devbox () {
         devbox add fzf@latest                   # https://www.nixhub.io/packages/fzf
         devbox add gh@latest                    # https://www.nixhub.io/packages/gh
         devbox add bat@latest                   # https://www.nixhub.io/packages/bat
+        devbox add glab@latest                  # https://www.nixhub.io/packages/glab
     }
 
     #@ nest
@@ -1451,6 +1481,11 @@ function install_language () {
     #if [[  ]]; then
     #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     #fi
+}
+
+#@ install
+function install_rust () {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 
 #@ install
@@ -2012,7 +2047,12 @@ function attach_mywork () {
     # @Reference    
     #
 
-    $(cd $HOME/; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
+    if [[ $# == 0 ]]; then
+        download_place=$HOME
+    else
+        download_place=$1
+    fi
+    $(cd $download_place; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
 }
 
 #@
