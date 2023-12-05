@@ -1,0 +1,63 @@
+#!/bin/zsh
+#
+# FileName:     local
+# Author:       8ucchiman
+# CreatedDate:  2023-11-12 20:51:23
+# LastModified: 2023-01-23 14:11:45 +0900
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
+
+
+source $HOME/Bmods
+
+function linit () {
+    echo "init"
+}
+
+function lsetup () {
+    echo "setup"
+}
+
+function lopen () {
+    echo "open"
+}
+
+function lbuild () {
+    echo "build"
+}
+
+function lrun () {
+    echo "run"
+}
+
+function lclean () {
+    echo "clean"
+}
+
+function ldeploy () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://minory.org/rsync-exclude.html#google_vignette
+    #               https://qiita.com/bezeklik/items/22e791df7187958d76c1
+    #
+
+    echo "deploy"
+    #
+    # rsync -artlpu --exclue={'.git', 'assets', 'data/origin.zip'} ./ /tmp/8ucchiman/projectA
+    #
+    # a: archive
+    # r: recursive
+    # l: links
+    # p: perms
+    # t: timestamp
+    # u: update
+}
+
+
+eval $@
