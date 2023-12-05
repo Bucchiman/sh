@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-01-23 14:11:45 +0900
+# LastModified: 2023-12-05 14:37:30
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -163,6 +163,8 @@ function pocket () {
         docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
         mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
         hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
+        vertexbuffer                    https://antongerdelan.net/opengl/vertexbuffers.html
+        grid_block_thread               http://harmanani.github.io/classes/csc447/Notes/Lecture15.pdf
     )
 }
 
