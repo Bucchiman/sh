@@ -100,14 +100,12 @@ EOF
 
 function diskformat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  diskformat for exFat
     # @params       : command a
     #               : command b
-    # @Example
-    # @Remarks      Mac formatter (for raspi)
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Example      diskformat
+    # @Remarks      setting format in mac (for raspi), interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
     #
     # @result       disutil list
     # /dev/disk0 (internal, physical):
@@ -151,6 +149,68 @@ function diskformat () {
     read diskname
     local format=`array_fzf "${formats[*]}"`
     diskutil eraseDisk $format $diskname /dev/$identifier
+}
+
+#@ raspberry pi
+function set_mount4raspi () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      set_mount
+    # @Remarks      interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #               https://asithink001.blogspot.com/2013/05/exfat.html
+    #
+    # @Results      on `sudo blkid`
+    # /dev/mmcblk0p1: LABEL_FATBOOT="boot" LABEL="boot" UUID="D386-9DE9" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="ebbe9c69-01"
+    # /dev/mmcblk0p2: LABEL="rootfs" UUID="996c1b5f-170b-4f38-a5e0-85eef5acf12c" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="ebbe9c69-02"
+    # /dev/loop0: TYPE="squashfs"
+    # /dev/loop1: TYPE="squashfs"
+    # /dev/loop2: TYPE="squashfs"
+    # /dev/loop3: TYPE="squashfs"
+    # /dev/loop4: TYPE="squashfs"
+    # /dev/loop5: TYPE="squashfs"
+    # /dev/loop6: TYPE="squashfs"
+    # /dev/loop7: TYPE="squashfs"
+    # /dev/loop8: TYPE="squashfs"
+    # /dev/sda1: LABEL="raspiHDD" UUID="653F-973F" BLOCK_SIZE="512" TYPE="exfat" PARTUUID="9bdbf079-01"         # target device
+    # /dev/sda2: LABEL_FATBOOT="SERVICEV001" LABEL="SERVICEV001" UUID="3011-EE06" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="9bdbf079-02"
+    #
+    # @Results      on `sudo vim /etc/fstab`
+    # proc            /proc           proc    defaults          0       0
+    # /dev/mmcblk0p6  /boot           vfat    defaults          0       2
+    # /dev/mmcblk0p7  /               ext4    defaults,noatime  0       1
+    # UUID="653F-973F"        /mnt/raspiHDD    exfat-fuse      async,auto,dev,exec,gid=65534,rw,uid=65534,umask=007    0       0
+    # ---------------         -------------    ----------      ----------------------------------------------------
+    #   device                 mount point     file system          mount option
+    #
+
+    sudo apt-get install exfat-fuse exfat-utils
+    sudo blkid
+    echo -n "You have to remember UUID. Do you remember that? [Enter]"
+    read dummy
+    echo -n "open fstab, to use UUID."
+    sleep 3
+    sudo vim /etc/fstab
+}
+
+#@ raspberry pi
+function change_hostname () {
+    #
+    # @Description  change hostname 
+    # @params       
+    # @Example      change_hostname
+    # @Remarks      2023-10-30 21:57:39
+    #                   raspberrypi ->  raspi
+    #                   
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #
+
+    sudo vim /etc/hostname
+    sudo vim /etc/hosts
+    
 }
 
 function _check_file_exist () {
