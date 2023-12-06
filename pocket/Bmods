@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-06 16:39:51
+# LastModified: 2023-12-06 19:00:33
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -13,7 +13,7 @@
 #@ archive
 function pass () {
     #
-    # @Description  no running, like python
+    # @Description  Identity function, like python
     # @params       
     # @Example      pass
     # @Reference    
@@ -554,7 +554,7 @@ function neovim_projects () {
     #@ nest
     function reference () {
         typeset -A reference_lst=(
-            tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
+            tetris001       https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
             hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
             usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
@@ -564,6 +564,84 @@ function neovim_projects () {
         )
     }
 }
+
+#@
+function install_gh () {
+    mkdir -p $HOME/source; cd $_
+    git clone https://github.com/cli/cli.git gh-cli
+    cd gh-cli; mkdir -p bin
+    make install prefix=$HOME/source/gh-cli/build
+    ln -sf $PWD/build/bin/gh $HOME/bin/
+}
+
+
+#@
+function gist () {
+    gh gist list
+}
+
+
+
+#@ initialize
+function starter_pack () {
+    if ! _has starship ; then
+        install_starship
+    fi
+    if ! _has fzf ; then
+        install_fzf
+    fi
+    if ! _has bat ; then
+        install_bat
+    fi
+    if ! _has delta; then
+        install_delta
+    fi
+    if ! _has lazygit; then
+        install_lazygit
+    fi
+}
+
+#@
+function install_delta () {
+    #
+    # @Description  success to diff
+    # @params       
+    # @Example      insatll_delta
+    # @Reference    https://dandavison.github.io/delta/get-started.html
+    #
+
+    cargo install --locked git-delta
+}
+
+
+#@
+function install_starship () {
+    #
+    # @Description  prompt decorator
+    # @params       
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
+    ## sudo
+    # curl -sS https://starship.rs/install.sh | sh
+
+    cargo install starship --locked
+}
+
+
+#@
+function install_exa () {
+    #
+    # @Description  success to ls, with icon
+    # @params       
+    # @Example      install_exa
+    # @Reference    https://github.com/ogham/exa
+    #
+
+    cargo install exa
+}
+
 
 
 ## #@ lopez
@@ -611,6 +689,8 @@ function rust_projects () {
     function reference () {
         typeset -A reference_lst=(
             テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
+            tetris002       https://qiita.com/namn1125/items/15ddea322c086aa1b0d3
+            tetris003       https://speakerdeck.com/shunshobon/rustdedui-zhan-xing-tetriswozuo-tutahua?slide=22
             入門            https://zenn.dev/mebiusbox/books/22d4c1ed9b0003
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
@@ -855,6 +935,14 @@ function install_lua () {
 
 #@ error
 function install_luarocks () {
+    mkdir $HOME/source/luarocks && cd $_
+    wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
+    tar zxpf luarocks-3.9.2.tar.gz
+
+}
+
+#@ install
+function install_lua () {
     #
     # @Description  install luarocks
     # @params       
@@ -879,7 +967,7 @@ function install_luarocks () {
         curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
         tar -zxf lua-5.3.5.tar.gz
         cd lua-5.3.5
-        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+        sed -i -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
         make linux test
         make install
     }
@@ -1404,14 +1492,12 @@ eos
 #@ mac
 function diskformat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  diskformat for exFat
     # @params       : command a
     #               : command b
-    # @Example
-    # @Remarks      Mac formatter (for raspi)
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Example      diskformat
+    # @Remarks      setting format in mac (for raspi), interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
     #
     # @result       disutil list
     # /dev/disk0 (internal, physical):
@@ -1455,6 +1541,68 @@ function diskformat () {
     read diskname
     local format=`array_fzf "${formats[*]}"`
     diskutil eraseDisk $format $diskname /dev/$identifier
+}
+
+#@ raspberry pi
+function set_mount4raspi () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      set_mount
+    # @Remarks      interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #               https://asithink001.blogspot.com/2013/05/exfat.html
+    #
+    # @Results      on `sudo blkid`
+    # /dev/mmcblk0p1: LABEL_FATBOOT="boot" LABEL="boot" UUID="D386-9DE9" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="ebbe9c69-01"
+    # /dev/mmcblk0p2: LABEL="rootfs" UUID="996c1b5f-170b-4f38-a5e0-85eef5acf12c" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="ebbe9c69-02"
+    # /dev/loop0: TYPE="squashfs"
+    # /dev/loop1: TYPE="squashfs"
+    # /dev/loop2: TYPE="squashfs"
+    # /dev/loop3: TYPE="squashfs"
+    # /dev/loop4: TYPE="squashfs"
+    # /dev/loop5: TYPE="squashfs"
+    # /dev/loop6: TYPE="squashfs"
+    # /dev/loop7: TYPE="squashfs"
+    # /dev/loop8: TYPE="squashfs"
+    # /dev/sda1: LABEL="raspiHDD" UUID="653F-973F" BLOCK_SIZE="512" TYPE="exfat" PARTUUID="9bdbf079-01"         # target device
+    # /dev/sda2: LABEL_FATBOOT="SERVICEV001" LABEL="SERVICEV001" UUID="3011-EE06" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="9bdbf079-02"
+    #
+    # @Results      on `sudo vim /etc/fstab`
+    # proc            /proc           proc    defaults          0       0
+    # /dev/mmcblk0p6  /boot           vfat    defaults          0       2
+    # /dev/mmcblk0p7  /               ext4    defaults,noatime  0       1
+    # UUID="653F-973F"        /mnt/raspiHDD    exfat-fuse      async,auto,dev,exec,gid=65534,rw,uid=65534,umask=007    0       0
+    # ---------------         -------------    ----------      ----------------------------------------------------
+    #   device                 mount point     file system          mount option
+    #
+
+    sudo apt-get install exfat-fuse exfat-utils
+    sudo blkid
+    echo -n "You have to remember UUID. Do you remember that? [Enter]"
+    read dummy
+    echo -n "open fstab, to use UUID."
+    sleep 3
+    sudo vim /etc/fstab
+}
+
+#@ raspberry pi
+function change_hostname () {
+    #
+    # @Description  change hostname 
+    # @params       
+    # @Example      change_hostname
+    # @Remarks      2023-10-30 21:57:39
+    #                   raspberrypi ->  raspi
+    #                   
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #
+
+    sudo vim /etc/hostname
+    sudo vim /etc/hosts
+    
 }
 
 #@
@@ -1536,10 +1684,17 @@ function install_go () {
     #
 
     cd $HOME/source
-    if [[ -e go1.21.3.linux-arm64.tar.gz ]]; then
-        wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
-        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # for amd64
+    if [[ ! -e https://go.dev/dl/go1.21.3.linux-amd64.tar.gz ]]; then
+        wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
+        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-amd64.tar.gz
     fi
+
+    # for arm 
+    # if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
+    #     wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+    #     rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # fi
     ln -sf $PWD/go/bin/go $HOME/bin/
 }
 
@@ -1825,13 +1980,13 @@ function install_fzf () {
 #@ install
 function install_bat () {
     #
-    # @Description  install batcat
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  success to cat, useful with syntax hightlight et al...
+    # @params       
+    # @Example      install_bat
+    # @Reference    https://github.com/sharkdp/bat
     #
 
+    cargo install --locked bat
 }
 
 #@
