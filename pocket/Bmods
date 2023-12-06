@@ -3,14 +3,14 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-01-23 14:11:45 +0900
+# LastModified: 2023-12-06 10:09:09
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
 # Description:  ---
 #
 
-#@
+#@ archive
 function pass () {
     #
     # @Description  Identity function, like python
@@ -21,12 +21,525 @@ function pass () {
 
 }
 
+#@
+function init () {
+    install_system
+    if ! _has nvim; then install_neovim; fi
+    if ! _has fzf; then install_fzf; fi
+    if ! _has bat; then install_bat; fi
+}
+
+
+function install_system () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://installati.one/install-freeglut3-dev-ubuntu-20-04/#google_vignette
+    #               https://utho.com/docs/tutorial/how-to-install-the-opengl-library-on-ubuntu-20-04/
+    # 
+    #
+
+    
+    local -a package_lst=(
+        make
+        cmake
+        libglu1-mesa
+        libxi-dev
+        libxmu-dev
+        libglu1-mesa-dev
+        pkg-config
+        freeglut3-dev       # lglut not found
+        x11-apps
+        mesa-utils
+    )
+    sudo apt-get install -y ${package_lst[*]}
+}
+
+function init_wsl () {
+    sudo apt update
+    sudo apt upgrade
+
+}
+
+function sick_sensor () {
+    local -a sensor_lst=(
+        wtt12l_b12547
+        tim551_2050001
+    )
+    local -A datasheet(
+        wtt12l_b12547       https://docs.rs-online.com/a533/A700000007638335.pdf
+        tim551_2050001      https://docs.rs-online.com/513f/A700000007802452.pdf
+    )
+}
+
+function add_metadata_to_image () {
+
+}
+
+
+function install_yq () {
+    #
+    # @Description  yaml cli install
+    # @params       
+    # @Example      install_yq
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $HOME/bin/yq
+    chmod u+x $HOME/bin/yq
+}
+
+function sample01_yq () {
+
+cat <<eos > sample01.yml
+---
+# A sample yaml file
+company: spacelift
+domain:
+ - devops
+ - devsecops
+tutorial:
+  - yaml:
+      name: "YAML Ain't Markup Language"
+      type: awesome
+      born: 2001
+  - json:
+      name: JavaScript Object Notation
+      type: great
+      born: 2001
+  - xml:
+      name: Extensible Markup Language
+      type: good
+      born: 1996
+author: omkarbirade
+published: true
+eos
+}
+
+function sample02_yq () {
+    #
+    # @Description  generate sample yaml file
+    # @params       
+    # @Example      sample02_yq
+    # @Reference    https://zenn.dev/musyu/articles/a2ffd081b0eb077cf7b5
+    #
+
+cat <<eos > postgres-pod.yml
+# postgres-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-pod
+  labels:
+    name: postgres-pod
+    app: demo-app
+spec:
+  containers:
+    - name: postgres
+      image: postgres
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+eos
+}
+
+
+
+function pocket () {
+    local -A reference_lst=(
+        water_detection_satelight       https://towardsdatascience.com/water-detection-in-high-resolution-satellite-images-using-the-waterdetect-python-package-7c5a031e3d16
+        wavelet_idea                    https://qiita.com/TumoiYorozu/items/a8193e5ecd957a1b9b0d
+        wavelet_opencv                  https://qiita.com/stktk/items/c056ad72a8d9f9226c1f
+        wavelet_intro                   https://scicoding.com/introduction-to-wavelet-transform-using-python/
+        docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
+        mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
+        hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
+        vertexbuffer                    https://antongerdelan.net/opengl/vertexbuffers.html
+        grid_block_thread               http://harmanani.github.io/classes/csc447/Notes/Lecture15.pdf
+    )
+}
+
+function install_glab () {
+    curl -L https://packages.gitlab.com/glab/glab/gpgkey | sudo apt-key add -
+    sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    sudo apt update
+    sudo apt install glab
+}
+
+
+#@ $1
+function glab_create_branch_from_issue () {
+    #
+    # @Description  gitlab merge request
+    # @params       $1: issue number
+    # @Example      glab_create_branch_from_issue 6
+    # @Reference    https://gitlab.com/gitlab-org/cli/-/blob/main/docs/source/mr/create.md
+    #
+
+    glab mr create -i $1
+}
+
+#@
+function 8bit_assembler_simulator () {
+    #
+    # @Description  prepare for making 8bit assembler simulator
+    # @params       
+    # @Example      8bit_assembler_simulator
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    local -a reference_lst=(
+        https://light11.hatenadiary.com/entry/2020/04/09/203510
+        https://schweigi.github.io/assembler-simulator/
+        https://schweigi.github.io/assembler-simulator/instruction-set.html
+        https://www.mschweighauser.com/make-your-own-assembler-simulator-in-javascript-part1/
+    )
+}
+
+#@
+function pytorch_lib () {
+    #
+    # @Description  pytorch awesome libraries
+    # @params       
+    # @Example      pytorch_lib
+    # @Reference    https://github.com/bharathgs/Awesome-pytorch-list
+    #
+
+    local -A lib_lst=(
+        awesome     https://github.com/bharathgs/Awesome-pytorch-list
+        pyro        https://github.com/pyro-ppl/pyro
+        fastai      https://github.com/fastai/fastai
+        raytune     xxxxxx
+    )
+
+    local -A tutorial_lst=(
+        practical       https://github.com/spro/practical-pytorch
+        nlp             https://pytorch.org/tutorials/beginner/deep_learning_nlp_tutorial.html
+        pytorch_tuto    https://github.com/yunjey/pytorch-tutorial
+
+    )
+
+    local -A modelzoo_lst=(
+        modelzoo        https://modelzoo.co/
+    )
+
+    local -A metrics_lst=(
+        official        https://pytorch.org/serve/metrics.html
+
+    )
+}
+
+#@
+function install_firewalld () {
+    #
+    # @Description  install firewalld to set firewall
+    # @params       
+    # @Example      install_firewalld
+    # @Reference    https://computingforgeeks.com/install-and-use-firewalld-on-ubuntu/
+    #
+
+    sudo apt update
+    sudo apt install -y firewalld
+    sudo systemctl enable firewalld
+    sudo systemctl start firewalld
+}
+
+#@
+function TauriDesktop () {
+    #
+    # @Description  install tauri (Desktop application)
+    # @params       
+    # @Example      install_tauri
+    # @Reference    https://tauri.app/
+    #
+
+    #@ nest install
+    function install_tauri () {
+        cargo install create-tauri-app --locked
+        cargo install trunk
+    }
+
+    #@ nest
+    function run_tauri () {
+        cargo tauri dev
+    }
+
+    #@ nest
+    function create_tauri_app () {
+        cargo create-tauri-app
+    }
+
+    #@ nest
+    function _cargo () {
+        cargo install create-tauri-app --locked
+        cargo create-tauri-app
+    }
+
+    #@ nest
+    function _shell () {
+        sh <(curl https://create.tauri.app/sh)
+    }
+
+}
+
+#@ install
+function install_typescript () {
+    npm install -g typescript
+    npm install -g ts-node
+}
+
+function setup_deno () {
+    #
+    # @Description  deno setup
+    # @params       
+    # @Example      setup_deno
+    # @Reference    https://deno-ja.vercel.app/manual@v1.9.1/getting_started/first_steps
+    #
+
+    #@ install
+    function install_deno () {
+        #
+        # @Description  deno installer
+        # @params       
+        # @Example
+        # @Reference    https://github.com/denoland/deno
+        #
+
+        curl -fsSL https://deno.land/install.sh | sh
+    }
+
+    #@
+    function sample_deno () {
+        deno run https://deno.land/std@0.94.0/examples/welcome.ts
+    }
+}
+
+
+
+#@ mac
+function MacSet () {
+    #@ nest
+    function mac_update () {
+        sudo port selfupdate
+    }
+
+    #@ nest
+    function mac_upgrade () {
+        local target_package=packages=$(sudo port selfupdate && sudo port installed | fzf)
+        # sudo port upgrade $target_package
+    }
+}
+
+#@
+function environment () {
+    nvim --version
+}
+
+
+#@
+function fork_repo () {
+    local -a platforms=(
+        github 
+        gitlab
+    )
+    local target_platform=`array_fzf "${platforms[*]}"`
+    echo -n "repository for fork...> "
+    read repo
+    if [[ $target_platform == "github" ]]; then
+        gh repo fork $repo
+    else
+        glab repo fork $repo
+    fi
+}
+
+#@
+function website () {
+    local -A reference_lst=(
+        rust_web    https://zenn.dev/etoal83/articles/6eb6031865f3de
+        elm         https://qiita.com/kazurego7/items/27a2b6f8b4a1bfac4bd3
+        #reddit_info https://www.reddit.com/r/rust/comments/igrq90/comment/g2wkd17/?utm_source=share&utm_medium=web2x&context=3
+    )
+}
+
+#@ 
+function colorhex() {
+    # https://askubuntu.com/questions/1405822/printf-statement-with-background-and-foreground-colours
+    # printf '\033[41;32m%s\033[0m\n' foobar
+    for color in {000..255}; do
+        hex_color=`printf "%04x" $color`
+        print -nP "%F{$color}$hex_color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+
+}
+
+
+#@ idea
+function gameboy_emulator () {
+    local -A reference_lst=(
+        keichi      https://keichi.dev/post/write-yourself-a-game-boy-emulator/
+        ocaml       https://www.docswell.com/s/linoscope/ZNRRXL-game-boy-emulator-ocaml#p24
+        go_01       https://hackmd.io/@anqou/HJcvRrwy9
+        awesome     https://github.com/gbdev/awesome-gbdev#documentation
+        go_02       https://zenn.dev/akatsuki/articles/ec95ab95f0e89ea8c38f
+        rust        https://mjhd.hatenablog.com/entry/2021/04/14/221813
+    )
+}
+
+
+#@
+function colorlist () {
+    for color in {000..015}; do
+        print -nP "%F{$color}$color %f"
+        print -nP "%K{$color}$color %k"
+    done
+    printf "\n"
+    for color in {016..255}; do
+        print -nP "%F{$color}$color %f"
+        if [ $(($((color-16))%6)) -eq 5 ]; then
+            printf "\n"
+        fi
+    done
+}
+
+
+#@ $1 git
+function update_submodules () {
+    #
+    # @Description  update submodules
+    # @params       $1: Directory
+    # @Example
+    # @Date         2023-11-09 11:49:01
+    # @ToDo         if arguments
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    $(cd $1 && git submodule update --init --recursive)
+}
+
+#@
+function network_projects () {
+    local -A projects=(
+    )
+}
+
+
+#@
+function hotprojects () {
+    #
+    # @Description  hotprojects of repository, publickey1
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    #@ nest
+    function reference_lst () {
+        mojo                https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
+        wasm                https://zenn.dev/topics/wasm
+        wasmer              https://www.publickey1.jp/blog/23/webassemblybashwasmer_40posixwasix.html
+        technical_writing   https://qiita.com/yasuoyasuo/items/c43783316a4d141a140f
+    }
+    typeset -A platforms=(
+        publickey1              https://www.publickey1.jp/
+        most-repos              https://www.hostinger.com/tutorials/most-popular-github-repos
+        codecamp                https://www.freecodecamp.org/news/the-most-popular-coding-challenge-websites/#7atcoder
+        beecrowd                https://www.beecrowd.com.br/judge/en
+        hackerrank              https://www.hackerrank.com/
+    )
+
+}
+   
+
+#@ $2
+function Lremote_mount () {
+    #
+    # @Description  remote mount
+    # @params       $1: remote server(remote path + remote directory)
+    #                   e.g. bucchiman@hogemachine:mywork/project/fuga/mnt
+    #               $2: host directory
+    #                   e.g. $BASE_DIR/mnt
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    local remote_server=$1
+    local host_dir=$2
+    if [[ $# == 0 ]]; then
+        echo -n "remote server(like \"bucchiman@hogemachine:mywork/project/fuga/mnt\")> "
+        read remote_server
+        echo -n "host directory(like \"\$BASE_DIR/mnt\")> "
+        read host_dir
+    fi
+    
+    sshfs -o follow_symlinks -o intr -o sshfs_sync \
+             $remote_server \
+             $host_dir
+}
+
+#@ educ lua reference
+function lua_projects () {
+    #
+    # @Description  lua projects
+    #               reference:  other projects
+    #               idea:       my projects
+    # @params       
+    # @Example      lua_projects
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    #@ nest
+    function reference () {
+        typeset -A reference_lst=(
+            apisix          https://github.com/apache/apisix
+            kong            https://github.com/Kong/kong
+        )
+    }
+
+    #@ nest
+    function idea () {
+        typeset -A idear_lst=(
+        )
+    }
+
+}
+
+
+
 #@ educ neovim reference
 function neovim_projects () {
+    #
+    # @Description  neovim projects
+    #               reference:  other projects
+    #               idea:       my projects
+    # @params       
+    # @Example      neovim_projects
+    # @Reference    
+    #
+
+    #@ nest
     function reference () {
         typeset -A reference_lst=(
             tetris001       https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
+            hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
+            usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
+            colorscheme     https://blog.atusy.net/2022/04/28/vim-colorscheme-by-buffer/
+            extmark         https://www.rasukarusan.com/entry/2021/08/22/202248
+            play_neovim     https://www.rasukarusan.com/entry/2019/12/06/000000
         )
     }
 }
@@ -110,6 +623,46 @@ function install_exa () {
 
 
 
+## #@ lopez
+## function temporal_fixed () {
+##     sed 's/if \[ \$USE_WSL2 == 1 \]/if \[\[ \$USE_WSL2 == 1 \]\]/g' $HOME/bin/gulliver/dot.bashrc
+## }
+
+#@ install
+function install_wasm () {
+    #
+    # @Description  wasm to install
+    # @params       
+    # @Example      install_wasm
+    # @Date         2023-11-08 12:58:32
+    # @Reference    https://rustwasm.github.io/wasm-pack/installer/
+    #
+
+    #@ nest
+    function only4wsl2 () {
+        curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+    }
+
+    #@ nest
+    function anyplatform () {
+        cargo install wasm-pack
+    }
+
+    #@ nest
+    function otherpm () {
+        npm install -g wasm-pack
+        # yarn global add wasm-pack
+    }
+
+    function_lst=(
+        only4wsl2
+        anyplatform
+    )
+    local target_func=`array_fzf "$function_lst[*]"`
+    eval $target_func
+}
+
+
 #@ educ rust reference
 function rust_projects () {
     function reference () {
@@ -121,6 +674,7 @@ function rust_projects () {
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
             async           https://zenn.dev/magurotuna/books/tokio-tutorial-ja
+            official_docs   https://www.rust-lang.org/ja/
         )
         for key in ${(k)reference_lst}; do
             echo "$key\t\t$reference_lst[$key]"
@@ -349,6 +903,16 @@ function github_action () {
 }
 
 #@ install
+function install_lua () {
+    mkdir -p $HOME/source && cd $_
+    curl -R -O http://www.lua.org/ftp/lua-5.4.6.tar.gz
+    tar zxf lua-5.4.6.tar.gz
+    cd lua-5.4.6
+    make all test
+    cd src && ln -sf $PWD/lua $HOME/bin/
+}
+
+#@ error
 function install_luarocks () {
     mkdir $HOME/source/luarocks && cd $_
     wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
@@ -395,25 +959,51 @@ function install_lua () {
     eval $target_function
 }
 
-#@
+#@ $1
 function CurrentDirectory2Submodule () {
     #
     # @Description  directory to submodule
-    # @params       CurrentDiretory2Submodule
-    # @Example      CurrentDirectory2Submodule()
-    # @Reference    https://blog.cloud-acct.com/posts/u-git-add-submodule/
+    # @params       
+    # @Example      CurrentDirectory2Submodule
+    # @Reference    https://day.marketing/blog/create-a-git-submodule-inside-an-existing-directory/
+    #               https://blog.cloud-acct.com/posts/u-git-add-submodule/
     #
+
+    # # local BASENAME=`basename $1`
+    # # local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
+    # # gh repo create $BASENAME --private  # リモートリポジトリを作成 
+    # # cd $1; git init
+    # # git submodule add $remoterepo $BASENAME
 
     # local BASENAME=`basename $1`
     # local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
-    # gh repo create $BASENAME --private  # リモートリポジトリを作成 
-    # cd $1; git init
-    # git submodule add $remoterepo $BASENAME
+    # gh repo create $BASENAME --private
+    # git submodule add $remoterepo $1
 
-    local BASENAME=`basename $1`
-    local remoterepo="git@github.com:Bucchiman/$BASENAME.git"
-    gh repo create $BASENAME --private
-    git submodule add $remoterepo $1
+    local -A platforms=(
+        github      git@github.com:Bucchiman/
+        gitlab      git@gitlab.com:Bucchiman/
+    )
+    target_platform=~`array_fzf "${(k)platforms[*]}"`
+
+    # # vim .gitmodule
+    # ## [submodule "path/to/submodule"]
+    # ## path = path/to/submodule
+    # ## url = git@github.com:user/submodule
+    # ## 
+
+    # git submodule add git@github.com:user/submodule.git submoduletmp
+    # git submodule sync
+    # git add .
+    # git commit -m 'Initial commit of submodule'
+    # git push origin master
+
+    # cd path/to/submodule
+    # # vim .gitignore
+    # git add .
+    # git commit -m 'Initial commit of submodule'
+    # git remote add origin git@github.com:user/submodule.git
+    # git push -u origin master
 }
 
 #@
@@ -430,39 +1020,80 @@ function topleveldirectory () {
 
 #@
 function install_distant () {
-    git clone https://github.com/chipsenkbeil/distant.git
-    cargo build --release
+    mkdir -p $HOME/source/ && \
+    git clone https://github.com/chipsenkbeil/distant.git && \
+    cd distant && \
+    cargo build --release && \
     ln -sf $PWD/target/release/distant $HOME/bin
+}
+
+#@ install
+function install_nix () {
+    _has cargo
 }
 
 #@
 function set_devbox () {
+    #
+    # @Description  devbox setup
+    # @params       
+    # @Example      set_devbox
+    # @Reference    https://www.nixhub.io/
+    #
+
+
+    #@ nest local
+    function install_nix () {
+        #
+        # @Description  command a & command b
+        #               background command a
+        #               foreground command b
+        # @params       : command a
+        #               : command b
+        # @Example
+        # @Reference    https://github.com/nix-community/nix-user-chroot
+        #               https://nixos.wiki/wiki/Nix_Installation_Guide
+        #
+
+        cargo install nix-user-chroot
+        mkdir -m 0755 $HOME/bin/.nix
+        nix-user-chroot $HOME/bin/.nix bash -c 'curl -L https://nixos.org/nix/install | sh'
+        #nix-user-chroot ~/.nix bash
+    }
+
+
     #@ nest sudo
     function install_devbox () {
         #
-        # @Description  install devbox
+        # @Description  install devbox [sudo | local]
         # @params       
-        # @Example      insatll_devbox
+        # @Example      install_devbox
         # @Reference    https://www.jetpack.io/devbox/docs/installing_devbox/
         #
 
-        #curl -fsSL https://get.jetpack.io/devbox | bash
-        curl https://get.jetpack.io/devbox
+        curl -fsSL https://get.jetpack.io/devbox | bash
+        # curl https://get.jetpack.io/devbox
     }
 
     #@ nest
     function base_packages () {
-        devbox add neovim@latest
-        devbox add neovim-qt@latest
-        devbox add neovim-gtk@latest
-        devbox add neovim-remote@latest
-        devbox add git@latest
-        devbox add ripgrep
+        devbox add zsh@latest                   # https://www.nixhub.io/packages/zsh
+        devbox add neovim@latest                # https://www.nixhub.io/packages/neovim
+        devbox add neovim-qt@latest             # https://www.nixhub.io/packages/neovim-qt
+        devbox add neovim-gtk@latest            # https://www.nixhub.io/packages/neovim-gtk
+        devbox add neovim-remote@latest         # https://www.nixhub.io/packages/neovim-remote
+        devbox add git@latest                   # https://www.nixhub.io/packages/git
+        # devbox add ripgrep
+        devbox add fzf@latest                   # https://www.nixhub.io/packages/fzf
+        devbox add gh@latest                    # https://www.nixhub.io/packages/gh
+        devbox add bat@latest                   # https://www.nixhub.io/packages/bat
+        devbox add glab@latest                  # https://www.nixhub.io/packages/glab
     }
 
     #@ nest
     function python_packages () {
-        devbox add python@latest
+        devbox add python@312
+        devbox add python312Packages.pip
     }
 
     #@ nest
@@ -498,6 +1129,7 @@ function set_devbox () {
     }
 
     local -a function_lst=(
+        install_nix
         install_devbox
         create_workspace
         pass
@@ -665,6 +1297,32 @@ function help_rsync () {
     echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
 }
 
+#@ python
+function instance_package () {
+    pip install hydra-core --upgrade
+    pip install -U "ray[data,train,tune,serve]"
+    pip install async-timeout
+    pip install hyperopt
+    pip install torch torchvision torchaudio
+    pip install scipy
+    pip install scikit-learn
+    pip install tensorboard
+}
+
+#@ 
+function Mhoareyou () {
+    #
+    # @Description  machine description
+    # @params       
+    # @Example      
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    set DATE  = `date +%Y.%m.%d_%H:%M:%S`
+set HERE = `pwd`
+
+}
+
 
 #@ python
 function scraping_python () {
@@ -813,14 +1471,12 @@ eos
 #@ mac
 function diskformat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  diskformat for exFat
     # @params       : command a
     #               : command b
-    # @Example
-    # @Remarks      Mac formatter (for raspi)
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Example      diskformat
+    # @Remarks      setting format in mac (for raspi), interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
     #
     # @result       disutil list
     # /dev/disk0 (internal, physical):
@@ -864,6 +1520,68 @@ function diskformat () {
     read diskname
     local format=`array_fzf "${formats[*]}"`
     diskutil eraseDisk $format $diskname /dev/$identifier
+}
+
+#@ raspberry pi
+function set_mount4raspi () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      set_mount
+    # @Remarks      interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #               https://asithink001.blogspot.com/2013/05/exfat.html
+    #
+    # @Results      on `sudo blkid`
+    # /dev/mmcblk0p1: LABEL_FATBOOT="boot" LABEL="boot" UUID="D386-9DE9" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="ebbe9c69-01"
+    # /dev/mmcblk0p2: LABEL="rootfs" UUID="996c1b5f-170b-4f38-a5e0-85eef5acf12c" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="ebbe9c69-02"
+    # /dev/loop0: TYPE="squashfs"
+    # /dev/loop1: TYPE="squashfs"
+    # /dev/loop2: TYPE="squashfs"
+    # /dev/loop3: TYPE="squashfs"
+    # /dev/loop4: TYPE="squashfs"
+    # /dev/loop5: TYPE="squashfs"
+    # /dev/loop6: TYPE="squashfs"
+    # /dev/loop7: TYPE="squashfs"
+    # /dev/loop8: TYPE="squashfs"
+    # /dev/sda1: LABEL="raspiHDD" UUID="653F-973F" BLOCK_SIZE="512" TYPE="exfat" PARTUUID="9bdbf079-01"         # target device
+    # /dev/sda2: LABEL_FATBOOT="SERVICEV001" LABEL="SERVICEV001" UUID="3011-EE06" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="9bdbf079-02"
+    #
+    # @Results      on `sudo vim /etc/fstab`
+    # proc            /proc           proc    defaults          0       0
+    # /dev/mmcblk0p6  /boot           vfat    defaults          0       2
+    # /dev/mmcblk0p7  /               ext4    defaults,noatime  0       1
+    # UUID="653F-973F"        /mnt/raspiHDD    exfat-fuse      async,auto,dev,exec,gid=65534,rw,uid=65534,umask=007    0       0
+    # ---------------         -------------    ----------      ----------------------------------------------------
+    #   device                 mount point     file system          mount option
+    #
+
+    sudo apt-get install exfat-fuse exfat-utils
+    sudo blkid
+    echo -n "You have to remember UUID. Do you remember that? [Enter]"
+    read dummy
+    echo -n "open fstab, to use UUID."
+    sleep 3
+    sudo vim /etc/fstab
+}
+
+#@ raspberry pi
+function change_hostname () {
+    #
+    # @Description  change hostname 
+    # @params       
+    # @Example      change_hostname
+    # @Remarks      2023-10-30 21:57:39
+    #                   raspberrypi ->  raspi
+    #                   
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #
+
+    sudo vim /etc/hostname
+    sudo vim /etc/hosts
+    
 }
 
 #@
@@ -913,6 +1631,11 @@ function install_language () {
     #if [[  ]]; then
     #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     #fi
+}
+
+#@ install
+function install_rust () {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 }
 
 #@ install
@@ -1081,6 +1804,22 @@ function make_shared_library () {
     gcc -maix64 -shared -o lib$1.so $1.o
 }
 
+
+#@
+function zsh_lovers () {
+
+    local -A reference_lst=(
+        modifier        https://wonderwall.hatenablog.com/entry/2016/06/19/154205
+    )
+}
+
+
+#@ $1
+function youare... () {
+    echo "you are ..."
+    echo "$1"
+}
+
 #@ install
 function install_neovim () {
     #
@@ -1091,12 +1830,16 @@ function install_neovim () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    sudo apt install -y snapd
-    sudo snap install --classic nvim
-    #git clone https://github.com/neovim/neovim.git $HOME/source/neovim
-    #cd $HOME/source/neovim
-    #make CMAKE_BUILD_TYPE=RelWithDebInfo
-    #sudo make install
+    cd $HOME/source/
+    wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+    tar xzvf nvim-linux64.tar.gz
+    ln -sf $PWD/nvim-linux64/bin/nvim $HOME/bin/nvim
+    # sudo apt install -y snapd
+    # sudo snap install --classic nvim
+    # git clone https://github.com/neovim/neovim.git $HOME/source/neovim
+    # cd $HOME/source/neovim
+    # make CMAKE_BUILD_TYPE=RelWithDebInfo
+    # sudo make install
 }
 
 #@ 
@@ -1189,21 +1932,28 @@ function _example_wokwi () {
     wokwi-cli .
 }
 
-#@ install
+#@ $2 install
 function install_fzf () {
     #
-    # @Description  command a || command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  install fzf for local user
+    # @params
+    # @Example      install_fzf
+    # @Reference    https://github.com/junegunn/fzf#installation
     #
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git ~/source/fzf
-    ~/source/fzf/install
-    ln -sf $HOME/source/fzf/bin/fzf $HOME/bin/
+    local install_place
+    if [[ $# == 0 ]]; then
+        mkdir -p $HOME/source
+        install_place=$HOME/source/fzf
+        bin_place=$HOME/bin/fzf
+    else
+        install_place=$1
+        bin_place=$2
+    fi
+
+    git clone --depth 1 https://github.com/junegunn/fzf.git $install_place
+    $install_place/install
+    ln -sf $install_place/bin/fzf $bin_place
 }
 
 #@ install
@@ -1454,7 +2204,12 @@ function attach_mywork () {
     # @Reference    
     #
 
-    $(cd $HOME/; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
+    if [[ $# == 0 ]]; then
+        download_place=$HOME
+    else
+        download_place=$1
+    fi
+    $(cd $download_place; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
 }
 
 #@
@@ -1528,23 +2283,6 @@ function show_samples () {
     # echo $sample
 }
 
-#@
-function just_memo () {
-    #
-    # @Description  
-    #               background command a
-    #               foreground command b
-    # @params       
-    # @Example      just_memo
-    # @Reference    https://www.publickey1.jp/
-    #
-
-    local -a keywords=(
-        mojo        https://www.publickey1.jp/blog/23/wslpythonmojoastro_3020239.html
-        wasm        https://zenn.dev/topics/wasm
-        wasmer      https://www.publickey1.jp/blog/23/webassemblybashwasmer_40posixwasix.html
-    )
-}
 
 #@
 function show_cmd_history () {
@@ -1684,7 +2422,7 @@ function update_dotfiles () {
     for value in ${(v)DOTFILES_SUBMODULES}; do
         cd $DOTFILES/$value
         git fetch origin dev
-        git merge origin/dev
+        git merge --no-edit origin/dev
     done
     source $HOME/.zshrc
 }
@@ -1861,6 +2599,44 @@ function gutils_tic_toc () {
     
 }
 
+
+#@
+function georgia_omscs () {
+    #@ nest
+    function matrials () {
+        local -A material_lst=(
+            apply           https://omscs.gatech.edu/program-info/application-deadlines-process-requirements
+            zenn01          https://zenn.dev/magurotuna/articles/georgia-tech-omscs
+            zenn02          https://zenn.dev/kakeami/articles/617efe3bf9841d
+            zenn02_github   https://kakeami.github.io/road-to-gatech/
+            zenn03_文系     https://zenn.dev/tofu511/articles/49b81ec2b6883e
+            sugita          https://lapras.com/public/toshi0607
+            yusuke_         https://github.com/magurotuna
+            prerequisite    https://ja.takp.me/posts/how-i-was-accepted-to-georgia-tech-omscs/
+        )
+    }
+
+    #@ nest
+    function prerequisite () {
+        local -a lst=(
+            resume
+            大学の成績証明書
+            卒業証明書
+            TOEFL_iBT
+            statement_of_purpose
+            recommendation_three
+        )
+    }
+
+    #@ nest
+    function deadline () {
+        local -A sched=(
+            spring      july_01st
+            automn      march_01st
+        )
+    }
+}
+
 #@ $2
 function create_remote_repository () {
     #
@@ -1886,27 +2662,27 @@ function create_remote_repository () {
         project_name=$2
     fi
     if [[ $target_platform == "github" ]]; then
-        gh repo create $project_name --private
+        gh repo create $project_name --private --add-readme
     else
-        glab repo create $project_name --private --readme
+        glab repo create $project_name --private --readme --defaultBranch master
     fi
 
 }
 
 
 
-#@
-function default () {
-    #
-    # this is default setting
-    # you can run this function without no arguments.
-    #
-    echo "******************************"
-    echo "* default                    *"
-    echo "******************************"
-    echo "this is default setting"
-    echo "you can run this function without no arguments."
-}
+# #@
+# function default () {
+#     #
+#     # this is default setting
+#     # you can run this function without no arguments.
+#     #
+#     echo "******************************"
+#     echo "* default                    *"
+#     echo "******************************"
+#     echo "this is default setting"
+#     echo "you can run this function without no arguments."
+# }
 
 #@
 function search () {
