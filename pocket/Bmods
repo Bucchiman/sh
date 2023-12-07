@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-06 19:00:33
+# LastModified: 2023-12-07 17:06:19
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -29,7 +29,38 @@ function init () {
     if ! _has bat; then install_bat; fi
 }
 
+#@
+function systemd_cron () {
+    #
+    # @Description  create cron job on systemd
+    # @params       
+    # @Example      systemd_cron
+    # @Reference    https://vlike-vlife.netlify.app/posts/systemd_scheduling
+    #
 
+    #@ nest
+    function sample () {
+        if [[ ! -L $HOME/.config/cron ]]; then
+            cd $HOME/dotfiles;
+            ./attach_dotfiles.zsh;
+        fi
+        cd $HOME/.config/cron
+#cat << EOF > hello.sh
+##!/bin/bash
+#echo    "Hello, " "$@" "!"
+#EOF
+#        chmod u+x hello.sh
+
+#        systemctl edit --user --force --full demo@.service
+#        systemctl --user start demo@sample.servije
+#        systemctl --user status demo@sample.service
+    }
+    # systemctl disable --user --now demo@schedule.timer
+    # sample
+}
+
+
+#@ install
 function install_system () {
     #
     # @Description  command a & command b
@@ -57,6 +88,78 @@ function install_system () {
         mesa-utils
     )
     sudo apt-get install -y ${package_lst[*]}
+}
+
+#@
+function docker () {
+    #@ nest
+    function sample () {
+        mkdir -p /tmp/8ucchiman/test_docker; cd $_
+cat << EOF > docker-compose.yml
+web:
+  build: .
+  environment:
+    DISABLE_SPRING: "1" 
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    DB_HOST: "db"
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/var/local/rails5_product"
+  links:
+    - "db"
+
+db:
+  image: mysql:5.6
+  environment:
+    MYSQL_ROOT_PASSWORD: "root"
+EOF
+
+cat << EOF > Dockerfile
+# rails5_product
+FROM ruby:2.3.0
+ENV LANG C.UTF-8
+
+# Install Packages
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y \
+      sudo \
+      nodejs \
+      build-essential \
+      mysql-client 
+
+# Application
+ENV app     rails5_product
+ENV deploy  /var/local/\$app
+ENV user    prod_dev
+
+# User
+RUN useradd -d /home/\$user -m -s /bin/bash \$user
+RUN echo "\$user:\$user" | chpasswd
+RUN echo "\$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/\$user
+USER \$user
+ENV HOME /home/\$user
+
+# Work Directory
+RUN sudo mkdir -p \$deploy
+RUN sudo chown -R \$user:\$user \$deploy
+WORKDIR \$deploy
+
+# Bundle Install
+RUN sudo gem install bundler
+# ADD Gemfile \$deploy/
+# ADD Gemfile.lock \$deploy/
+# RUN sudo chown \$user:\$user Gemfile
+# RUN sudo chown \$user:\$user Gemfile.lock
+# RUN bundle install
+
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+EOF
+        docker-compose build
+    }
+    sample
 }
 
 function install_cling () {
@@ -184,6 +287,8 @@ function pocket () {
         grid_block_thread               http://harmanani.github.io/classes/csc447/Notes/Lecture15.pdf
         opengl_tutorial                 https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-10-transparency/
         3d_rendering                    https://zenn.dev/mebiusbox/articles/8e765148576919
+        wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
+        awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
