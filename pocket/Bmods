@@ -843,6 +843,10 @@ function set_devbox () {
     }
 
     #@ nest
+    function cpp_packages () {
+        devbox add opencv4@4.7.0
+    }
+    #@ nest
     function go_packages () {
         devbox add go
     }
