@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-01-23 14:11:45 +0900
+# LastModified: 2023-12-07 17:06:19
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -13,13 +13,265 @@
 #@ archive
 function pass () {
     #
-    # @Description  no running, like python
+    # @Description  Identity function, like python
     # @params       
     # @Example      pass
     # @Reference    
     #
 
 }
+
+#@
+function init () {
+    install_system
+    if ! _has nvim; then install_neovim; fi
+    if ! _has fzf; then install_fzf; fi
+    if ! _has bat; then install_bat; fi
+}
+
+#@
+function systemd_cron () {
+    #
+    # @Description  create cron job on systemd
+    # @params       
+    # @Example      systemd_cron
+    # @Reference    https://vlike-vlife.netlify.app/posts/systemd_scheduling
+    #
+
+    #@ nest
+    function sample () {
+        if [[ ! -L $HOME/.config/cron ]]; then
+            cd $HOME/dotfiles;
+            ./attach_dotfiles.zsh;
+        fi
+        cd $HOME/.config/cron
+#cat << EOF > hello.sh
+##!/bin/bash
+#echo    "Hello, " "$@" "!"
+#EOF
+#        chmod u+x hello.sh
+
+#        systemctl edit --user --force --full demo@.service
+#        systemctl --user start demo@sample.servije
+#        systemctl --user status demo@sample.service
+    }
+    # systemctl disable --user --now demo@schedule.timer
+    # sample
+}
+
+
+#@ install
+function install_system () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://installati.one/install-freeglut3-dev-ubuntu-20-04/#google_vignette
+    #               https://utho.com/docs/tutorial/how-to-install-the-opengl-library-on-ubuntu-20-04/
+    # 
+    #
+
+    
+    local -a package_lst=(
+        make
+        cmake
+        libglu1-mesa
+        libxi-dev
+        libxmu-dev
+        libglu1-mesa-dev
+        pkg-config
+        freeglut3-dev       # lglut not found
+        x11-apps
+        mesa-utils
+    )
+    sudo apt-get install -y ${package_lst[*]}
+}
+
+#@
+function docker () {
+    #@ nest
+    function sample () {
+        mkdir -p /tmp/8ucchiman/test_docker; cd $_
+cat << EOF > docker-compose.yml
+web:
+  build: .
+  environment:
+    DISABLE_SPRING: "1" 
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    DB_HOST: "db"
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/var/local/rails5_product"
+  links:
+    - "db"
+
+db:
+  image: mysql:5.6
+  environment:
+    MYSQL_ROOT_PASSWORD: "root"
+EOF
+
+cat << EOF > Dockerfile
+# rails5_product
+FROM ruby:2.3.0
+ENV LANG C.UTF-8
+
+# Install Packages
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y \
+      sudo \
+      nodejs \
+      build-essential \
+      mysql-client 
+
+# Application
+ENV app     rails5_product
+ENV deploy  /var/local/\$app
+ENV user    prod_dev
+
+# User
+RUN useradd -d /home/\$user -m -s /bin/bash \$user
+RUN echo "\$user:\$user" | chpasswd
+RUN echo "\$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/\$user
+USER \$user
+ENV HOME /home/\$user
+
+# Work Directory
+RUN sudo mkdir -p \$deploy
+RUN sudo chown -R \$user:\$user \$deploy
+WORKDIR \$deploy
+
+# Bundle Install
+RUN sudo gem install bundler
+# ADD Gemfile \$deploy/
+# ADD Gemfile.lock \$deploy/
+# RUN sudo chown \$user:\$user Gemfile
+# RUN sudo chown \$user:\$user Gemfile.lock
+# RUN bundle install
+
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+EOF
+        docker-compose build
+    }
+    sample
+}
+
+function install_cling () {
+    #
+    # @Description  interactive mode cling
+    # @params       
+    # @Example      install_cling
+    # @Reference    https://root.cern.ch/
+    #               https://root.cern/cling/cling_build_instructions/
+    #
+
+    mkdir -p $HOME/source/cling; cd $_
+    curl -O https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
+    chmod u+x clone.sh
+    ./clone.sh
+    ln -sf $PWD/build/bin/cling $HOME/bin/cling
+    ln -sf $PWD/build/bin/cling $HOME/bin/root
+}
+
+function init_wsl () {
+    sudo apt update
+    sudo apt upgrade
+
+}
+
+function sick_sensor () {
+    local -a sensor_lst=(
+        wtt12l_b12547
+        tim551_2050001
+    )
+    local -A datasheet(
+        wtt12l_b12547       https://docs.rs-online.com/a533/A700000007638335.pdf
+        tim551_2050001      https://docs.rs-online.com/513f/A700000007802452.pdf
+    )
+}
+
+function add_metadata_to_image () {
+
+}
+
+
+function install_yq () {
+    #
+    # @Description  yaml cli install
+    # @params       
+    # @Example      install_yq
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O $HOME/bin/yq
+    chmod u+x $HOME/bin/yq
+}
+
+function sample01_yq () {
+
+cat <<eos > sample01.yml
+---
+# A sample yaml file
+company: spacelift
+domain:
+ - devops
+ - devsecops
+tutorial:
+  - yaml:
+      name: "YAML Ain't Markup Language"
+      type: awesome
+      born: 2001
+  - json:
+      name: JavaScript Object Notation
+      type: great
+      born: 2001
+  - xml:
+      name: Extensible Markup Language
+      type: good
+      born: 1996
+author: omkarbirade
+published: true
+eos
+}
+
+function sample02_yq () {
+    #
+    # @Description  generate sample yaml file
+    # @params       
+    # @Example      sample02_yq
+    # @Reference    https://zenn.dev/musyu/articles/a2ffd081b0eb077cf7b5
+    #
+
+cat <<eos > postgres-pod.yml
+# postgres-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: postgres-pod
+  labels:
+    name: postgres-pod
+    app: demo-app
+spec:
+  containers:
+    - name: postgres
+      image: postgres
+      ports:
+        - containerPort: 5432
+      env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+eos
+}
+
 
 
 function pocket () {
@@ -31,7 +283,22 @@ function pocket () {
         docker_port_forward             https://qiita.com/tatsuo-iriyama/items/e4bf2404411343116e3e
         mlflow_tips                     https://qiita.com/c60evaporator/items/e0eb1a0c521d1310d95d
         hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
+        vertexbuffer                    https://antongerdelan.net/opengl/vertexbuffers.html
+        grid_block_thread               http://harmanani.github.io/classes/csc447/Notes/Lecture15.pdf
+        opengl_tutorial                 https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-10-transparency/
+        3d_rendering                    https://zenn.dev/mebiusbox/articles/8e765148576919
+        wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
+        awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
     )
+    local target_=`array_fzf "${(k)reference_lst[*]}"`
+    google-chrome $reference_lst[$target_]
+}
+
+function install_glab () {
+    curl -L https://packages.gitlab.com/glab/glab/gpgkey | sudo apt-key add -
+    sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    sudo apt update
+    sudo apt install glab
 }
 
 
@@ -114,6 +381,13 @@ function install_firewalld () {
 
 #@
 function TauriDesktop () {
+    #
+    # @Description  install tauri (Desktop application)
+    # @params       
+    # @Example      install_tauri
+    # @Reference    https://tauri.app/
+    #
+
     #@ nest install
     function install_tauri () {
         cargo install create-tauri-app --locked
@@ -129,7 +403,52 @@ function TauriDesktop () {
     function create_tauri_app () {
         cargo create-tauri-app
     }
+
+    #@ nest
+    function _cargo () {
+        cargo install create-tauri-app --locked
+        cargo create-tauri-app
+    }
+
+    #@ nest
+    function _shell () {
+        sh <(curl https://create.tauri.app/sh)
+    }
+
 }
+
+#@ install
+function install_typescript () {
+    npm install -g typescript
+    npm install -g ts-node
+}
+
+function setup_deno () {
+    #
+    # @Description  deno setup
+    # @params       
+    # @Example      setup_deno
+    # @Reference    https://deno-ja.vercel.app/manual@v1.9.1/getting_started/first_steps
+    #
+
+    #@ install
+    function install_deno () {
+        #
+        # @Description  deno installer
+        # @params       
+        # @Example
+        # @Reference    https://github.com/denoland/deno
+        #
+
+        curl -fsSL https://deno.land/install.sh | sh
+    }
+
+    #@
+    function sample_deno () {
+        deno run https://deno.land/std@0.94.0/examples/welcome.ts
+    }
+}
+
 
 
 #@ mac
@@ -324,34 +643,6 @@ function lua_projects () {
 
 }
 
-#@ install
-function install_tauri () {
-    #
-    # @Description  install tauri (Desktop application)
-    # @params       
-    # @Example      install_tauri
-    # @Reference    https://tauri.app/
-    #
-
-    #@ nest
-    function _cargo () {
-        cargo install create-tauri-app --locked
-        cargo create-tauri-app
-    }
-
-    #@ nest
-    function _shell () {
-        sh <(curl https://create.tauri.app/sh)
-    }
-
-    typeset -a install_types=(
-        _cargo
-        _shell
-    )
-    echo "what is your favorite types of installation?>"
-    local target_type=`array_fzf "$install_types[*]"`
-    eval $target_type
-}
 
 
 #@ educ neovim reference
@@ -368,7 +659,7 @@ function neovim_projects () {
     #@ nest
     function reference () {
         typeset -A reference_lst=(
-            tetris_like     https://www.rasukarusan.com/entry/2021/12/14/000000
+            tetris001       https://www.rasukarusan.com/entry/2021/12/14/000000
             snow_like       https://qiita.com/kaitat/items/fe72c844e86abd030daa
             hightlight      https://ryota2357.com/blog/2023/neovim-custom-vim-ui-input/
             usefule_builtin https://qiita.com/jnchito/items/57ffda5712636a9a1e62
@@ -378,6 +669,84 @@ function neovim_projects () {
         )
     }
 }
+
+#@
+function install_gh () {
+    mkdir -p $HOME/source; cd $_
+    git clone https://github.com/cli/cli.git gh-cli
+    cd gh-cli; mkdir -p bin
+    make install prefix=$HOME/source/gh-cli/build
+    ln -sf $PWD/build/bin/gh $HOME/bin/
+}
+
+
+#@
+function gist () {
+    gh gist list
+}
+
+
+
+#@ initialize
+function starter_pack () {
+    if ! _has starship ; then
+        install_starship
+    fi
+    if ! _has fzf ; then
+        install_fzf
+    fi
+    if ! _has bat ; then
+        install_bat
+    fi
+    if ! _has delta; then
+        install_delta
+    fi
+    if ! _has lazygit; then
+        install_lazygit
+    fi
+}
+
+#@
+function install_delta () {
+    #
+    # @Description  success to diff
+    # @params       
+    # @Example      insatll_delta
+    # @Reference    https://dandavison.github.io/delta/get-started.html
+    #
+
+    cargo install --locked git-delta
+}
+
+
+#@
+function install_starship () {
+    #
+    # @Description  prompt decorator
+    # @params       
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
+    ## sudo
+    # curl -sS https://starship.rs/install.sh | sh
+
+    cargo install starship --locked
+}
+
+
+#@
+function install_exa () {
+    #
+    # @Description  success to ls, with icon
+    # @params       
+    # @Example      install_exa
+    # @Reference    https://github.com/ogham/exa
+    #
+
+    cargo install exa
+}
+
 
 
 ## #@ lopez
@@ -425,6 +794,8 @@ function rust_projects () {
     function reference () {
         typeset -A reference_lst=(
             テトリス        https://zenn.dev/kumavale/books/30efec2e1d3428
+            tetris002       https://qiita.com/namn1125/items/15ddea322c086aa1b0d3
+            tetris003       https://speakerdeck.com/shunshobon/rustdedui-zhan-xing-tetriswozuo-tutahua?slide=22
             入門            https://zenn.dev/mebiusbox/books/22d4c1ed9b0003
             tauri           https://zenn.dev/kumassy/books/6e518fe09a86b2
             vulkan          https://zenn.dev/hatoo/books/52bcb9e9f7c87d
@@ -669,6 +1040,14 @@ function install_lua () {
 
 #@ error
 function install_luarocks () {
+    mkdir $HOME/source/luarocks && cd $_
+    wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
+    tar zxpf luarocks-3.9.2.tar.gz
+
+}
+
+#@ install
+function install_lua () {
     #
     # @Description  install luarocks
     # @params       
@@ -693,7 +1072,7 @@ function install_luarocks () {
         curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
         tar -zxf lua-5.3.5.tar.gz
         cd lua-5.3.5
-        sed -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
+        sed -i -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
         make linux test
         make install
     }
@@ -834,6 +1213,7 @@ function set_devbox () {
         devbox add fzf@latest                   # https://www.nixhub.io/packages/fzf
         devbox add gh@latest                    # https://www.nixhub.io/packages/gh
         devbox add bat@latest                   # https://www.nixhub.io/packages/bat
+        devbox add glab@latest                  # https://www.nixhub.io/packages/glab
     }
 
     #@ nest
@@ -1221,14 +1601,12 @@ eos
 #@ mac
 function diskformat () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
+    # @Description  diskformat for exFat
     # @params       : command a
     #               : command b
-    # @Example
-    # @Remarks      Mac formatter (for raspi)
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Example      diskformat
+    # @Remarks      setting format in mac (for raspi), interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
     #
     # @result       disutil list
     # /dev/disk0 (internal, physical):
@@ -1272,6 +1650,68 @@ function diskformat () {
     read diskname
     local format=`array_fzf "${formats[*]}"`
     diskutil eraseDisk $format $diskname /dev/$identifier
+}
+
+#@ raspberry pi
+function set_mount4raspi () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      set_mount
+    # @Remarks      interactive mode
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #               https://asithink001.blogspot.com/2013/05/exfat.html
+    #
+    # @Results      on `sudo blkid`
+    # /dev/mmcblk0p1: LABEL_FATBOOT="boot" LABEL="boot" UUID="D386-9DE9" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="ebbe9c69-01"
+    # /dev/mmcblk0p2: LABEL="rootfs" UUID="996c1b5f-170b-4f38-a5e0-85eef5acf12c" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="ebbe9c69-02"
+    # /dev/loop0: TYPE="squashfs"
+    # /dev/loop1: TYPE="squashfs"
+    # /dev/loop2: TYPE="squashfs"
+    # /dev/loop3: TYPE="squashfs"
+    # /dev/loop4: TYPE="squashfs"
+    # /dev/loop5: TYPE="squashfs"
+    # /dev/loop6: TYPE="squashfs"
+    # /dev/loop7: TYPE="squashfs"
+    # /dev/loop8: TYPE="squashfs"
+    # /dev/sda1: LABEL="raspiHDD" UUID="653F-973F" BLOCK_SIZE="512" TYPE="exfat" PARTUUID="9bdbf079-01"         # target device
+    # /dev/sda2: LABEL_FATBOOT="SERVICEV001" LABEL="SERVICEV001" UUID="3011-EE06" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="9bdbf079-02"
+    #
+    # @Results      on `sudo vim /etc/fstab`
+    # proc            /proc           proc    defaults          0       0
+    # /dev/mmcblk0p6  /boot           vfat    defaults          0       2
+    # /dev/mmcblk0p7  /               ext4    defaults,noatime  0       1
+    # UUID="653F-973F"        /mnt/raspiHDD    exfat-fuse      async,auto,dev,exec,gid=65534,rw,uid=65534,umask=007    0       0
+    # ---------------         -------------    ----------      ----------------------------------------------------
+    #   device                 mount point     file system          mount option
+    #
+
+    sudo apt-get install exfat-fuse exfat-utils
+    sudo blkid
+    echo -n "You have to remember UUID. Do you remember that? [Enter]"
+    read dummy
+    echo -n "open fstab, to use UUID."
+    sleep 3
+    sudo vim /etc/fstab
+}
+
+#@ raspberry pi
+function change_hostname () {
+    #
+    # @Description  change hostname 
+    # @params       
+    # @Example      change_hostname
+    # @Remarks      2023-10-30 21:57:39
+    #                   raspberrypi ->  raspi
+    #                   
+    # @Reference    https://qiita.com/rkonno/items/54b2e4b8770c8b0b2bcd
+    #
+
+    sudo vim /etc/hostname
+    sudo vim /etc/hosts
+    
 }
 
 #@
@@ -1324,6 +1764,11 @@ function install_language () {
 }
 
 #@ install
+function install_rust () {
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+}
+
+#@ install
 function install_modular () {
     #
     # @Description  modular mojo install
@@ -1348,10 +1793,17 @@ function install_go () {
     #
 
     cd $HOME/source
-    if [[ -e go1.21.3.linux-arm64.tar.gz ]]; then
-        wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
-        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # for amd64
+    if [[ ! -e https://go.dev/dl/go1.21.3.linux-amd64.tar.gz ]]; then
+        wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
+        rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-amd64.tar.gz
     fi
+
+    # for arm 
+    # if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
+    #     wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+    #     rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    # fi
     ln -sf $PWD/go/bin/go $HOME/bin/
 }
 
@@ -1508,12 +1960,16 @@ function install_neovim () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
-    sudo apt install -y snapd
-    sudo snap install --classic nvim
-    #git clone https://github.com/neovim/neovim.git $HOME/source/neovim
-    #cd $HOME/source/neovim
-    #make CMAKE_BUILD_TYPE=RelWithDebInfo
-    #sudo make install
+    cd $HOME/source/
+    wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+    tar xzvf nvim-linux64.tar.gz
+    ln -sf $PWD/nvim-linux64/bin/nvim $HOME/bin/nvim
+    # sudo apt install -y snapd
+    # sudo snap install --classic nvim
+    # git clone https://github.com/neovim/neovim.git $HOME/source/neovim
+    # cd $HOME/source/neovim
+    # make CMAKE_BUILD_TYPE=RelWithDebInfo
+    # sudo make install
 }
 
 #@ 
@@ -1617,6 +2073,7 @@ function install_fzf () {
 
     local install_place
     if [[ $# == 0 ]]; then
+        mkdir -p $HOME/source
         install_place=$HOME/source/fzf
         bin_place=$HOME/bin/fzf
     else
@@ -1632,13 +2089,13 @@ function install_fzf () {
 #@ install
 function install_bat () {
     #
-    # @Description  install batcat
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  success to cat, useful with syntax hightlight et al...
+    # @params       
+    # @Example      install_bat
+    # @Reference    https://github.com/sharkdp/bat
     #
 
+    cargo install --locked bat
 }
 
 #@
@@ -1877,7 +2334,12 @@ function attach_mywork () {
     # @Reference    
     #
 
-    $(cd $HOME/; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
+    if [[ $# == 0 ]]; then
+        download_place=$HOME
+    else
+        download_place=$1
+    fi
+    $(cd $download_place; git clone --recursive git@gitlab.com:8ucchiman/mywork.git)
 }
 
 #@
@@ -2332,7 +2794,7 @@ function create_remote_repository () {
     if [[ $target_platform == "github" ]]; then
         gh repo create $project_name --private --add-readme
     else
-        glab repo create $project_name --private --readme
+        glab repo create $project_name --private --readme --defaultBranch master
     fi
 
 }
