@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-08 18:31:51
+# LastModified: 2023-12-08 23:40:33
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -141,6 +141,19 @@ function lst2issues () {
         glab issue create -t "\"$title\"" -d "\"$description\""
         rm -f /tmp/8ucchiman/issues/${i}
     done
+}
+
+#@ $1
+function append_issue () {
+    # https://itneko.com/awk-print-index/
+    #echo $@
+    if [[ $# == 0 ]]; then
+        echo "cannot find a todo file"
+        exit 1;
+    fi
+    local title=`awk 'NR==1{print $0}' $1`
+    gh issue create --title $title -F $1
+
 }
 
 #@
