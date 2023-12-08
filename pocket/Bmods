@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-08 13:38:30
+# LastModified: 2023-12-08 18:31:51
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -24,19 +24,73 @@ function pass () {
 #@
 function init () {
     #
-    # @Description  command a & command b
-    #               background command a
-    #               foreground command b
-    # @params       : command a
-    #               : command b
-    # @Example
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Description  install packages
+    # @params       
+    # @Example      init
+    # @Reference    
     #
 
     install_system
     if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
+}
+
+
+#@
+function memory_leak () {
+    #
+    # @Description  check memory leak
+    # @params       
+    # @Example      memory_leak
+    # @Reference    chatgpt: How to detect memory leak in c language?
+    #
+
+    function sample () {
+        mkdir -p /tmp/8ucchiman/memory_leak_test; cd $_
+cat << EOF > memory_leak.c
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int main(void) {
+    int *geho;
+    geho = (int*) malloc(50*sizeof(int));
+    // free(geho);
+    return 0;
+}
+EOF
+cat << EOF > no_memory_leak.c
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int main(void) {
+    int *geho;
+    geho = (int*) malloc(50*sizeof(int));
+    free(geho);
+    return 0;
+}
+EOF
+        gcc -g -o memory_leak memory_leak.c
+        gcc -g -o no_memory_leak no_memory_leak.c
+        valgrind --leak-check=full ./memory_leak
+        valgrind --leak-check=full ./no_memory_leak
+    }
+
+    function checker_code () {
+        mkdir -p /tmp/8ucchiman/memory_leak_test; cd $_
+cat << EOF > memchecker.c
+#include <mcheck.h>
+int main() {
+    mtrace();
+    // Your code here
+    muntrace();
+}
+EOF
+    }
+    # sample
+    # checker_code
 }
 
 #@
@@ -77,11 +131,14 @@ function lst2issues () {
         next_num_line=$num_lines[$((i+1))]
         #echo $cur_num_line $next_num_line
         sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst > /tmp/8ucchiman/issues/${i}
+        local description=`sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst`
         #local title=`sed -n "${cur_num_line}p" toDolst`
         local title=`awk -v nr=${cur_num_line} 'NR==nr{print $2}' toDolst`
         # echo title is $title
         # awk -v nr=${cur_num_line} 'NR=nr{print}' toDolst
-        gh issue create --title $title -F /tmp/8ucchiman/issues/${i}
+
+        # gh issue create --title $title -F /tmp/8ucchiman/issues/${i}
+        glab issue create -t "\"$title\"" -d "\"$description\""
         rm -f /tmp/8ucchiman/issues/${i}
     done
 }
