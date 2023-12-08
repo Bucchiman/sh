@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-08 12:32:35
+# LastModified: 2023-12-08 13:38:30
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -23,6 +23,16 @@ function pass () {
 
 #@
 function init () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
     install_system
     if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
@@ -31,7 +41,15 @@ function init () {
 
 #@
 function lst2issues () {
-    echo $BASE_DIR
+    #
+    # @Description  convert toDo list to issues
+    # @params       
+    # @Example      lst2issues
+    # @Reference    https://qiita.com/takech9203/items/b96eff5773ce9d9cc9b3
+    #               https://tech.kurojica.com/archives/25401/
+    #               https://linux.just4fun.biz/?%E9%80%86%E5%BC%95%E3%81%8DUNIX%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89/%E6%8C%87%E5%AE%9A%E3%81%97%E3%81%9F%E7%AF%84%E5%9B%B2%E3%81%AE%E8%A1%8C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95
+    #
+    
     if [[ ! -e toDolst ]]; then
         echo "cannot find toDolst"
         exit 1
@@ -41,12 +59,31 @@ function lst2issues () {
     #     
 
     # done< <(cat toDolst)
-    awk '
-        $0 ~ /^-+/  {print $2}
-        $0 ~ /^[ ]+-+/  {print $2}
-    ' toDolst
-    
-
+    # awk '
+    #     $0 ~ /^-+/  {print $2}
+    #     $0 ~ /^[ ]+-+/  {print $2}
+    # ' toDolst
+    # awk "/i\/o/,/setup/" toDolst
+    local -a num_lines=(`awk '
+        $0 ~ /^-+/  {printf "%d ", NR}
+        END{printf "%d\n", NR+1}
+    ' toDolst`)
+    # echo ${num_lines[*]}
+    # echo ${#num_lines}
+    mkdir -p /tmp/8ucchiman/issues
+    for i in `seq -s " " $((${#num_lines}-1))`; do
+        # echo $num_line
+        cur_num_line=$num_lines[$i]
+        next_num_line=$num_lines[$((i+1))]
+        #echo $cur_num_line $next_num_line
+        sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst > /tmp/8ucchiman/issues/${i}
+        #local title=`sed -n "${cur_num_line}p" toDolst`
+        local title=`awk -v nr=${cur_num_line} 'NR==nr{print $2}' toDolst`
+        # echo title is $title
+        # awk -v nr=${cur_num_line} 'NR=nr{print}' toDolst
+        gh issue create --title $title -F /tmp/8ucchiman/issues/${i}
+        rm -f /tmp/8ucchiman/issues/${i}
+    done
 }
 
 #@
