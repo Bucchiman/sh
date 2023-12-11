@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-08 18:31:51
+# LastModified: 2023-12-11 10:45:00
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -403,6 +403,7 @@ function pocket () {
         3d_rendering                    https://zenn.dev/mebiusbox/articles/8e765148576919
         wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
         awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
+        bandit_model                    https://www.ai-gakkai.or.jp/resource/my-bookmark/my-bookmark_vol31-no5/
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
