@@ -3,12 +3,14 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-11 10:45:00
+# LastModified: 2023-12-11 11:39:28
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
 # Description:  ---
 #
+
+# set -ex
 
 #@ archive
 function pass () {
@@ -99,6 +101,7 @@ function lst2issues () {
     # @Description  convert toDo list to issues
     # @params       
     # @Example      lst2issues
+    # @Description  You have to prepare toDolst file in the current directory.
     # @Reference    https://qiita.com/takech9203/items/b96eff5773ce9d9cc9b3
     #               https://tech.kurojica.com/archives/25401/
     #               https://linux.just4fun.biz/?%E9%80%86%E5%BC%95%E3%81%8DUNIX%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89/%E6%8C%87%E5%AE%9A%E3%81%97%E3%81%9F%E7%AF%84%E5%9B%B2%E3%81%AE%E8%A1%8C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95
@@ -129,18 +132,69 @@ function lst2issues () {
         # echo $num_line
         cur_num_line=$num_lines[$i]
         next_num_line=$num_lines[$((i+1))]
-        #echo $cur_num_line $next_num_line
+        issue_check=`awk -v nr=${cur_num_line} 'NR==nr{print $(NF-1)}' toDolst`
+        echo $issue_check
+        if [[ $issue_check == "issue:" ]]; then
+            echo "issue already exists..."
+            echo title ""
+            echo issue is `awk -v nr=${cur_num_line} 'NR==nr{print $(NF)}' toDolst`
+            rm -f /tmp/8ucchiman/issues/${i}
+            continue
+        fi
         sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst > /tmp/8ucchiman/issues/${i}
+
         local description=`sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst`
-        #local title=`sed -n "${cur_num_line}p" toDolst`
-        local title=`awk -v nr=${cur_num_line} 'NR==nr{print $2}' toDolst`
-        # echo title is $title
         # awk -v nr=${cur_num_line} 'NR=nr{print}' toDolst
 
-        # gh issue create --title $title -F /tmp/8ucchiman/issues/${i}
-        glab issue create -t "\"$title\"" -d "\"$description\""
+        #local title=`sed -n "${cur_num_line}p" toDolst`
+        local title=`awk -v nr=${cur_num_line} 'NR==nr{for(i=2; i<=NF; i++){printf("%s ", $i)}}' toDolst`
+
+
+        local remote_repository=`git config --get remote.origin.url`
+        if [[ $remote_repository =~ "github" ]]; then
+            local issue_info=`gh issue create --title $title -F /tmp/8ucchiman/issues/${i}`
+        elif [[ $remote_repository =~ "gitlab" ]]; then
+            local issue_info=`glab issue create -t "$title" -d "$description"`
+        else
+            echo "cannot detect platform..."
+            exit 1
+        fi
+        issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
+        sed -i  -e "${cur_num_line} s/$/        issue: ${issue_number}/g" toDolst
         rm -f /tmp/8ucchiman/issues/${i}
     done
+}
+
+#@ $1
+function append_issue () {
+    #
+    # @Description  append an issue (you have to make an issue with )
+    # @params       
+    # @Example      append_issue ./assets/append_01
+    # @Reference    
+    #
+
+    # https://itneko.com/awk-print-index/
+    #echo $@
+    if [[ $# == 0 ]]; then
+        echo "Need a toDo file as an argument."
+        exit 1;
+    fi
+    local title=`awk 'NR==1{print $0}' $1`
+    local remote_repository=`git config --get remote.origin.url`
+    if [[ $remote_repository =~ "gitlab" ]]; then
+        local issue_info=`gh issue create --title $title -F ${i}`
+        #rm -f /tmp/8ucchiman/issues/${i}
+    elif [[ $remote_repository =~ "github" ]]; then
+        local issue_info=`glab issue create -t "$title" -d "$(cat $1)"`
+    else
+        echo "cannot detect platform..."
+        exit 1
+    fi
+    issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
+    sed -i  -e "1 s/$/        issue: ${issue_number}/g" $1
+    cat $1 >> toDolst
+
 }
 
 #@
