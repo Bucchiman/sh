@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-11 18:32:03
+# LastModified: 2023-12-11 18:39:21
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -549,6 +549,7 @@ function pocket () {
         shadertoy                       https://www.shadertoy.com/browse
         shaderref                       https://qiita.com/guru_taka/items/28c7cd5db4ce3a3bf287
         reactthreefiber                 https://qiita.com/osakasho/items/c75d27e98aca9f4dc166
+        glsl_dann                       https://qiita.com/doxas/items/5a7b6dedff4bc2ce1586
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
