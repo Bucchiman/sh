@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-12 15:12:26
+# LastModified: 2023-12-12 18:21:47
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -545,6 +545,7 @@ function pocket () {
         3d_rendering                    https://zenn.dev/mebiusbox/articles/8e765148576919
         wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
         awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
+        markov_processing               https://www.ma.noda.tus.ac.jp/u/sh/pdfdvi/10aa.pdf
         bandit_model                    https://www.ai-gakkai.or.jp/resource/my-bookmark/my-bookmark_vol31-no5/
         shadertoy                       https://www.shadertoy.com/browse
         shaderref                       https://qiita.com/guru_taka/items/28c7cd5db4ce3a3bf287
@@ -1476,6 +1477,13 @@ function set_devbox () {
         devbox add gh@latest                    # https://www.nixhub.io/packages/gh
         devbox add bat@latest                   # https://www.nixhub.io/packages/bat
         devbox add glab@latest                  # https://www.nixhub.io/packages/glab
+    }
+
+    #@ nest
+    function cpp_packages () {
+        devbox add gcc@latest
+        devbox add cmake@latest
+        devbox add opencv@latest
     }
 
     #@ nest
@@ -3029,13 +3037,15 @@ function georgia_omscs () {
     }
 }
 
-#@ $2
+#@ $3
 function create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
+    #               This is empty.
     # @params       $1: github | gitlab
-    #               $2:
-    # @Example
+    #               $2: project name
+    #               $3: use_template
+    # @Example      create_remote_repository github segmentation_inference
     # @Reference    
     #
 
@@ -3049,12 +3059,18 @@ function create_remote_repository () {
         target_platform=`array_fzf "$platforms[*]"`
         echo -n "project name> "
         read project_name
+        echo -n "use template[yes/no]> "
+        read use_template
+    local OPTS
+    if [[ $use_template == "yes" ]]; then
+        OPTS="--template git@github.com:Bucchiman/Bproject.git"
+    fi
     else
         target_platform=$1
         project_name=$2
     fi
     if [[ $target_platform == "github" ]]; then
-        gh repo create $project_name --private --add-readme
+        gh repo create $project_name --private --add-readme $OPTS
     else
         glab repo create $project_name --private --readme --defaultBranch master
     fi
