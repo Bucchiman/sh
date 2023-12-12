@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-10 12:17:27
+# LastModified: 2023-12-12 12:00:27
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -38,6 +38,78 @@ function init () {
     if ! _has bat; then install_bat; fi
 }
 
+#@
+function recognize_usb_driver_in_wsl () {
+    #
+    # @Description  recognize usb driver in wsl
+    # @params       
+    # @Example      recognize_usb_driver_in_wsl
+    # @Reference    https://qiita.com/KMNMKT/items/ae0e76a3e420b3ca16e6
+    #               https://qiita.com/ryoma-jp/items/9db6cca5ed10f1aed7ff
+    #               https://zenn.dev/fuyuaice/articles/930d41504818c6
+    #               https://macha795.com/eset-ip-port-num-allow/
+    #
+
+    # on powershell
+    winget install --interactive --exact dorssel.usbipd-win
+
+    # on wsl
+    sudo apt upgrade
+    sudo apt update
+    sudo apt install -y linux-tools-5.4.0-77-generic hwdata
+    sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/5.4.0-77-generic/usbip 20
+
+    # on powershell (admin)
+    usbipd list
+    usbipd bind -b 1-13
+    usbipd attach --wsl --busid 1-13
+
+}
+
+
+#@
+function yamaha_lua () {
+    #
+    # @Description  yamaha lua script
+    # @params       yamaha_lua
+    # @Example      yamaha_lua
+    # @Reference    http://www.rtpro.yamaha.co.jp/RT/manual/rtx830/Users.pdf
+    #               https://network.yamaha.com/setting/router_firewall/monitor/lua_script/manual
+    #
+
+    local -A description_search=(
+        font    "console character en.ascii"
+        copy    "copy usb1:/test.lua /test.lua"
+        show    "show file list /"
+        show_status "show status lan1"
+        run     "lua usb1:/test.lua"
+        set_ip  "ip lan1 address 192.168.6.199"
+        set_ip_lan2 "ip lan2 address 192.168.6.198"
+        set_ip_lan3 "ip lan3 address 192.168.6.197"
+    )
+
+    #@ nest
+    function open_description () {
+        nohup google-chrome http://www.rtpro.yamaha.co.jp/RT/manual/rtx830/Users.pdf &
+    }
+
+    local -a function_lst=(
+        open_description
+    )
+    local target_func=`array_fzf "${function_lst[*]}"`
+    eval $target_func
+}
+
+#@
+function mount_usb_from_native_to_wsl () {
+    # echo "sudo mount -t drvfs $1: /mnt/${(L)1}"
+    sudo mount -t drvfs $1: /mnt/${(L)1}
+}
+
+#@
+function umount () {
+    # sudo umount /mnt/d
+}
 
 #@
 function memory_leak () {
@@ -96,6 +168,23 @@ EOF
 }
 
 #@
+function all_issues () {
+    #
+    # @Description  all issues from various repositories
+    # @params       
+    # @Example      all_issues
+    # @Reference    
+    #
+
+    while read target_repository; do
+        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
+    done< <(cat /tmp/8ucchiman/target_repositories)
+
+
+}
+
+
+#@
 function lst2issues () {
     #
     # @Description  convert toDo list to issues
@@ -133,7 +222,7 @@ function lst2issues () {
         cur_num_line=$num_lines[$i]
         next_num_line=$num_lines[$((i+1))]
         issue_check=`awk -v nr=${cur_num_line} 'NR==nr{print $(NF-1)}' toDolst`
-        echo $issue_check
+        #echo $issue_check
         if [[ $issue_check == "issue:" ]]; then
             echo "issue already exists..."
             echo title ""
@@ -148,7 +237,6 @@ function lst2issues () {
 
         #local title=`sed -n "${cur_num_line}p" toDolst`
         local title=`awk -v nr=${cur_num_line} 'NR==nr{for(i=2; i<=NF; i++){printf("%s ", $i)}}' toDolst`
-
 
         local remote_repository=`git config --get remote.origin.url`
         if [[ $remote_repository =~ "github" ]]; then
@@ -458,6 +546,11 @@ function pocket () {
         wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
         awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
         markov_processing               https://www.ma.noda.tus.ac.jp/u/sh/pdfdvi/10aa.pdf
+        bandit_model                    https://www.ai-gakkai.or.jp/resource/my-bookmark/my-bookmark_vol31-no5/
+        shadertoy                       https://www.shadertoy.com/browse
+        shaderref                       https://qiita.com/guru_taka/items/28c7cd5db4ce3a3bf287
+        reactthreefiber                 https://qiita.com/osakasho/items/c75d27e98aca9f4dc166
+        glsl_dann                       https://qiita.com/doxas/items/5a7b6dedff4bc2ce1586
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
