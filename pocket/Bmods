@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-13 23:51:32
+# LastModified: 2023-12-14 00:32:12
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -48,6 +48,11 @@ function install_dropbox () {
     wget https://github.com/dropbox/dbxcli/releases/download/v3.0.0/dbxcli-linux-amd64
     mv dbxcli-linux-amd64 dbxcli
     chmod u+x dbxcli
+}
+
+#@ install repl rust
+install_repl_rust () {
+    cargo install evcxr_repl
 }
 
 #@ install
@@ -131,12 +136,49 @@ function install_google_cloud_cli () {
 # 
 # return
 
-
+#@ install
 function install_starship () {
     cargo install starship --locked
 }
 
+#@ install
+function install_hexyl () {
+    #
+    # @Description  hexyl, alternative to od
+    # @params       
+    # @Example      install_hexyl
+    # @Reference    https://github.com/sharkdp/hexyl
+    #
+    
+    cargo install hexyl
+    # sudo apt install -y hexyl
+    # sudo port install hexyl
+}
+
+#@ install
+function install_broot () {
+    #
+    # @Description  alternative to tree
+    # @params       
+    # @Example      install_broot
+    # @Reference    https://dystroy.org/broot/install/
+    #
+    
+    # cd $HOME/bin
+    # wget https://dystroy.org/broot/download/x86_64-linux/broot
+    # chmod u+x broot
+    cargo install --locked broot
+}
+
+#@ install
 function install_exa () {
+    #
+    # @Description  alternative to ls
+    # @params       
+    # @Example      install_exa
+    # @Reference    https://github.com/ogham/exa
+    #
+
     cargo install --locked exa
 }
 
@@ -653,7 +695,8 @@ EOF
     sample
 }
 
-function install_cling () {
+#@ install repl c
+function install_repl_c () {
     #
     # @Description  interactive mode cling
     # @params       
