@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-13 16:37:31
+# LastModified: 2023-12-13 20:21:10
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -50,6 +50,77 @@ function install_google_cloud_cli () {
     sudo apt-get install google-cloud-cli-app-engine-java
     gcloud init
 }
+
+# for gpu detection
+#
+# date "+%Y_%m_%d_%H_%M"
+# source /home/yk.iwabuchi/.zshrc
+# base_path="/home/yk.iwabuchi/projects/RDC/confuciux/src/ConfX"
+# out_dir="/home/yk.iwabuchi/projects/RDC/confuciux/outdir"
+# conda activate confxEnvForce
+# conda deactivate; conda activate confxEnvForce; rehash; which pip python
+# bus_id=(0 0)
+# #nvidia-smi --query-compute-apps=pid,gpu_bus_id,process_name --format=csv,noheader
+# empty_gpu=(`nvidia-smi --query-compute-apps=gpu_bus_id --format=csv,noheader`)
+# echo "num: ${#empty_gpu[@]}"
+# if [[ ${#empty_gpu[@]} > 0 ]]
+#   then
+#   for eg in $empty_gpu
+#   do
+#     if [[ `echo $eg | grep 17` ]]
+#     then
+#       bus_id[1]=$(($bus_id[1]+1))
+#     fi
+#     if [[ `echo $eg | grep 65` ]]
+#     then
+#       bus_id[2]=$(($bus_id[2]+1))
+#     fi
+#   done
+# fi
+# 
+# model="mobilenet_v2"
+# #local -a FITNESS
+# #local -a CSTR
+# #local -a DATAFLOW
+# FITNESS=(latency energy)
+# CSTR=(area power)
+# DATAFLOW=(shi dla eye dpt)
+# 
+# #if [[$bus_id[17] == 0 ]]
+# #then
+# #  export CUDA_VISIBLE_DEVICES="0"
+# #fi
+# if [[ $bus_id[2] < 3 ]]
+# then
+#   export CUDA_VISIBLE_DEVICES="1"
+#   for fitness in $FITNESS
+#   do
+#     for cstr in $CSTR
+#     do
+#       for dataflow in $DATAFLOW
+#       do
+#         dir_name=${model}_F-${fitness}_C-${cstr}_Mul-0.5_DF-${dataflow}_RL_GA_D
+#         if [[ -e ${out_dir}/${dir_name}/result.csv ]] && [[ ${bus_id[2]} < 3 ]]
+#         then
+#         else
+#           cd $base_path
+#           nohup python main.py --outdir outdir --model ${model} --fitness ${fitness} --cstr ${cstr} --mul 0.5 --epochs 500 --df ${dataflow} --alg RL_GA &
+#           bus_id[2]=$(($bus_id[2]+1))
+#         fi
+#         echo "GPU0: $bus_id[1] GPU1: $bus_id[2]"
+#         if [[ $bus_id[2] > 1 ]]
+#         then
+#           exit
+#         fi
+#       done
+#     done
+#   done
+# else
+#   echo "order"
+# fi
+# 
+# return
+
 
 function install_starship () {
     cargo install starship --locked
