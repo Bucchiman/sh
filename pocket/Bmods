@@ -121,6 +121,139 @@ function yamaha_lua () {
     eval $target_func
 }
 
+
+#@ educ c
+function c_lang {
+#@ nest
+function ar_static () {
+    #
+    # @Description  ar command (static maker)
+    # @params       
+    # @Example      ar_static
+    # @Reference    https://linuxcommand.net/ar/
+    #
+
+    #@ nest
+    function _r-option () {
+        mkdir $TMP/ar_educ; cd $_;
+cat <<eos > file1.c
+#include<stdio.h>
+void func1 (void) {
+    printf("func1 is here\n");
+}
+eos
+cat <<eos > file2.c
+#include<stdio.h>
+void func2 (void) {
+    printf("func2 is here\n");
+}
+eos
+cat <<eos > file3.c
+#include<stdio.h>
+void func3 (void) {
+    printf("func3 is here\n");
+}
+eos
+        gcc -c file1.c file2.c file3.c      # オプジェクトファイル作成
+        ar r archive.a *.o                  # 静的ファイル追加
+        ar t archive.a                      # 静的ライブラリ一覧表示
+    }
+
+    #@ nest
+    function _d-option () {
+        _r-option
+        ar t archive.a
+        ar d archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function _t-option () {
+        _r-option
+        ar t archive.a
+    }
+
+    #@ nest
+    function _x-option () {
+        _r-option
+        ar t archive.a
+        ar x archive.a file1.o file2.o
+        ls
+    }
+
+    #@ nest
+    function _p-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _s-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _q-option () {
+        _r-option
+        ar t archive.a
+cat <<eos > file4.c
+#include<stdio.h>
+void func4 (void) {
+    printf("func4 is here!!\n");
+}
+eos
+        ar q archive.a file4.o
+    }
+
+    #@ nest
+    function _m-option () {
+        _r-option
+        ar t archive.a
+        ar m archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function clean () {
+        rm -r $TMP/ar_educ
+    }
+}
+
+#@ nest
+function gcc_option () {
+    function _I-option () {
+        #
+        # @Description  
+        # @params       
+        # @Example      _I-option
+        # @Reference    https://qiita.com/DQNEO/items/4e5c2eca2761ec08b922
+        #
+        
+        mkdir -p /tmp/8ucchiman/C/header; cd /tmp/8ucchiman/C;
+cat <<eos > main.c
+#include <stdio.h>
+#include <bucchiman.h>
+
+int main(int argc, char** argv) {
+    print_all(argc, argv);
+}
+eos
+        cd header;
+cat <<eos > bucchiman.h
+#include <stdio.h>
+
+void print_all(int argc, char** argv) {
+    for (int i=0; i<argc; i++) {
+        printf("i: %d, arg: %s\n", i, argv[i]);
+    }
+}
+eos
+        cd ..
+        gcc -I ./header main.c
+        ./a.out bucchiman Bucchiman 8ucchiman
+    }
+}
+}
+
 #@
 function mount_usb_from_native_to_wsl () {
     # echo "sudo mount -t drvfs $1: /mnt/${(L)1}"
@@ -1169,99 +1302,6 @@ function machine_language () {
 }
 
 
-#@ educ
-function ar_static () {
-    #
-    # @Description  ar command (static maker)
-    # @params       
-    # @Example      ar_static
-    # @Reference    https://linuxcommand.net/ar/
-    #
-
-    #@ nest
-    function _r-option () {
-        mkdir $TMP/ar_educ; cd $_;
-cat <<eos > file1.c
-#include<stdio.h>
-void func1 (void) {
-    printf("func1 is here\n");
-}
-eos
-cat <<eos > file2.c
-#include<stdio.h>
-void func2 (void) {
-    printf("func2 is here\n");
-}
-eos
-cat <<eos > file3.c
-#include<stdio.h>
-void func3 (void) {
-    printf("func3 is here\n");
-}
-eos
-        gcc -c file1.c file2.c file3.c      # オプジェクトファイル作成
-        ar r archive.a *.o                  # 静的ファイル追加
-        ar t archive.a                      # 静的ライブラリ一覧表示
-    }
-
-    #@ nest
-    function _d-option () {
-        _r-option
-        ar t archive.a
-        ar d archive.a file2.o
-        ar t archive.a
-    }
-
-    #@ nest
-    function _t-option () {
-        _r-option
-        ar t archive.a
-    }
-
-    #@ nest
-    function _x-option () {
-        _r-option
-        ar t archive.a
-        ar x archive.a file1.o file2.o
-        ls
-    }
-
-    #@ nest
-    function _p-option () {
-        echo "no description"
-    }
-
-    #@ nest
-    function _s-option () {
-        echo "no description"
-    }
-
-    #@ nest
-    function _q-option () {
-        _r-option
-        ar t archive.a
-cat <<eos > file4.c
-#include<stdio.h>
-void func4 (void) {
-    printf("func4 is here!!\n");
-}
-eos
-        ar q archive.a file4.o
-    }
-
-    #@ nest
-    function _m-option () {
-        _r-option
-        ar t archive.a
-        ar m archive.a file2.o
-        ar t archive.a
-    }
-
-    #@ nest
-    function clean () {
-        rm -r $TMP/ar_educ
-    }
-}
 
 
 #@
