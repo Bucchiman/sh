@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-13 12:52:10
+# LastModified: 2023-12-13 12:53:12
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -36,6 +36,27 @@ function init () {
     if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
+    if ! _has cargo; then install_rust; fi
+    if ! _has exa; then install_exa; fi
+    if ! _has starthip; then install_starship; fi
+}
+
+function install_google_cloud_cli () {
+    sudo apt update
+    sudo apt-get install -y apt-transport-https ca-certificates gnupg curl sudo
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+    sudo apt-get update && sudo apt-get install -y google-cloud-cli
+    sudo apt-get install google-cloud-cli-app-engine-java
+    gcloud init
+}
+
+function install_starship () {
+    cargo install starship --locked
+}
+
+function install_exa () {
+    cargo install --locked exa
 }
 
 #@
@@ -552,6 +573,7 @@ function pocket () {
         reactthreefiber                 https://qiita.com/osakasho/items/c75d27e98aca9f4dc166
         glsl_dann                       https://qiita.com/doxas/items/5a7b6dedff4bc2ce1586
         hlsl                            https://github.com/Unity-Technologies/HLSLcc
+        dynamic_library                 https://qiita.com/developer-kikikaikai/items/f6f87b2d1d7c3e14fb52#%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AAlinux%E3%81%AE%E5%8B%95%E7%9A%84%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E4%BB%95%E7%B5%84%E3%81%BF
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
@@ -559,7 +581,10 @@ function pocket () {
 
 function install_glab () {
     curl -L https://packages.gitlab.com/glab/glab/gpgkey | sudo apt-key add -
-    sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    cd /tmp/
+    wget https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    sudo mv /tmp/glab.list /etc/apt/sources.list.d/glab.list
+    #sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
     sudo apt update
     sudo apt install glab
 }
@@ -2014,8 +2039,9 @@ function install_lazygit () {
         install_go
     fi
     # go install github.com/jesseduffield/lazygit@leighmcculloch
-    sudo snap install core
-    sudo snap install lazygit-gm
+    go install github.com/jesseduffield/lazygit@latest
+    # sudo snap install core
+    # sudo snap install lazygit-gm
 }
 
 #@ install
@@ -2063,6 +2089,11 @@ function install_go () {
     #
 
     cd $HOME/source
+    if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
+        #wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+        wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
+        #rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    fi
     # for amd64
     if [[ ! -e https://go.dev/dl/go1.21.3.linux-amd64.tar.gz ]]; then
         wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
