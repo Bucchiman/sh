@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-12 23:25:04
+# LastModified: 2023-12-13 12:53:12
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -705,6 +705,7 @@ function pocket () {
         shaderref                       https://qiita.com/guru_taka/items/28c7cd5db4ce3a3bf287
         reactthreefiber                 https://qiita.com/osakasho/items/c75d27e98aca9f4dc166
         glsl_dann                       https://qiita.com/doxas/items/5a7b6dedff4bc2ce1586
+        hlsl                            https://github.com/Unity-Technologies/HLSLcc
         dynamic_library                 https://qiita.com/developer-kikikaikai/items/f6f87b2d1d7c3e14fb52#%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AAlinux%E3%81%AE%E5%8B%95%E7%9A%84%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E4%BB%95%E7%B5%84%E3%81%BF
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
@@ -3142,7 +3143,7 @@ function create_remote_repository () {
     if [[ $target_platform == "github" ]]; then
         gh repo create $project_name --private --add-readme $OPTS
     else
-        glab repo create $project_name --private --readme --defaultBranch master
+        glab repo create $project_name --private --readme --defaultBranch main
     fi
 
 }
