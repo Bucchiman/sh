@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-15 15:56:57
+# LastModified: 2023-12-15 17:02:18
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -617,12 +617,12 @@ function append_issue () {
         echo "Need a toDo file as an argument."
         exit 1;
     fi
-    local title=`awk 'NR==1{print $0}' $1`
+    local title=`awk 'NR==1{for(i=2;i<=NF;i++) printf"%s ", $i}END{printf "\n"}' $1`
     local remote_repository=`git config --get remote.origin.url`
-    if [[ $remote_repository =~ "gitlab" ]]; then
-        local issue_info=`gh issue create --title $title -F ${i}`
+    if [[ $remote_repository =~ "github" ]]; then
+        local issue_info=`gh issue create --title $title -F ${1}`
         #rm -f /tmp/8ucchiman/issues/${i}
-    elif [[ $remote_repository =~ "github" ]]; then
+    elif [[ $remote_repository =~ "gitlab" ]]; then
         local issue_info=`glab issue create -t "$title" -d "$(cat $1)"`
     else
         echo "cannot detect platform..."
