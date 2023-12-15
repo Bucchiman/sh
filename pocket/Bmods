@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-14 00:32:12
+# LastModified: 2023-12-15 15:56:57
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -23,7 +23,7 @@ function pass () {
 
 }
 
-#@
+#@ init
 function init () {
     #
     # @Description  install packages
@@ -40,6 +40,18 @@ function init () {
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
+}
+
+#@ deploy
+function deploy2script () {
+    #
+    # @Description  This is the deployment from functions of Bmods to shell script 
+    # @params       
+    # @Example      deploy2script
+    # @Reference    
+    #
+
+
 }
 
 #@ install
@@ -65,6 +77,7 @@ function install_google_cloud_cli () {
     sudo apt-get install google-cloud-cli-app-engine-java
     gcloud init
 }
+
 
 # for gpu detection
 #
@@ -135,6 +148,38 @@ function install_google_cloud_cli () {
 # fi
 # 
 # return
+
+#@ $1
+function random_words_generator () {
+    #
+    # @Description  random words generator
+    # @params       
+    # @Example      random_words_generator 100
+    # @Reference    https://linuxconfig.org/random-word-generator
+    #
+
+    local num_words=$1
+    if [[ $# == 0 ]]; then
+        num_words=`tr -dc 0-9 < /dev/urandom | fold -w 2 | head -1`
+        num_words=$((num_words%20))
+    fi
+    echo $num_words
+ 
+    # Constants
+    X=0
+    ALL_NON_RANDOM_WORDS=/usr/share/dict/words
+ 
+    # total number of non-random words available
+    non_random_words=`cat $ALL_NON_RANDOM_WORDS | wc -l`
+ 
+    # while loop to generate random words  
+    # number of random generated words depends on supplied argument 
+    while [[ $X -lt $num_words ]]; do
+        random_number=`od -N3 -An -i /dev/urandom | awk -v f=0 -v r="$non_random_words" '{printf "%i\n", f + r * $num_words / 16777216}'`
+        sed `echo $random_number`"q;d" $ALL_NON_RANDOM_WORDS
+        let "X = X + 1"
+    done
+}
 
 #@ install
 function install_starship () {
@@ -242,6 +287,33 @@ function yamaha_lua () {
     )
     local target_func=`array_fzf "${function_lst[*]}"`
     eval $target_func
+}
+
+
+#@
+function library_scratch () {
+    #
+    # @Description  install library, build, compile from scratch
+    # @params       
+    # @Example      library_scratch  glfw
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    mkdir -p $HOME/include
+    mkdir -p $HOME/lib
+    cd source
+
+    #@ nest
+    function glfw () {
+        git clone https://github.com/glfw/glfw.git
+        cd glfw;
+        cmake -S . -B build
+        ln -sf $PWD/include/GLFW $HOME/include/
+        ln -sf $PWD/build/src/libglfw3.a $HOME/lib/
+    }
+
+    eval $@
 }
 
 
@@ -3119,6 +3191,96 @@ function clone_testrepository () {
     #git clone https://github.com/Bucchiman/test.git
 }
 
+#@ $1
+function what_file_is_this () {
+    #
+    # @Description  show file infomation
+    # @params       $1: file
+    # @Example      what_file_is_this hoge.png
+    # @Reference    https://kodekloud.com/blog/file-creation-time-linux/
+    #
+
+    if [[ $# == 0 ]]; then
+        echo "You have to specify the file as an argument..."
+    fi
+    local target=$1
+    local full_file_path=${target:a}
+    local base_name=${target:r}
+    local extension=${target:e}
+    local own_user=`stat -c "%U:%u" $1`
+    local own_group=`stat -c "%G:%g" $1`
+    local access_mode=`stat -c "%A" $1`
+    local create_date=`stat -c "%w" $1`
+    local acccess_date=`stat -c "%x" $1`
+    local modify_date=`stat -c "%z" $1`
+    local change_date=`stat -c "%y" $1`
+
+    local -A metadata
+    if [[ $extension == "png" || $extension == "jpg" ]]; then
+        metadata["size"]=`identify -format "%[size]" $1`
+        metadata["width"]=`identify -format "%[width]" $1`
+        metadata["height"]=`identify -format "%[height]" $1`
+        metadata["colorspace"]=`identify -format "%[colorspace]" $1`
+        #identify -format "%[resolution.x], %[resolution.y], %[size], %[width], %[height], %[colorspace]" $1
+    fi
+
+    echo "$1 info"
+    echo "path: $full_file_path"
+    echo "base name: $base_name"
+    echo "extension: $extension"
+    echo "metadata: ${(kv)metadata}"
+    #if [[]]
+}
+
+#@ $1 deploy
+function deploy2yaml () {
+    #
+    # @Description  This is deployment from associative array to yaml
+    # @params       $1: associative array
+    # @Example      deploy2yaml associative_lst
+    # @Reference    
+    #
+
+}
+
+#@ $1 deploy
+function deploy2json () {
+    #
+    # @Description  This is deployment from associative array to json
+    # @params       $1: associative array
+    # @Example      deploy2json
+    # @Reference    https://stackoverflow.com/questions/442012/in-zsh-how-do-i-pass-anonymous-arrays-into-functions
+    #
+
+}
+
+#@ what
+function what_environment_is_this () {
+    #
+    # @Description  show environment
+    # @params       
+    # @Example      what_environment_is_this
+    # @Reference    
+    #
+
+    local hostname=`hostname`
+    local ip_address=`hostname -I`
+    local num_process=`ps aux | wc -l`
+    local gpu_status
+}
+
+#@ $1 what
+function what_process_is_this () {
+    #
+    # @Description  show process info
+    # @params       $1: process id
+    # @Example      what_process_is_this 17
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    ps -eo user,pid,ppid,c,lstart,tty,time,cmd | head -5
+}
+
 #@
 function myawk () {
     """
@@ -3297,7 +3459,7 @@ function search () {
 }
 
 #@
-function keywords_searcher () {
+function search_keywords () {
     local -a tmp=($(awk '/#@/{$1="";print}' $BMODS_PATH))
     local -a keywords_lst=(${(u)tmp[@]})
     local target_keywords=`array_fzf "${keywords_lst[*]}"`
