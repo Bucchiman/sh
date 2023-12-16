@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-16 15:18:42
+# LastModified: 2023-12-16 16:09:17
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -47,13 +47,17 @@ function create_WIPissue () {
     #
     # @Description  create Working in progress issue
     # @params       $1: issue_number
-    # @Example      create_WIPissue
+    # @Example      create_WIPissue 44
+    #               create_WIPissue # interactive mode
     # @Reference    
     #
 
+    #set -xe
     local issue_number=$1
+    if [[ $# == 0 ]]; then
+        issue_number=`gh issue list | fzf --height 100% | awk '{print $1}'`
+    fi
     gh issue develop $issue_number --base dev --checkout
-
 }
 
 #@ $2 git
@@ -660,7 +664,7 @@ function lst2issues () {
 function append_issue () {
     #
     # @Description  append an issue (you have to make an issue with )
-    # @params       
+    # @params       $1: issue file
     # @Example      append_issue ./assets/append_01
     # @Reference    
     #
