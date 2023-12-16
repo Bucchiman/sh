@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-15 17:02:18
+# LastModified: 2023-12-16 15:12:19
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -42,6 +42,41 @@ function init () {
     if ! _has dbxcli; then install_dropbox; fi
 }
 
+#@ $1 git
+function create_WIPissue () {
+    #
+    # @Description  create Working in progress issue
+    # @params       $1: issue_number
+    # @Example      create_WIPissue
+    # @Reference    
+    #
+
+    local issue_number=$1
+    gh issue develop $issue_number --base dev --checkout
+
+}
+
+#@ $2 git
+function issue2pullrequest () {
+    #
+    # @Description  Work in progress about issue
+    # @params       $1: issue_number
+    #               $2: PR title
+    # @Example      issue2pullrequest 44 fix bug about open window
+    # @Reference    https://cli.github.com/manual/gh_pr_create
+    #               https://cli.github.com/manual/gh_issue_develop
+    #               ChatGPT: How to make pull request from issue with gh cli?
+    #
+    
+    local issue_number=$1
+    local issue_branch=`gh issue develop --list $issue_number | awk '{print $1}'`
+    shift
+    local title=$@
+    local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
+    local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
+    #gh pr checkout $pr_number
+}
+
 #@ deploy
 function deploy2script () {
     #
@@ -78,6 +113,25 @@ function install_google_cloud_cli () {
     gcloud init
 }
 
+##@
+#function gpu_status () {
+#    bus_id=(0 0)
+#    #nvidia-smi --query-compute-apps=pid,gpu_bus_id,process_name --format=csv,noheader
+#    empty_gpu=(`nvidia-smi --query-compute-apps=gpu_bus_id --format=csv,noheader`)
+#
+#    # echo "num: ${#empty_gpu[@]}"
+#    if [[ ${#empty_gpu[@]} > 0 ]]; then
+#        for eg in $empty_gpu; do
+#            if [[ `echo $eg | grep 17` ]]; then
+#                bus_id[1]=$(($bus_id[1]+1))
+#            fi
+#            if [[ `echo $eg | grep 65` ]]; then
+#                bus_id[2]=$(($bus_id[2]+1))
+#            fi
+#        done
+#    fi
+#
+#}
 
 # for gpu detection
 #
@@ -533,7 +587,7 @@ function all_issues () {
 }
 
 
-#@
+#@ git
 function lst2issues () {
     #
     # @Description  convert toDo list to issues
@@ -602,7 +656,7 @@ function lst2issues () {
     done
 }
 
-#@ $1
+#@ $1 git
 function append_issue () {
     #
     # @Description  append an issue (you have to make an issue with )
@@ -631,7 +685,7 @@ function append_issue () {
     issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
     sed -i  -e "1 s/$/        issue: ${issue_number}/g" $1
     cat $1 >> toDolst
-
+    rm $1
 }
 
 #@
