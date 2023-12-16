@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-16 15:12:19
+# LastModified: 2023-12-16 15:18:42
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -2661,24 +2661,24 @@ function _example_wokwi () {
 function install_fzf () {
     #
     # @Description  install fzf for local user
-    # @params
+    # @params       $1: install path
+    #               $2: bin path
     # @Example      install_fzf
+    #               install_fzf $PWD $PWD/bin
     # @Reference    https://github.com/junegunn/fzf#installation
     #
 
-    local install_place
-    if [[ $# == 0 ]]; then
+    local install_path=$1
+    local bin_path=$2
+    if [[ $# < 2 ]]; then
         mkdir -p $HOME/source
-        install_place=$HOME/source/fzf
-        bin_place=$HOME/bin/fzf
-    else
-        install_place=$1
-        bin_place=$2
+        install_path=$HOME/source/fzf
+        bin_path=$HOME/bin/fzf
     fi
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git $install_place
-    $install_place/install
-    ln -sf $install_place/bin/fzf $bin_place
+    git clone --depth 1 https://github.com/junegunn/fzf.git $install_path
+    $install_path/install
+    ln -sf $install_path/bin/fzf $bin_path
 }
 
 #@ install
