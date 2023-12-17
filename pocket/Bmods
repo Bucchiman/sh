@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-17 21:35:36
+# LastModified: 2023-12-17 21:45:05
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -40,6 +40,7 @@ function init () {
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
+    if ! _has dust; then install_dust; fi
 }
 
 #@ $1 git
@@ -94,7 +95,7 @@ function deploy2script () {
 }
 
 
-#@
+#@ install
 function install_dust () {
     cargo install --locked du-dust
 }
@@ -243,6 +244,18 @@ function random_words_generator () {
         sed `echo $random_number`"q;d" $ALL_NON_RANDOM_WORDS
         let "X = X + 1"
     done
+}
+
+#@
+function install_cargo () {
+    #
+    # @Description  install cargo, rust
+    # @params       
+    # @Example      install_cargo
+    # @Reference    https://www.rust-lang.org/tools/install
+    #
+
+    install_rust
 }
 
 #@
