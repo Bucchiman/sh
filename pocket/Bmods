@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-16 16:09:17
+# LastModified: 2023-12-17 21:35:36
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -91,6 +91,12 @@ function deploy2script () {
     #
 
 
+}
+
+
+#@
+function install_dust () {
+    cargo install --locked du-dust
 }
 
 #@ install
@@ -237,6 +243,14 @@ function random_words_generator () {
         sed `echo $random_number`"q;d" $ALL_NON_RANDOM_WORDS
         let "X = X + 1"
     done
+}
+
+#@
+function wsl_chrome_font_settings () {
+    sudo apt install -y language-pack-ja
+    sudo apt install -y fonts-ipafont
+    sudo apt install -y fonts-ipaexfont
+    fc-cache -fv
 }
 
 #@ install
@@ -846,7 +860,17 @@ function install_repl_c () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
+    sudo apt install -y xclip
+    
 
+}
+
+#@ install
+function install_google_chrome () {
+    sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    sudo apt update
+    sudo apt-get install google-chrome-stable
 }
 
 function sick_sensor () {
@@ -1526,14 +1550,17 @@ function diy_projects () {
     
 }
 
+function install_nasm () {
+    sudo apt install -y nasm
+}
 
 
 #@ educ reference
 function machine_language () {
-    function reference () {
+    #function reference () {
         local -A reference_lst=(
             シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
-            arコマンド解説              https://linuxcommand.net/ar/#s
+            arコマンド解説              https://linuxcommand.net/ar/\#s
             cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
             ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
             system_call01               https://research.miidas.jp/2019/05/macos%E3%81%AE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/
@@ -1556,8 +1583,11 @@ function machine_language () {
             68000_hello                 https://www.kkaneko.jp/pro/as/advanced/outline.html
             8086_hello                  http://software.aufheben.info/contents.html?contents_key=kouza_asm
         )
-        echo ${(kv)reference_lst}
-    }
+        #echo ${(kv)reference_lst}
+        local target_url=`array_fzf "${(k)reference_lst[*]}"`
+        nohup google-chrome ${reference_lst[$target_url]} &
+    #}
+    #reference
 }
 
 
