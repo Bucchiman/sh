@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-15 18:09:41
+# LastModified: 2023-12-18 09:41:56
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -40,6 +40,46 @@ function init () {
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
+    if ! _has dust; then install_dust; fi
+}
+
+#@ $1 git
+function create_WIPissue () {
+    #
+    # @Description  create Working in progress issue
+    # @params       $1: issue_number
+    # @Example      create_WIPissue 44
+    #               create_WIPissue # interactive mode
+    # @Reference    
+    #
+
+    #set -xe
+    local issue_number=$1
+    if [[ $# == 0 ]]; then
+        issue_number=`gh issue list | fzf --height 100% | awk '{print $1}'`
+    fi
+    gh issue develop $issue_number --base dev --checkout
+}
+
+#@ $2 git
+function issue2pullrequest () {
+    #
+    # @Description  Work in progress about issue
+    # @params       $1: issue_number
+    #               $2: PR title
+    # @Example      issue2pullrequest 44 fix bug about open window
+    # @Reference    https://cli.github.com/manual/gh_pr_create
+    #               https://cli.github.com/manual/gh_issue_develop
+    #               ChatGPT: How to make pull request from issue with gh cli?
+    #
+    
+    local issue_number=$1
+    local issue_branch=`gh issue develop --list $issue_number | awk '{print $1}'`
+    shift
+    local title=$@
+    local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
+    local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
+    #gh pr checkout $pr_number
 }
 
 #@ deploy
@@ -52,6 +92,12 @@ function deploy2script () {
     #
 
 
+}
+
+
+#@ install
+function install_dust () {
+    cargo install --locked du-dust
 }
 
 #@ install
@@ -78,6 +124,25 @@ function install_google_cloud_cli () {
     gcloud init
 }
 
+##@
+#function gpu_status () {
+#    bus_id=(0 0)
+#    #nvidia-smi --query-compute-apps=pid,gpu_bus_id,process_name --format=csv,noheader
+#    empty_gpu=(`nvidia-smi --query-compute-apps=gpu_bus_id --format=csv,noheader`)
+#
+#    # echo "num: ${#empty_gpu[@]}"
+#    if [[ ${#empty_gpu[@]} > 0 ]]; then
+#        for eg in $empty_gpu; do
+#            if [[ `echo $eg | grep 17` ]]; then
+#                bus_id[1]=$(($bus_id[1]+1))
+#            fi
+#            if [[ `echo $eg | grep 65` ]]; then
+#                bus_id[2]=$(($bus_id[2]+1))
+#            fi
+#        done
+#    fi
+#
+#}
 
 # for gpu detection
 #
@@ -179,6 +244,26 @@ function random_words_generator () {
         sed `echo $random_number`"q;d" $ALL_NON_RANDOM_WORDS
         let "X = X + 1"
     done
+}
+
+#@
+function install_cargo () {
+    #
+    # @Description  install cargo, rust
+    # @params       
+    # @Example      install_cargo
+    # @Reference    https://www.rust-lang.org/tools/install
+    #
+
+    install_rust
+}
+
+#@
+function wsl_chrome_font_settings () {
+    sudo apt install -y language-pack-ja
+    sudo apt install -y fonts-ipafont
+    sudo apt install -y fonts-ipaexfont
+    fc-cache -fv
 }
 
 #@ install
@@ -533,7 +618,7 @@ function all_issues () {
 }
 
 
-#@
+#@ git
 function lst2issues () {
     #
     # @Description  convert toDo list to issues
@@ -602,11 +687,11 @@ function lst2issues () {
     done
 }
 
-#@ $1
+#@ $1 git
 function append_issue () {
     #
     # @Description  append an issue (you have to make an issue with )
-    # @params       
+    # @params       $1: issue file
     # @Example      append_issue ./assets/append_01
     # @Reference    
     #
@@ -631,7 +716,7 @@ function append_issue () {
     issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
     sed -i  -e "1 s/$/        issue: ${issue_number}/g" $1
     cat $1 >> toDolst
-
+    rm $1
 }
 
 #@
@@ -788,7 +873,17 @@ function install_repl_c () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
+    sudo apt install -y xclip
+    
 
+}
+
+#@ install
+function install_google_chrome () {
+    sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    sudo apt update
+    sudo apt-get install google-chrome-stable
 }
 
 function sick_sensor () {
@@ -1468,14 +1563,17 @@ function diy_projects () {
     
 }
 
+function install_nasm () {
+    sudo apt install -y nasm
+}
 
 
 #@ educ reference
 function machine_language () {
-    function reference () {
+    #function reference () {
         local -A reference_lst=(
             シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
-            arコマンド解説              https://linuxcommand.net/ar/#s
+            arコマンド解説              https://linuxcommand.net/ar/\#s
             cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
             ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
             system_call01               https://research.miidas.jp/2019/05/macos%E3%81%AE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/
@@ -1498,8 +1596,11 @@ function machine_language () {
             68000_hello                 https://www.kkaneko.jp/pro/as/advanced/outline.html
             8086_hello                  http://software.aufheben.info/contents.html?contents_key=kouza_asm
         )
-        echo ${(kv)reference_lst}
-    }
+        #echo ${(kv)reference_lst}
+        local target_url=`array_fzf "${(k)reference_lst[*]}"`
+        nohup google-chrome ${reference_lst[$target_url]} &
+    #}
+    #reference
 }
 
 
@@ -2607,24 +2708,24 @@ function _example_wokwi () {
 function install_fzf () {
     #
     # @Description  install fzf for local user
-    # @params
+    # @params       $1: install path
+    #               $2: bin path
     # @Example      install_fzf
+    #               install_fzf $PWD $PWD/bin
     # @Reference    https://github.com/junegunn/fzf#installation
     #
 
-    local install_place
-    if [[ $# == 0 ]]; then
+    local install_path=$1
+    local bin_path=$2
+    if [[ $# < 2 ]]; then
         mkdir -p $HOME/source
-        install_place=$HOME/source/fzf
-        bin_place=$HOME/bin/fzf
-    else
-        install_place=$1
-        bin_place=$2
+        install_path=$HOME/source/fzf
+        bin_path=$HOME/bin/fzf
     fi
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git $install_place
-    $install_place/install
-    ln -sf $install_place/bin/fzf $bin_place
+    git clone --depth 1 https://github.com/junegunn/fzf.git $install_path
+    $install_path/install
+    ln -sf $install_path/bin/fzf $bin_path
 }
 
 #@ install
