@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-18 14:56:18
+# LastModified: 2023-12-18 18:06:28
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -33,10 +33,10 @@ function init () {
     #
 
     install_system
+    if ! _has cargo; then install_rust; fi
     if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
-    if ! _has cargo; then install_rust; fi
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
@@ -44,7 +44,7 @@ function init () {
 }
 
 #@ $1 git
-function create_WIPissue () {
+function _create_WIPissue () {
     #
     # @Description  create Working in progress issue
     # @params       $1: issue_number
@@ -62,7 +62,7 @@ function create_WIPissue () {
 }
 
 #@ $2 git
-function issue2pullrequest () {
+function _issue2pullrequest () {
     #
     # @Description  Work in progress about issue
     # @params       $1: issue_number
@@ -94,29 +94,32 @@ function deploy2script () {
 
 }
 
-#@
-function show_samples () {
-    #
-    # @Description  Show sample images, videos, gifs, or texts
-    # @params
-    # @Example      show_samples
-    # @Reference    
-    #
+##@
+#function show_samples () {
+#    #
+#    # @Description  Show sample images, videos, gifs, or texts
+#    # @params
+#    # @Example      show_samples
+#    # @Reference    
+#    #
+#
+#    fuzzy_settings
+#    $(cd $SAMPLE; fzf)
+#    # echo $sample
+#}
 
-    fuzzy_settings
-    $(cd $SAMPLE; fzf)
-    # echo $sample
+#@
+function show_pics_preview () {
+    
 }
 
 
-
 #@
-function show_sample_pics () {
+function _show_sample_pics () {
     #
     # @Description  show sample pictures
-    # @params       : command a
-    #               : command b
-    # @Example
+    # @params       
+    # @Example      show_sample_pics
     # @Reference    https://www.reddit.com/r/bash/comments/uxds93/add_image_preview_to_fzf/
     #
 
@@ -133,7 +136,7 @@ function show_sample_pics () {
 
 #@ install
 function install_catimg () {
-    cd $HOME/source
+    mkdir -p $HOME/source; cd $_
     git clone https://github.com/posva/catimg.git
     cd catimg
     cmake -S . -B build
@@ -263,6 +266,26 @@ function install_google_cloud_cli () {
 # 
 # return
 
+
+# #@ $3
+# function random_words2file () {
+#     #
+#     # @Description  create file with random words
+#     # @params       $1: output file
+#     #               $2: number of words
+#     # @Example      random_words2file
+#     # @Reference    
+#     #
+# 
+#     local output_file=$1
+#     if [[ $# < 2 ]]; then
+#         output_file=random_words.txt
+#     fi
+#     touch $output_file
+#     local -a random_words=(`random_words_generator $2`)
+# }
+
+
 #@ $1
 function random_words_generator () {
     #
@@ -277,7 +300,7 @@ function random_words_generator () {
         num_words=`tr -dc 0-9 < /dev/urandom | fold -w 2 | head -1`
         num_words=$((num_words%20))
     fi
-    echo $num_words
+    #echo $num_words
  
     # Constants
     X=0
@@ -295,12 +318,14 @@ function random_words_generator () {
     done
 }
 
-#@
+#@ wrapper install
 function install_cargo () {
     #
     # @Description  install cargo, rust
     # @params       
     # @Example      install_cargo
+    # @Keywords     wrapper
+    #               install
     # @Reference    https://www.rust-lang.org/tools/install
     #
 
@@ -309,6 +334,13 @@ function install_cargo () {
 
 #@
 function wsl_chrome_font_settings () {
+    #
+    # @Description  setup google chrome font in linux(wsl)
+    # @params       
+    # @Example      wsl_chrome_font_settings
+    # @Reference    https://lef237.hatenablog.com/entry/2022/12/05/163550
+    #
+
     sudo apt install -y language-pack-ja
     sudo apt install -y fonts-ipafont
     sudo apt install -y fonts-ipaexfont
@@ -317,6 +349,13 @@ function wsl_chrome_font_settings () {
 
 #@ install
 function install_starship () {
+    #
+    # @Description  install starship to set modern commandline
+    # @params       
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
     cargo install starship --locked
 }
 
@@ -328,7 +367,7 @@ function install_hexyl () {
     # @Example      install_hexyl
     # @Reference    https://github.com/sharkdp/hexyl
     #
-    
+
     cargo install hexyl
     # sudo apt install -y hexyl
     # sudo port install hexyl
@@ -361,7 +400,7 @@ function install_exa () {
     cargo install --locked exa
 }
 
-#@
+#@ wsl
 function recognize_usb_driver_in_wsl () {
     #
     # @Description  recognize usb driver in wsl
@@ -650,21 +689,22 @@ EOF
     # checker_code
 }
 
-#@
-function all_issues () {
-    #
-    # @Description  all issues from various repositories
-    # @params       
-    # @Example      all_issues
-    # @Reference    
-    #
 
-    while read target_repository; do
-        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
-    done< <(cat /tmp/8ucchiman/target_repositories)
-
-
-}
+##@ git
+#function all_issues () {
+#    #
+#    # @Description  all issues from various repositories
+#    # @params       
+#    # @Example      all_issues
+#    # @Reference    
+#    #
+#
+#    while read target_repository; do
+#        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
+#    done< <(cat /tmp/8ucchiman/target_repositories)
+#
+#
+#}
 
 
 #@ git
@@ -3483,7 +3523,7 @@ function _assert () {
 
 #echo OK
 
-#@
+#@ gulliver
 function gutils_tic_toc () {
     #
     # Description:  Gutils tictoc
@@ -3498,7 +3538,7 @@ function gutils_tic_toc () {
 }
 
 
-#@
+#@ obsolete
 function georgia_omscs () {
     #@ nest
     function matrials () {
@@ -3536,7 +3576,7 @@ function georgia_omscs () {
 }
 
 #@ $3
-function create_remote_repository () {
+function _create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
     #               This is empty.
