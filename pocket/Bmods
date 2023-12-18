@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-18 09:41:56
+# LastModified: 2023-12-18 14:56:18
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -92,6 +92,55 @@ function deploy2script () {
     #
 
 
+}
+
+#@
+function show_samples () {
+    #
+    # @Description  Show sample images, videos, gifs, or texts
+    # @params
+    # @Example      show_samples
+    # @Reference    
+    #
+
+    fuzzy_settings
+    $(cd $SAMPLE; fzf)
+    # echo $sample
+}
+
+
+
+#@
+function show_sample_pics () {
+    #
+    # @Description  show sample pictures
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://www.reddit.com/r/bash/comments/uxds93/add_image_preview_to_fzf/
+    #
+
+    
+    local target_pics=$(cd $HOME/.config/sample/pics; /bin/ls | fzf --preview="
+        if [[ {} =~ ('.jpg'|'.JPG'|'.jpeg'|'.png'|'.PNG')$ ]]; then
+            catimg -r2 -w$COLUMNS {};
+        elif [ -d {} ]; then
+            /bin/ls --color=always --group-directories-first -H {};
+        else
+            nl -pba -w1 -s' ' {};
+        fi")
+}
+
+#@ install
+function install_catimg () {
+    cd $HOME/source
+    git clone https://github.com/posva/catimg.git
+    cd catimg
+    cmake -S . -B build
+    cd build
+    maka install
+    make
+    ln -sf $PWD/bin/catimg $HOME/bin/
 }
 
 
@@ -1002,6 +1051,7 @@ function pocket () {
         neovim_plugin                   https://github.com/Olical/conjure
         network_commands                jetpack.io/devbox/docs/installing_devbox/
         mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
+        tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
@@ -3039,20 +3089,6 @@ function add_submodules () {
     #
 
     git submodule add $1
-}
-
-#@
-function show_samples () {
-    #
-    # @Description  Show sample images, videos, gifs, or texts
-    # @params
-    # @Example      show_samples
-    # @Reference    
-    #
-
-    fuzzy_settings
-    $(cd $SAMPLE; fzf)
-    # echo $sample
 }
 
 
