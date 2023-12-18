@@ -56,3 +56,25 @@ declare -A my_vars=( ["key1"]="value1" ["key2"]="value" )
 
 to_param_list list my_vars
 echo $list[*]
+
+
+# ----------------------------------------------------
+# Reference: https://qiita.com/kawaz/items/6e037631ca68d2dca13c
+
+# 標準入力を指定の変数名に1行1値の配列として読み込む関数
+read2arr() {
+  [[ $1 =~ ^[a-zA-Z][a-zA-Z0-9_]*$ ]] || return 1
+  local IFS=
+  eval "local $1_"
+  eval "$1=()"
+  eval "while read -r $1_ || [[ -n \$$1_ ]]; do $1+=(\"\$$1_\"); done"
+}
+
+# ----------------------------------------------------
+# Keyword> zsh each line of command's output to array
+# Reference> array_of_lines=("${(@f)$(my_command)}")
+
+test_array=("${(@f)$(cd $HOME/mywork/projects/test4github; gh issue list)}")
+for ta in $test_array; do
+    echo $ta
+done

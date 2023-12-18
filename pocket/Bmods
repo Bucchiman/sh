@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-16 16:09:17
+# LastModified: 2023-12-17 16:34:34
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -60,6 +60,21 @@ function create_WIPissue () {
     gh issue develop $issue_number --base dev --checkout
 }
 
+#@
+function install_gb_debugger () {
+    local install_path=$1
+    local bin_path=$2
+    if [[ $# < 2 ]]; then
+        install_path=$HOME/source
+        bin_path=$HOME/bin
+    fi
+
+    cd $install_path
+    wget https://github.com/LIJI32/SameBoy/releases/download/v0.16/sameboy_cocoa_v0.16.zip && unzip sameboy_cocoa_v0.16.zip
+    ln -sf $PWD/SameBoy.app/Contents/MacOS/SameBoy $HOME/mywork/projects/gb_emulator/bin/
+
+}
+
 #@ $2 git
 function issue2pullrequest () {
     #
@@ -79,6 +94,60 @@ function issue2pullrequest () {
     local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
     local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
     #gh pr checkout $pr_number
+}
+
+#@ git
+function issue2toDo () {
+    #
+    # @Description  issue list of all repositories
+    # @params       
+    # @Example      issuelst
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    local PROJECT_DIR=$HOME/mywork/projects
+    local ISSUELST_PATH=/tmp/8ucchiman/all_issues
+    if [[ -e $ISSUELST_PATH ]]; then
+        rm $ISSUELST_PATH
+    fi
+    touch $ISSUELST_PATH
+    for target_dir in `/bin/ls $PROJECT_DIR`; do
+        cd $PROJECT_DIR/$target_dir
+
+        if [[ -e .git ]]; then
+            local remote_repository=`git config --get remote.origin.url`
+            if [[ $remote_repository =~ "github" ]]; then
+                local issues=("${(@f)$(gh issue list)}")
+                #local issue_info=`gh issue create --title $title -F /tmp/8ucchiman/issues/${i}`
+            else
+                local issues=("${(@f)$(glab issue list)}")
+                #local issue_info=`glab issue create -t "$title" -d "$description"`
+            fi
+            for issue in $issues; do
+                echo "$PROJECT_DIR/$target_dir $issue" >> $ISSUELST_PATH
+            done
+
+            #gh issue list
+        fi
+    done
+}
+
+#@
+function show_issuelst () {
+    local ISSUELST_PATH=/tmp/8ucchiman/all_issues
+    local issue_lst=`file_fzf $ISSUELST_PATH`
+}
+
+#@
+function line_of_command2arr () {
+    #
+    # @Description  convert each line of command's output to array
+    # @params       
+    # @Example      line_of_command2arr
+    # @Reference    https://qiita.com/kawaz/items/6e037631ca68d2dca13c
+    #
+
+    
 }
 
 #@ deploy
@@ -836,7 +905,7 @@ function install_repl_c () {
     #
 
     mkdir -p $HOME/source/cling; cd $_
-    curl -O https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
+    wget https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
     chmod u+x clone.sh
     ./clone.sh
     ln -sf $PWD/build/bin/cling $HOME/bin/cling
@@ -2738,7 +2807,7 @@ function file_fzf () {
     # @Reference    
     #
 
-    echo $(cat $1 | fzf --height 100% )
+    echo $(/bin/cat $1 | fzf --height 100% )
 }
 
 #@ archive
