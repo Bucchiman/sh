@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-17 16:34:34
+# LastModified: 2023-12-18 20:20:02
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -33,17 +33,18 @@ function init () {
     #
 
     install_system
+    if ! _has cargo; then install_rust; fi
     if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
-    if ! _has cargo; then install_rust; fi
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
+    if ! _has dust; then install_dust; fi
 }
 
 #@ $1 git
-function create_WIPissue () {
+function _create_WIPissue () {
     #
     # @Description  create Working in progress issue
     # @params       $1: issue_number
@@ -76,7 +77,7 @@ function install_gb_debugger () {
 }
 
 #@ $2 git
-function issue2pullrequest () {
+function _issue2pullrequest () {
     #
     # @Description  Work in progress about issue
     # @params       $1: issue_number
@@ -160,6 +161,64 @@ function deploy2script () {
     #
 
 
+}
+
+##@
+#function show_samples () {
+#    #
+#    # @Description  Show sample images, videos, gifs, or texts
+#    # @params
+#    # @Example      show_samples
+#    # @Reference    
+#    #
+#
+#    fuzzy_settings
+#    $(cd $SAMPLE; fzf)
+#    # echo $sample
+#}
+
+#@
+function show_pics_preview () {
+    
+}
+
+
+#@
+function _show_sample_pics () {
+    #
+    # @Description  show sample pictures
+    # @params       
+    # @Example      show_sample_pics
+    # @Reference    https://www.reddit.com/r/bash/comments/uxds93/add_image_preview_to_fzf/
+    #
+
+    
+    local target_pics=$(cd $HOME/.config/sample/pics; /bin/ls | fzf --preview="
+        if [[ {} =~ ('.jpg'|'.JPG'|'.jpeg'|'.png'|'.PNG')$ ]]; then
+            catimg -r2 -w$COLUMNS {};
+        elif [ -d {} ]; then
+            /bin/ls --color=always --group-directories-first -H {};
+        else
+            nl -pba -w1 -s' ' {};
+        fi")
+}
+
+#@ install
+function install_catimg () {
+    mkdir -p $HOME/source; cd $_
+    git clone https://github.com/posva/catimg.git
+    cd catimg
+    cmake -S . -B build
+    cd build
+    maka install
+    make
+    ln -sf $PWD/bin/catimg $HOME/bin/
+}
+
+
+#@ install
+function install_dust () {
+    cargo install --locked du-dust
 }
 
 #@ install
@@ -276,6 +335,26 @@ function install_google_cloud_cli () {
 # 
 # return
 
+
+# #@ $3
+# function random_words2file () {
+#     #
+#     # @Description  create file with random words
+#     # @params       $1: output file
+#     #               $2: number of words
+#     # @Example      random_words2file
+#     # @Reference    
+#     #
+# 
+#     local output_file=$1
+#     if [[ $# < 2 ]]; then
+#         output_file=random_words.txt
+#     fi
+#     touch $output_file
+#     local -a random_words=(`random_words_generator $2`)
+# }
+
+
 #@ $1
 function random_words_generator () {
     #
@@ -290,7 +369,7 @@ function random_words_generator () {
         num_words=`tr -dc 0-9 < /dev/urandom | fold -w 2 | head -1`
         num_words=$((num_words%20))
     fi
-    echo $num_words
+    #echo $num_words
  
     # Constants
     X=0
@@ -308,8 +387,44 @@ function random_words_generator () {
     done
 }
 
+#@ wrapper install
+function install_cargo () {
+    #
+    # @Description  install cargo, rust
+    # @params       
+    # @Example      install_cargo
+    # @Keywords     wrapper
+    #               install
+    # @Reference    https://www.rust-lang.org/tools/install
+    #
+
+    install_rust
+}
+
+#@
+function wsl_chrome_font_settings () {
+    #
+    # @Description  setup google chrome font in linux(wsl)
+    # @params       
+    # @Example      wsl_chrome_font_settings
+    # @Reference    https://lef237.hatenablog.com/entry/2022/12/05/163550
+    #
+
+    sudo apt install -y language-pack-ja
+    sudo apt install -y fonts-ipafont
+    sudo apt install -y fonts-ipaexfont
+    fc-cache -fv
+}
+
 #@ install
 function install_starship () {
+    #
+    # @Description  install starship to set modern commandline
+    # @params       
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
     cargo install starship --locked
 }
 
@@ -321,7 +436,7 @@ function install_hexyl () {
     # @Example      install_hexyl
     # @Reference    https://github.com/sharkdp/hexyl
     #
-    
+
     cargo install hexyl
     # sudo apt install -y hexyl
     # sudo port install hexyl
@@ -354,7 +469,7 @@ function install_exa () {
     cargo install --locked exa
 }
 
-#@
+#@ wsl
 function recognize_usb_driver_in_wsl () {
     #
     # @Description  recognize usb driver in wsl
@@ -643,21 +758,22 @@ EOF
     # checker_code
 }
 
-#@
-function all_issues () {
-    #
-    # @Description  all issues from various repositories
-    # @params       
-    # @Example      all_issues
-    # @Reference    
-    #
 
-    while read target_repository; do
-        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
-    done< <(cat /tmp/8ucchiman/target_repositories)
-
-
-}
+##@ git
+#function all_issues () {
+#    #
+#    # @Description  all issues from various repositories
+#    # @params       
+#    # @Example      all_issues
+#    # @Reference    
+#    #
+#
+#    while read target_repository; do
+#        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
+#    done< <(cat /tmp/8ucchiman/target_repositories)
+#
+#
+#}
 
 
 #@ git
@@ -915,7 +1031,17 @@ function install_repl_c () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
+    sudo apt install -y xclip
+    
 
+}
+
+#@ install
+function install_google_chrome () {
+    sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    sudo apt update
+    sudo apt-get install google-chrome-stable
 }
 
 function sick_sensor () {
@@ -1033,7 +1159,8 @@ function pocket () {
         network                         http://www.runsurunet.com/2017/10/13/%E5%88%A5%E3%81%AE%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9/
         neovim_plugin                   https://github.com/Olical/conjure
         network_commands                jetpack.io/devbox/docs/installing_devbox/
-
+        mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
+        tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
@@ -1595,14 +1722,17 @@ function diy_projects () {
     
 }
 
+function install_nasm () {
+    sudo apt install -y nasm
+}
 
 
 #@ educ reference
 function machine_language () {
-    function reference () {
+    #function reference () {
         local -A reference_lst=(
             シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
-            arコマンド解説              https://linuxcommand.net/ar/#s
+            arコマンド解説              https://linuxcommand.net/ar/\#s
             cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
             ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
             system_call01               https://research.miidas.jp/2019/05/macos%E3%81%AE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/
@@ -1625,8 +1755,11 @@ function machine_language () {
             68000_hello                 https://www.kkaneko.jp/pro/as/advanced/outline.html
             8086_hello                  http://software.aufheben.info/contents.html?contents_key=kouza_asm
         )
-        echo ${(kv)reference_lst}
-    }
+        #echo ${(kv)reference_lst}
+        local target_url=`array_fzf "${(k)reference_lst[*]}"`
+        nohup google-chrome ${reference_lst[$target_url]} &
+    #}
+    #reference
 }
 
 
@@ -3067,20 +3200,6 @@ function add_submodules () {
     git submodule add $1
 }
 
-#@
-function show_samples () {
-    #
-    # @Description  Show sample images, videos, gifs, or texts
-    # @params
-    # @Example      show_samples
-    # @Reference    
-    #
-
-    fuzzy_settings
-    $(cd $SAMPLE; fzf)
-    # echo $sample
-}
-
 
 #@
 function show_cmd_history () {
@@ -3473,7 +3592,7 @@ function _assert () {
 
 #echo OK
 
-#@
+#@ gulliver
 function gutils_tic_toc () {
     #
     # Description:  Gutils tictoc
@@ -3488,7 +3607,7 @@ function gutils_tic_toc () {
 }
 
 
-#@
+#@ obsolete
 function georgia_omscs () {
     #@ nest
     function matrials () {
@@ -3526,7 +3645,7 @@ function georgia_omscs () {
 }
 
 #@ $3
-function create_remote_repository () {
+function _create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
     #               This is empty.
