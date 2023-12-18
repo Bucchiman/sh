@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-15 17:02:18
+# LastModified: 2023-12-15 18:09:41
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -906,7 +906,7 @@ function pocket () {
         network                         http://www.runsurunet.com/2017/10/13/%E5%88%A5%E3%81%AE%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9/
         neovim_plugin                   https://github.com/Olical/conjure
         network_commands                jetpack.io/devbox/docs/installing_devbox/
-
+        mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
