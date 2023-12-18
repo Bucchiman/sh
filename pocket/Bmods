@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-18 20:20:02
+# LastModified: 2023-12-18 22:32:52
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -43,6 +43,23 @@ function init () {
     if ! _has dust; then install_dust; fi
 }
 
+#@
+function google_script () {
+    function _sample () {
+        mkdir -p /tmp/8ucchiman/google_script_sample; cd $_
+        clasp create
+
+/bin/cat <<eos > main.js
+function test () {
+    console.log('Hello World!');
+}
+eos
+        clasp push
+        clasp open
+    }
+    _sample
+}
+
 #@ $1 git
 function _create_WIPissue () {
     #
@@ -59,6 +76,19 @@ function _create_WIPissue () {
         issue_number=`gh issue list | fzf --height 100% | awk '{print $1}'`
     fi
     gh issue develop $issue_number --base dev --checkout
+}
+
+#@ install
+function install_google_script () {
+    #
+    # @Description  install clasp with google script
+    # @params       
+    # @Example      install_google_script
+    # @Reference    https://tech.arc-one.jp/gas-clasp
+    #
+
+    npm i @google/clasp -g
+    npm install @types/google-apps-script
 }
 
 #@
