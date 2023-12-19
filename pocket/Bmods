@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-18 22:32:52
+# LastModified: 2023-12-19 10:00:46
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -58,6 +58,15 @@ eos
         clasp open
     }
     _sample
+}
+
+#@
+function github_action () {
+    local -A reference_lst=(
+        qiita01         https://qiita.com/shun198/items/14cdba2d8e58ab96cf95
+    )
+    local target_ref=`array_fzf "$reference_lst[*]"`
+    nohup google-chrome ${reference_lst[$target_ref]} &
 }
 
 #@ $1 git
@@ -125,6 +134,19 @@ function _issue2pullrequest () {
     local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
     local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
     #gh pr checkout $pr_number
+}
+
+#@
+function install_python_package () {
+    #
+    # torch torchvision torchaudio
+    # opencv-python
+    # scikit-learn scikit-image
+    # pandas
+    # numpy scipy
+    # pytest
+    #
+
 }
 
 #@ git
