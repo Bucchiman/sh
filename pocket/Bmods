@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-19 17:27:37
+# LastModified: 2023-12-19 23:15:58
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -60,6 +60,11 @@ eos
     _sample
 }
 
+#@ install
+function install_lldb () {
+    sudo apt install -y lldb
+}
+
 #@
 function github_action () {
     local -A reference_lst=(
@@ -67,6 +72,12 @@ function github_action () {
     )
     local target_ref=`array_fzf "$reference_lst[*]"`
     nohup google-chrome ${reference_lst[$target_ref]} &
+}
+
+#@ install
+function install_markdown () {
+    pip install grip
+    cargo install --locked mdcat
 }
 
 #@ $1 git
@@ -1083,7 +1094,7 @@ function install_repl_c () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
-    sudo apt install -y xclip
+    sudo apt install -y xclip libssl-dev openssl
     
 
 }
