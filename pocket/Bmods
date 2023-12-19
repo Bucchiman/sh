@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-19 10:00:46
+# LastModified: 2023-12-19 17:27:37
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -1213,6 +1213,7 @@ function pocket () {
         network_commands                jetpack.io/devbox/docs/installing_devbox/
         mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
         tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
+        perlin_noise                    https://postd.cc/understanding-perlin-noise/
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
