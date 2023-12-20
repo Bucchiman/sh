@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-20 18:48:49
+# LastModified: 2023-12-20 18:55:08
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -113,6 +113,13 @@ function install_google_script () {
 
 #@
 function react_set () {
+    #
+    # @Description  make homepage by react framework
+    # @params       
+    # @Example      react_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
     #@ nest
     function create_react_app () {
         npx create-react-app $1
@@ -133,6 +140,13 @@ function react_set () {
 
 #@
 function vue_set () {
+    #
+    # @Description  make homepage by vue framework
+    # @params       
+    # @Example      vue_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
     #@ nest
     function create_vue_app () {
         vue create $1 $@
@@ -149,8 +163,18 @@ function vue_set () {
     local target_function=`array_fzf "${function_lst[*]}"`
 }
 
-#@
+#@ install $2
 function install_gb_debugger () {
+    #
+    # @Description  install gb emulator for making it
+    # @params       $1: install path
+    #               $2: bin path
+    # @Example      install_gb_debugger (install_path: $HOME/source/, bin_path:$HOME/bin)
+    #               install_gb_debugger hoge geho
+    # @Reference
+    #
+
+    
     local install_path=$1
     local bin_path=$2
     if [[ $# < 2 ]]; then
