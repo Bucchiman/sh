@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-19 23:15:58
+# LastModified: 2023-12-20 18:48:49
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -109,6 +109,44 @@ function install_google_script () {
 
     npm i @google/clasp -g
     npm install @types/google-apps-script
+}
+
+#@
+function react_set () {
+    #@ nest
+    function create_react_app () {
+        npx create-react-app $1
+    }
+
+    #@ nest
+    function start_app () {
+        npm start
+    }
+
+    local -a function_lst=(
+        create_react_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function $@
+}
+
+#@
+function vue_set () {
+    #@ nest
+    function create_vue_app () {
+        vue create $1 $@
+    }
+
+    #@ nest
+    function start_app () {
+    }
+
+    local -a function_lst=(
+        create_vue_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
 }
 
 #@
