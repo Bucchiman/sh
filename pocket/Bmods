@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-24 23:52:02
+# LastModified: 2023-12-24 23:59:37
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -60,6 +60,26 @@ eos
         clasp open
     }
     _sample
+}
+
+#@ install
+function install_lldb () {
+    sudo apt install -y lldb
+}
+
+#@
+function github_action () {
+    local -A reference_lst=(
+        qiita01         https://qiita.com/shun198/items/14cdba2d8e58ab96cf95
+    )
+    local target_ref=`array_fzf "$reference_lst[*]"`
+    nohup google-chrome ${reference_lst[$target_ref]} &
+}
+
+#@ install
+function install_markdown () {
+    pip install grip
+    cargo install --locked mdcat
 }
 
 #@ $1 git
@@ -277,7 +297,69 @@ EOF
 }
 
 #@
+function react_set () {
+    #
+    # @Description  make homepage by react framework
+    # @params       
+    # @Example      react_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
+    #@ nest
+    function create_react_app () {
+        npx create-react-app $1
+    }
+
+    #@ nest
+    function start_app () {
+        npm start
+    }
+
+    local -a function_lst=(
+        create_react_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function $@
+}
+
+#@
+function vue_set () {
+    #
+    # @Description  make homepage by vue framework
+    # @params       
+    # @Example      vue_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
+    #@ nest
+    function create_vue_app () {
+        vue create $1 $@
+    }
+
+    #@ nest
+    function start_app () {
+    }
+
+    local -a function_lst=(
+        create_vue_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+}
+
+#@ install $2
 function install_gb_debugger () {
+    #
+    # @Description  install gb emulator for making it
+    # @params       $1: install path
+    #               $2: bin path
+    # @Example      install_gb_debugger (install_path: $HOME/source/, bin_path:$HOME/bin)
+    #               install_gb_debugger hoge geho
+    # @Reference
+    #
+
+    
     local install_path=$1
     local bin_path=$2
     if [[ $# < 2 ]]; then
@@ -310,6 +392,19 @@ function _issue2pullrequest () {
     local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
     local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
     #gh pr checkout $pr_number
+}
+
+#@
+function install_python_package () {
+    #
+    # torch torchvision torchaudio
+    # opencv-python
+    # scikit-learn scikit-image
+    # pandas
+    # numpy scipy
+    # pytest
+    #
+
 }
 
 #@ git
@@ -1175,7 +1270,7 @@ function install_repl_c () {
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
-    sudo apt install -y xclip
+    sudo apt install -y xclip libssl-dev openssl evince
     
 
 }
@@ -1305,6 +1400,7 @@ function pocket () {
         network_commands                jetpack.io/devbox/docs/installing_devbox/
         mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
         tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
+        perlin_noise                    https://postd.cc/understanding-perlin-noise/
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
