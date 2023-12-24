@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-18 22:32:52
+# LastModified: 2023-12-24 23:52:02
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -41,6 +41,8 @@ function init () {
     if ! _has starthip; then install_starship; fi
     if ! _has dbxcli; then install_dropbox; fi
     if ! _has dust; then install_dust; fi
+    if ! _has fnm; then install_fnm; fi
+    if ! _has catimg; then install_catimg; fi
 }
 
 #@
@@ -89,6 +91,189 @@ function install_google_script () {
 
     npm i @google/clasp -g
     npm install @types/google-apps-script
+}
+
+
+#@ docker
+function _docker () {
+    #
+    # @Description  
+    # @params       
+    # @Example      _docker
+    # @Reference    
+    #
+
+    #@ nest
+    function clean_none () {
+        local -a image_lst=($(docker images | awk '/<none>/{print $3}'))
+        for il in $image_lst; do
+            docker rmi $il
+        done
+    }
+
+    #@ nest interactive
+    function clean_images () {
+        local target_images=`docker images | awk '{print $3}' | fzf --preview-label="clean images" --preview="docker images" --height 100%`
+        docker rmi $target_images
+    }
+
+    #@ nest
+    function sample () {
+        mkdir -p /tmp/8ucchiman/test_docker; cd $_
+cat << EOF > docker-compose.yml
+web:
+  build: .
+  environment:
+    DISABLE_SPRING: "1" 
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    DB_HOST: "db"
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/var/local/rails5_product"
+  links:
+    - "db"
+
+db:
+  image: mysql:5.6
+  environment:
+    MYSQL_ROOT_PASSWORD: "root"
+EOF
+
+cat << EOF > Dockerfile
+# rails5_product
+FROM ruby:2.3.0
+ENV LANG C.UTF-8
+
+# Install Packages
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y \
+      sudo \
+      nodejs \
+      build-essential \
+      mysql-client 
+
+# Application
+ENV app     rails5_product
+ENV deploy  /var/local/\$app
+ENV user    prod_dev
+
+# User
+RUN useradd -d /home/\$user -m -s /bin/bash \$user
+RUN echo "\$user:\$user" | chpasswd
+RUN echo "\$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/\$user
+USER \$user
+ENV HOME /home/\$user
+
+# Work Directory
+RUN sudo mkdir -p \$deploy
+RUN sudo chown -R \$user:\$user \$deploy
+WORKDIR \$deploy
+
+# Bundle Install
+RUN sudo gem install bundler
+# ADD Gemfile \$deploy/
+# ADD Gemfile.lock \$deploy/
+# RUN sudo chown \$user:\$user Gemfile
+# RUN sudo chown \$user:\$user Gemfile.lock
+# RUN bundle install
+
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+EOF
+        docker-compose build
+    }
+
+    #@ nest
+    function build_image () {
+        #
+        # @Description  build image from base_docker
+        # @params       
+        # @Example      build_image opencv
+        # @Reference    
+        #
+
+        local target_dockerfile=`ls_fzf $HOME/mywork/projects/base_docker`
+        local dockerfile_path=$HOME/mywork/projects/base_docker/$target_dockerfile
+        echo -n "image name> "
+        read image_name
+        #if [[ $image_name == "" ]]; then
+        #fi
+        docker image build -t ${image_name} -f $dockerfile_path .
+
+        # docker image build --build-arg USER_NAME=$username \
+        #                    --build_arg USER_ID=$(id -u) \
+        #                    --build arg GROUP_ID=$(id -g) \
+        #                    -t ${username}/${image_name} -f $dockerfile .
+    }
+
+    #@ nest
+    function run_container () {
+        #
+        # @Description  run container
+        # @params       
+        # @Example      run_container
+        # @Reference    
+        #
+
+        #nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+        #local os
+        #local os_info=`lsb_release --description | awk -F":" '{print $2}'`
+        local OPTS
+        if _has sw_vers; then
+            nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+            OPTS="-e DISPLAY=docker.for.mac.host.internal:0"    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            #echo $OPTS
+        fi
+
+        docker images
+        local username=`echo $USER`
+        local -a image_lst=($(docker images | cut -d' ' -f1 | awk 'NR>=2{print}'))
+        local target_image=`array_fzf "$image_lst[*]"`
+        echo -n "Container Name> "
+        read container_name
+        if [[ $container_name == "" ]]; then
+            container_name="$target_image"
+        fi
+        local uid=`id -u "$USER"`
+
+        echo "$OPTS"
+        docker run --rm -it --name ${container_name} \
+                   -e USER_NAME=$username \
+                   -e LOCAL_UID=$uid \
+                   -e LOCAL_GID=$uid \
+                   -v ${HOME}:/share \
+                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+
+
+        # docker run --rm -it --name ${container_name} \
+        #            -e USER_NAME=$username \
+        #            -e LOCAL_UID=$uid \
+        #            -e LOCAL_GID=$uid \
+        #            -v ${HOME}:/share \
+        #            -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+
+        #docker run -it --gpus all \
+        #           --net host \
+        #           --env DISPLAY=$DISPLAY \
+        #           --volume $HOME/.Xauthority:/home/bucchiman/.Xauthority \
+        #           --volume $HOME/.config/snippets:/home/bucchiman/lib \
+        #           --volume $HOME/.ssh:/home/bucchiman/.ssh \
+        #           --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
+        #           --volume $HOME/common:/home/bucchiman/common \
+        #           --name $container_name \
+        #           $image_name
+    }
+    local -a function_lst=(
+        sample
+        build_image
+        run_container
+        clean_none
+        clean_images
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function
 }
 
 #@
@@ -968,77 +1153,6 @@ function install_system () {
     sudo apt-get install -y ${package_lst[*]}
 }
 
-#@
-function docker () {
-    #@ nest
-    function sample () {
-        mkdir -p /tmp/8ucchiman/test_docker; cd $_
-cat << EOF > docker-compose.yml
-web:
-  build: .
-  environment:
-    DISABLE_SPRING: "1" 
-    DB_USERNAME: "root"
-    DB_PASSWORD: "root"
-    DB_HOST: "db"
-  ports:
-    - "3000:3000"
-  volumes:
-    - ".:/var/local/rails5_product"
-  links:
-    - "db"
-
-db:
-  image: mysql:5.6
-  environment:
-    MYSQL_ROOT_PASSWORD: "root"
-EOF
-
-cat << EOF > Dockerfile
-# rails5_product
-FROM ruby:2.3.0
-ENV LANG C.UTF-8
-
-# Install Packages
-RUN apt-get update -y && apt-get upgrade -y
-RUN apt-get install -y \
-      sudo \
-      nodejs \
-      build-essential \
-      mysql-client 
-
-# Application
-ENV app     rails5_product
-ENV deploy  /var/local/\$app
-ENV user    prod_dev
-
-# User
-RUN useradd -d /home/\$user -m -s /bin/bash \$user
-RUN echo "\$user:\$user" | chpasswd
-RUN echo "\$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/\$user
-USER \$user
-ENV HOME /home/\$user
-
-# Work Directory
-RUN sudo mkdir -p \$deploy
-RUN sudo chown -R \$user:\$user \$deploy
-WORKDIR \$deploy
-
-# Bundle Install
-RUN sudo gem install bundler
-# ADD Gemfile \$deploy/
-# ADD Gemfile.lock \$deploy/
-# RUN sudo chown \$user:\$user Gemfile
-# RUN sudo chown \$user:\$user Gemfile.lock
-# RUN bundle install
-
-EXPOSE 3000
-CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
-EOF
-        docker-compose build
-    }
-    sample
-}
 
 #@ install repl c
 function install_repl_c () {
@@ -2981,6 +3095,7 @@ function ls_fzf () {
     # @Example      ls_fzf $HOME/mywork/projects
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
+
     echo $(/bin/ls -1 $1 | fzf --height 100%)
 }
 
@@ -3057,7 +3172,7 @@ function get_target_function () {
 
 }
 
-#@
+#@ archive
 function choose_local_function () {
     #
     # @Description  choose target function from local script
@@ -3071,7 +3186,7 @@ function choose_local_function () {
     echo $target_function
 }
 
-#@
+#@ archive
 function choose_Bmods_function () {
     #
     # @Description  choose target function from Bmods
@@ -3539,6 +3654,8 @@ function what_environment_is_this () {
     # @Reference    
     #
 
+    local os=`sw_vers --productName`
+    system_profiler SPHardwareDataType | awk '/Total Number of Cores/ { print $NF }'
     local hostname=`hostname`
     local ip_address=`hostname -I`
     local num_process=`ps aux | wc -l`
