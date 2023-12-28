@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-25 18:48:32
+# LastModified: 2023-12-26 14:38:00
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -774,7 +774,7 @@ function install_broot () {
 #@ install
 function install_exa () {
     #
-    # @Description  alternative to ls
+    # @Description  alternative to ls, with icon
     # @params       
     # @Example      install_exa
     # @Reference    https://github.com/ogham/exa
@@ -1148,6 +1148,8 @@ function lst2issues () {
         if [[ $remote_repository =~ "github" ]]; then
             local issue_info=`gh issue create --title $title -F /tmp/8ucchiman/issues/${i}`
         elif [[ $remote_repository =~ "gitlab" ]]; then
+            local issue_info=`glab issue create -t "$title" -d "$description"`
+        elif [[ $remote_repository =~ "192.168.6.2" ]]; then
             local issue_info=`glab issue create -t "$title" -d "$description"`
         else
             echo "cannot detect platform..."
@@ -1854,17 +1856,7 @@ function install_starship () {
 }
 
 
-#@
-function install_exa () {
-    #
-    # @Description  success to ls, with icon
-    # @params       
-    # @Example      install_exa
-    # @Reference    https://github.com/ogham/exa
-    #
 
-    cargo install exa
-}
 
 
 
