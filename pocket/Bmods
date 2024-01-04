@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-24 23:59:37
+# LastModified: 2024-01-04 16:34:18
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -24,7 +24,7 @@ function pass () {
 }
 
 #@ init
-function init () {
+function __init () {
     #
     # @Description  install packages
     # @params       
@@ -43,10 +43,22 @@ function init () {
     if ! _has dust; then install_dust; fi
     if ! _has fnm; then install_fnm; fi
     if ! _has catimg; then install_catimg; fi
+    if ! _has delta; then install_delta; fi
+    if ! _has lazygit; then install_lazygit; fi
+    if ! _has clasp; then install_google_script; fi
 }
 
 #@
 function google_script () {
+    #
+    # @Description  google script
+    #               sample
+    # @params       
+    # @Example      google_script
+    # @Reference    
+    #
+
+    #@ nest
     function _sample () {
         mkdir -p /tmp/8ucchiman/google_script_sample; cd $_
         clasp create
@@ -64,10 +76,17 @@ eos
 
 #@ install
 function install_lldb () {
+    #
+    # @Description  install lldb
+    # @params       
+    # @Example      install_lldb
+    # @Reference    
+    #
+
     sudo apt install -y lldb
 }
 
-#@
+#@ git
 function github_action () {
     local -A reference_lst=(
         qiita01         https://qiita.com/shun198/items/14cdba2d8e58ab96cf95
@@ -78,6 +97,13 @@ function github_action () {
 
 #@ install
 function install_markdown () {
+    #
+    # @Description  install markdown preview
+    # @params       
+    # @Example      install_markdown
+    # @Reference    
+    #
+
     pip install grip
     cargo install --locked mdcat
 }
@@ -117,7 +143,7 @@ function install_google_script () {
 #@ docker
 function _docker () {
     #
-    # @Description  
+    # @Description  docker script
     # @params       
     # @Example      _docker
     # @Reference    
@@ -125,6 +151,13 @@ function _docker () {
 
     #@ nest
     function clean_none () {
+        #
+        # @Description  clean all none images
+        # @params       
+        # @Example      clean_none
+        # @Reference    
+        #
+
         local -a image_lst=($(docker images | awk '/<none>/{print $3}'))
         for il in $image_lst; do
             docker rmi $il
@@ -133,6 +166,13 @@ function _docker () {
 
     #@ nest interactive
     function clean_images () {
+        #
+        # @Description  clean images in interactive mode
+        # @params       
+        # @Example      clean_images
+        # @Reference    
+        #
+
         local target_images=`docker images | awk '{print $3}' | fzf --preview-label="clean images" --preview="docker images" --height 100%`
         docker rmi $target_images
     }
@@ -222,10 +262,6 @@ EOF
         #fi
         docker image build -t ${image_name} -f $dockerfile_path .
 
-        # docker image build --build-arg USER_NAME=$username \
-        #                    --build_arg USER_ID=$(id -u) \
-        #                    --build arg GROUP_ID=$(id -g) \
-        #                    -t ${username}/${image_name} -f $dockerfile .
     }
 
     #@ nest
@@ -243,7 +279,7 @@ EOF
         local OPTS
         if _has sw_vers; then
             nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
-            OPTS="-e DISPLAY=docker.for.mac.host.internal:0"    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
             #echo $OPTS
         fi
 
@@ -258,21 +294,17 @@ EOF
         fi
         local uid=`id -u "$USER"`
 
-        echo "$OPTS"
+        # echo "$OPTS"
         docker run --rm -it --name ${container_name} \
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
                    -v ${HOME}:/share \
                    -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+                   #--v $HOME/.ssh:/home/bucchiman/.ssh \
+                   #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 
-
-        # docker run --rm -it --name ${container_name} \
-        #            -e USER_NAME=$username \
-        #            -e LOCAL_UID=$uid \
-        #            -e LOCAL_GID=$uid \
-        #            -v ${HOME}:/share \
-        #            -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+                   #$OPTS ${target_image} /usr/bin/zsh
 
         #docker run -it --gpus all \
         #           --net host \
@@ -296,6 +328,22 @@ EOF
     eval $target_function
 }
 
+#@ install
+function install_opengl () {
+    #
+    # @Description  install opengl
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      install_opengl
+    # @Reference    
+    #
+
+    sudo port install glfw
+    sudo port install glew
+    sudo port install glm
+}
+
 #@
 function react_set () {
     #
@@ -307,11 +355,25 @@ function react_set () {
 
     #@ nest
     function create_react_app () {
+        #
+        # @Description  create project
+        # @params       $1: project name
+        # @Example      create_react_app webgl
+        # @Reference    
+        #
+
         npx create-react-app $1
     }
 
     #@ nest
     function start_app () {
+        #
+        # @Description  start app within a project
+        # @params       
+        # @Example      start_app
+        # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+        #
+
         npm start
     }
 
@@ -359,7 +421,6 @@ function install_gb_debugger () {
     # @Reference
     #
 
-    
     local install_path=$1
     local bin_path=$2
     if [[ $# < 2 ]]; then
@@ -413,7 +474,7 @@ function issue2toDo () {
     # @Description  issue list of all repositories
     # @params       
     # @Example      issuelst
-    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    # @Reference    
     #
 
     local PROJECT_DIR=$HOME/mywork/projects
@@ -458,7 +519,6 @@ function line_of_command2arr () {
     # @Reference    https://qiita.com/kawaz/items/6e037631ca68d2dca13c
     #
 
-    
 }
 
 #@ deploy
@@ -487,22 +547,17 @@ function deploy2script () {
 #    # echo $sample
 #}
 
-#@
-function show_pics_preview () {
-    
-}
-
 
 #@
 function _show_sample_pics () {
     #
     # @Description  show sample pictures
     # @params       
+    # @dependencies catimg
     # @Example      show_sample_pics
     # @Reference    https://www.reddit.com/r/bash/comments/uxds93/add_image_preview_to_fzf/
     #
 
-    
     local target_pics=$(cd $HOME/.config/sample/pics; /bin/ls | fzf --preview="
         if [[ {} =~ ('.jpg'|'.JPG'|'.jpeg'|'.png'|'.PNG')$ ]]; then
             catimg -r2 -w$COLUMNS {};
@@ -515,6 +570,13 @@ function _show_sample_pics () {
 
 #@ install
 function install_catimg () {
+    #
+    # @Description  install catimg
+    # @params       
+    # @Example      install_catimg
+    # @Reference    
+    #
+
     mkdir -p $HOME/source; cd $_
     git clone https://github.com/posva/catimg.git
     cd catimg
@@ -528,6 +590,14 @@ function install_catimg () {
 
 #@ install
 function install_dust () {
+    #
+    # @Description  alternative to du, disk utility
+    # @params       
+    # @dependencies cargo
+    # @Example      install_dust
+    # @Reference    
+    #
+
     cargo install --locked du-dust
 }
 
@@ -541,11 +611,30 @@ function install_dropbox () {
 
 #@ install repl rust
 install_repl_rust () {
+    #
+    # @Description  install repl on rust
+    # @params       
+    # @dependencies cargo
+    # @Example      
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
     cargo install evcxr_repl
 }
 
 #@ install
 function install_google_cloud_cli () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
     sudo apt update
     sudo apt-get install -y apt-transport-https ca-certificates gnupg curl sudo
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -731,6 +820,7 @@ function install_starship () {
     #
     # @Description  install starship to set modern commandline
     # @params       
+    # @dependencies cargo
     # @Example      install_starship
     # @Reference    https://starship.rs/
     #
@@ -743,6 +833,7 @@ function install_hexyl () {
     #
     # @Description  hexyl, alternative to od
     # @params       
+    # @dependencies cargo
     # @Example      install_hexyl
     # @Reference    https://github.com/sharkdp/hexyl
     #
@@ -757,6 +848,7 @@ function install_broot () {
     #
     # @Description  alternative to tree
     # @params       
+    # @dependencies cargo
     # @Example      install_broot
     # @Reference    https://dystroy.org/broot/install/
     #
@@ -1801,31 +1893,12 @@ function gist () {
 }
 
 
-
-#@ initialize
-function starter_pack () {
-    if ! _has starship ; then
-        install_starship
-    fi
-    if ! _has fzf ; then
-        install_fzf
-    fi
-    if ! _has bat ; then
-        install_bat
-    fi
-    if ! _has delta; then
-        install_delta
-    fi
-    if ! _has lazygit; then
-        install_lazygit
-    fi
-}
-
 #@
 function install_delta () {
     #
     # @Description  success to diff
     # @params       
+    # @dependencies cargo
     # @Example      insatll_delta
     # @Reference    https://dandavison.github.io/delta/get-started.html
     #
@@ -1839,6 +1912,7 @@ function install_starship () {
     #
     # @Description  prompt decorator
     # @params       
+    # @dependencies cargo
     # @Example      install_starship
     # @Reference    https://starship.rs/
     #
@@ -1855,6 +1929,7 @@ function install_exa () {
     #
     # @Description  success to ls, with icon
     # @params       
+    # @dependencies cargo
     # @Example      install_exa
     # @Reference    https://github.com/ogham/exa
     #
@@ -1969,6 +2044,15 @@ function install_nasm () {
 
 #@ educ reference
 function machine_language () {
+    #
+    # @Description  
+    # @params       
+    # @dependencies fzf
+    # @Example
+    # @Reference    
+    #
+
+    
     #function reference () {
         local -A reference_lst=(
             シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
@@ -2010,6 +2094,7 @@ function set_devcontainer () {
     #
     # @Description  set devcontainer
     # @params       
+    # @dependencies npm
     # @Example
     # @Reference    
     #
@@ -2068,6 +2153,13 @@ function install_lua () {
 
 #@ error
 function install_luarocks () {
+    #
+    # @Description  install luarocks
+    # @params       
+    # @Example      install_luarocks
+    # @Reference    
+    #
+
     mkdir $HOME/source/luarocks && cd $_
     wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
     tar zxpf luarocks-3.9.2.tar.gz
