@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-04 16:51:18
+# LastModified: 2024-01-15 00:08:23
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -92,6 +92,65 @@ eos
     _sample
 }
 
+#@ esp32
+function setup_esp32 () {
+    #
+    # @Description  setup esp32
+    # @Preriquisite connect esp32 via usb
+    # @params       
+    # @Example      setup_esp32
+    # @Reference    https://micropython-docs-ja.readthedocs.io/ja/latest/esp32/tutorial/intro.html#esp32-intro
+    #
+
+    curl https://micropython.org/resources/firmware/{ESP32_GENERIC-20240105-v1.22.1.bin} -o "/tmp/#1"
+
+    pip install esptool
+    local target_device=$(/bin/ls -1 /dev/tty* | fzf --height 100%)
+    esptool.py --port $target_device erase_flash
+    esptool.py --chip esp32 --port /dev/tty.usbserial-130 write_flash \
+               -z 0x1000 /tmp/ESP32_GENERIC-20240105-v1.22.1.bin
+}
+
+#@ dataset
+function download_waymo () {
+    #
+    # @Description  download waymo dataset
+    #               4.2TiB to use
+    # @params       
+    # @Example      download_waymo
+    # @Reference    https://console.cloud.google.com/storage/browser/waymo_open_dataset_motion_v_1_2_0;tab=objects?pli=1&prefix=&forceOnObjectsSortingFiltering=false
+    #
+
+    local -A type_lst=(
+        lidar lidar
+        scenario scenario
+        tf_example tf_example
+        all "")
+    mkdir -p $HOME/data/waymo/uncompressed
+    local download_type=`array_fzf "${(k)type_lst[*]}"`
+    download_type=${type_lst[$download_type]}
+    if [[ $download_type == "" ]]; then
+        gsutil -m cp -r "gs://waymo_open_dataset_motion_v_1_2_0/uncompressed/${download_type}" $HOME/data/waymo/
+    else
+        gsutil -m cp -r "gs://waymo_open_dataset_motion_v_1_2_0/uncompressed/${download_type}" $HOME/data/waymo/uncompressed/
+    fi
+}
+
+#@ install
+function install_youtube () {
+    #
+    # @Description  install youtube-dl
+    # @params       
+    # @ExampleA     install_youtube
+    # @Reference    
+    #
+
+    # if [[ ]]; then
+    #     sudo port install youtube-dl     # not running
+    # fi
+    pip install youtube-dl
+}
+
 #@ install
 function install_lldb () {
     #
@@ -155,6 +214,23 @@ function install_google_script () {
 
     npm i @google/clasp -g
     npm install @types/google-apps-script
+}
+
+
+#@ install mac
+function install_powershell () {
+    #
+    # @Description  install powershell on mac
+    # @params       
+    # @Example      install_powershell
+    # @Reference    https://learn.microsoft.com/ja-jp/powershell/scripting/install/installing-powershell-on-macos?view=powershell-7.4
+    #
+
+    mkdir -p $HOME/source/powershell/; cd $_
+    curl -L -o powershell.tar.gz https://github.com/PowerShell/PowerShell/releases/download/v7.4.0/powershell-7.4.0-osx-x64.tar.gz
+    tar xzvf powershell.tar.gz
+    chmod u+x pwsh
+    ln -sf $HOME/source/powershell/pwsh $HOME/bin/pwsh 
 }
 
 
@@ -3801,16 +3877,16 @@ function what_file_is_this () {
         echo "You have to specify the file as an argument..."
     fi
     local target=$1
-    local full_file_path=${target:a}
+    local full_file_path=${target:a}        # alt: $ realpath ${target}
     local base_name=${target:r}
     local extension=${target:e}
-    local own_user=`stat -c "%U:%u" $1`
-    local own_group=`stat -c "%G:%g" $1`
-    local access_mode=`stat -c "%A" $1`
-    local create_date=`stat -c "%w" $1`
-    local acccess_date=`stat -c "%x" $1`
-    local modify_date=`stat -c "%z" $1`
-    local change_date=`stat -c "%y" $1`
+    local own_user=`stat -f "%U:%u" $1`
+    local own_group=`stat -f "%G:%g" $1`
+    local access_mode=`stat -f "%A" $1`
+    local create_date=`stat -f "%w" $1`
+    local acccess_date=`stat -f "%x" $1`
+    local modify_date=`stat -f "%z" $1`
+    local change_date=`stat -f "%y" $1`
 
     local -A metadata
     if [[ $extension == "png" || $extension == "jpg" ]]; then
