@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-15 12:12:36
+# LastModified: 2024-01-15 12:30:31
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -97,19 +97,51 @@ eos
 function setup_esp32 () {
     #
     # @Description  setup esp32
+    #               install esptool.py
+    #                       idf.py
     # @Preriquisite connect esp32 via usb
     # @params       
     # @Example      setup_esp32
     # @Reference    https://micropython-docs-ja.readthedocs.io/ja/latest/esp32/tutorial/intro.html#esp32-intro
+    #               https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html
     #
 
-    curl https://micropython.org/resources/firmware/{ESP32_GENERIC-20240105-v1.22.1.bin} -o "/tmp/#1"
+    #@ nest
+    function esptool () {
+        #
+        # @Description  install and setup esptool
+        # @params       
+        # @Example      esptool
+        # @Reference    https://micropython-docs-ja.readthedocs.io/ja/latest/esp32/tutorial/intro.html#esp32-intro
+        #
 
-    pip install esptool
-    local target_device=$(/bin/ls -1 /dev/tty* | fzf --height 100%)
-    esptool.py --port $target_device erase_flash
-    esptool.py --chip esp32 --port /dev/tty.usbserial-130 write_flash \
-               -z 0x1000 /tmp/ESP32_GENERIC-20240105-v1.22.1.bin
+        curl https://micropython.org/resources/firmware/{ESP32_GENERIC-20240105-v1.22.1.bin} -o "/tmp/#1"
+
+        pip install esptool
+        local target_device=$(/bin/ls -1 /dev/tty* | fzf --height 100%)
+        esptool.py --port $target_device erase_flash
+        esptool.py --chip esp32 --port /dev/tty.usbserial-130 write_flash \
+                   -z 0x1000 /tmp/ESP32_GENERIC-20240105-v1.22.1.bin
+    }
+
+    #@ nest
+    function idf () {
+        #
+        # @Description  install and setup idf
+        # @params       
+        # @Example      idf
+        # @Reference    https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/linux-macos-setup.html
+        #
+
+        sudo port install cmake ninja dfu-util
+        mkdir -p $HOME/source/esp && cd $_
+        git clone --recursive https://github.com/espressif/esp-idf.git
+        cd esp-idf
+        ./install.sh esp32
+        . $HOME/source/esp/esp-idf/export.sh
+    }
+    idf
+
 }
 
 #@ dataset
