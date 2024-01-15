@@ -8,31 +8,17 @@
 # Description:  ---
 #
 
-#@ archive
-function __choose_project () {
-    #
-    # @Description      choose project of myworks
-    # @params  
-    # @Example          project=`Lchoose_project`
-    # @Reference
-    #
 
-    local project=`ls_fzf $BASE_DIR/submodules`
-    echo $project
-}
-
-# function choose_local_shell_function () {
-#     local 
-# }
+# set -ex        # 途中のエラーで実行中断
 
 
-#@ archive
-function __update_submodules () {
+#@
+function update_submodules () {
     $(cd $BASE_DIR; git submodule update --init --recursive)   # cloneした後submoduleをclone 
 }
 
-#@ archive
-function __create_remote_repository () {
+#@
+function submodule_add () {
     typeset -A platforms
     platforms=(
         github git@github.com:Bucchiman/
@@ -42,53 +28,15 @@ function __create_remote_repository () {
     echo -n "project name> ${platforms[$target_platform]}"
     read project_name
     local repository_url=${platforms[$target_platform]}${project_name}.git
-    create_remote_repository $target_platform $project_name
-    #git submodule add $repository_url ./projects/$project_name
-    cd projects; git submodule add $repository_url $project_name
+    mkdir -p ${BASE_DIR}/submodules; cd $_; git submodule add $repository_url ${project_name}
 }
 
-#@ archive
-function __submodule_add () {
-    typeset -A platforms
-    platforms=(
-        github git@github.com:
-        gitlab git@gitlab.com:
-    )
-    local target_platform=`array_fzf "${(k)platforms[*]}"`
-    echo -n "project name> ${platforms[$target_platform]}"
-    read project_name
-    local repository_url=${platforms[$target_platform]}${project_name}.git
-    cd ${BASE_DIR}/projects; git submodule add $repository_url ${project_name}
+#@
+function fzf_install () {
 }
 
-#@ archive
-function __eval () {
-    read casual_command
-    eval $casual_command
-}
-
-#@ archive
-function setup_devbox () {
-    function base_packages () {
-        devbox add zsh@latest                   # https://www.nixhub.io/packages/zsh
-        devbox add neovim@latest                # https://www.nixhub.io/packages/neovim
-        devbox add neovim-qt@latest             # https://www.nixhub.io/packages/neovim-qt
-        devbox add neovim-gtk@latest            # https://www.nixhub.io/packages/neovim-gtk
-        devbox add neovim-remote@latest         # https://www.nixhub.io/packages/neovim-remote
-        devbox add git@latest                   # https://www.nixhub.io/packages/git
-        # devbox add ripgrep
-        devbox add fzf@latest                   # https://www.nixhub.io/packages/fzf
-        devbox add gh@latest                    # https://www.nixhub.io/packages/gh
-        devbox add bat@latest                   # https://www.nixhub.io/packages/bat
-    }
-
-    devbox init
-    base_packages
-    devbox shell
-}
-
-#@ archive
-function __set_variables () {
+#@
+function set_variables () {
     #
     #
     #
@@ -97,23 +45,33 @@ function __set_variables () {
     echo "* set_variables              *"
     echo "******************************"
     BASE_DIR=$PWD
-    BMODS_PATH=$BASE_DIR/Bmods
-    PATH="$BASE_DIR/bin:$PATH"
-    #typeset -A -g SUBMODULES=(yolostereo3D https://github.com/Owen-Liuyuxuan/visualDet3D.git)
+    BMODS_PATH=$HOME/Bmods
+    ### you can write
+    typeset -A -g SUBMODULES=(
+        repo_name https://github.com/ # blablabla ...
+    )
+    typeset -A -g Reference_lst=(
+        ref_name https:// # blablabla ...
+    )
+    echo "BASE_DIR=$PWD"
+}
+#@
+function create_devbox () {
+    devbox init;
+    devbox shell;
 }
 
-
-
-#@ archive
-function init () {
-    linit
-}
-
-#@ archive
+#@
 function open () {
     lopen
 }
 
+#@ archive
+function setup () {
+    if [[ -e $BASE_DIR/local ]]; then
+        source local
+    fi
+}
 
 #@ archive
 function build () {
@@ -126,19 +84,10 @@ function run () {
 }
 
 #@ archive
-function setup () {
-    lsetup
+function clean () {
+    lclean
 }
 
-#@ archive
-function deploy () {
-    ldeploy
-}
-
-#@ archive
-function deploy_test () {
-    ldeploy_test
-}
 
 #@ archive
 function default () {
@@ -151,41 +100,30 @@ function default () {
     echo "******************************"
     echo "this is default setting"
     echo "you can run this function without no arguments."
-    init
-    setup
-    build
+    #build
     run
 }
-#######################################
 
+
+#######################################
 #@ archive
 function main01 () {
-    # source $BASE_DIR/Bmods
-    __set_variables
-    source $BASE_DIR/local
+    set_variables
+    setup
+    source $BMODS_PATH
     if [[ $@ == "" ]]; then
-        #
-        # source modules
-        # $ source Bmods
-        #
+        default
     elif [[ $@ == "." ]]; then
-        # array_of_lines=("${(@f)$(my_command)}")
-        # Reference: https://unix.stackexchange.com/questions/29724/how-to-properly-collect-an-array-of-lines-in-zsh
-        # Reference: https://stackoverflow.com/questions/15691942/print-array-elements-on-separate-lines-in-bash
-        # printf '%s\n' "${my_array[@]}"
-        # local target_func=
-        # echo 
-        # eval 
         local target_func=`choose_local_function $BASE_DIR/Brun`
         eval $target_func
     else
         eval $@
     fi
+
 }
 
 ME=$0
 main01 $@
-
 #######################################
 
 

@@ -1,0 +1,52 @@
+- Bmods: deploy2script        issue: 4
+    - This is the deployment from functions of Bmods to shell script
+    - Motivation
+        - to make customer script from functions of Bmods easily
+    - toDo
+        - [] if a file name of an argument already exists, suspend process.
+        - [] via fzf, you can choose functions in interactive mode.
+    - remarks
+        - need a output file name as an argument
+        - about begin and end lines of functions, lst2issues can be refered
+- Bmods: deploy2yaml        issue: 5
+    - This is the deployment from associative array of shell to yaml.
+    - Motivation
+        - to convert outputs of commands to yaml format
+    - toDo
+        - [] load assciative array of an argument
+        - [] Using yq, keys and values of an associative array are assigned in yaml.
+    - remarks
+        - yq installer is in Bmods
+- Bmods: deploy2json        issue: 6
+    - This is the deployment from associative array of shell to json.
+    - Motivation
+        - to convert outputs of commands to json format
+    - toDo
+        - [] load assciative array of an argument
+        - [] Using jq, keys and values of an associative array are assigned in json.
+- Bmods: search_keywords        issue: 7
+    - This is built-in function of Bmods. When the keyworsd `#@` is found in Bmods, the folloing keywords of it is hints for searching for functions.
+    - toDo
+        - [] find the `#@` keyword.
+        - [] the following keywords of `#@` are listed(this is unique).
+        - [] via fzf, you can choose keywords(no fzf preview).
+        - [] after that, based on the selected keywords, the corresponding functions can chosen in fzf interactive mode.
+    - future work
+        - In the interactive `Bmain` mode, not only functions but keywords can be chosen.
+- Bmods: what_environment_is_this        issue: 8
+    - This is built-in function of Bmods. the environment of machine can be logged.
+    - toDo
+        - [] check python platform (pyenv?|venv?|anaconda?)
+        - [] machine status
+            - os, hostname, et al...
+            - occupancy of cpu and gpu
+            - number of processings
+        - [] git info
+            - project name
+            - commit hash
+- Bmods: what_process_is_this        issue: 9
+    - This is built-in function of Bmods
+    - toDo
+        - [] full command of this process
+        - [] created date
+        - [] timelapsed

@@ -3,12 +3,14 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-15 10:36:13
+# LastModified: 2024-01-15 10:57:34
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
 # Description:  ---
 #
+
+# set -ex
 
 #@ archive
 function pass () {
@@ -21,15 +23,1314 @@ function pass () {
 
 }
 
-#@
-function init () {
-    install_system
-    if ! _has nvim; then install_neovim; fi
-    if ! _has fzf; then install_fzf; fi
-    if ! _has bat; then install_bat; fi
+
+#@ 2024
+function 2024_tactics () {
+    #@ nest
+    function event () {
+        function reference () {
+            local -A reference_lst=(
+                hackathon_kyoto https://connpass.com/event/289901/
+            )
+        }
+    }
 }
 
 
+#@ init
+function __init () {
+    #
+    # @Description  install packages
+    # @params       
+    # @Example      init
+    # @Reference    
+    #
+
+    install_system
+    if ! _has cargo; then install_rust; fi
+    if ! _has go; then install_go; fi
+    if ! _has nvim; then install_neovim; fi
+    if ! _has fzf; then install_fzf; fi
+    if ! _has bat; then install_bat; fi
+    if ! _has exa; then install_exa; fi
+    if ! _has starthip; then install_starship; fi
+    if ! _has lldb; then install_lldb; fi
+    if ! _has dbxcli; then install_dropbox; fi
+    if ! _has dust; then install_dust; fi
+    if ! _has fnm; then install_fnm; fi
+    if ! _has catimg; then install_catimg; fi
+    if ! _has delta; then install_delta; fi
+    if ! _has lazygit; then install_lazygit; fi
+    if ! _has clasp; then install_google_script; fi
+    if ! _has mdcat; then install_markdown; fi
+    if ! _has clasp; then install_google_script; fi
+}
+
+#@
+function google_script () {
+    #
+    # @Description  google script
+    #               sample
+    # @params       
+    # @Example      google_script
+    # @Reference    
+    #
+
+    #@ nest
+    function _sample () {
+        mkdir -p /tmp/8ucchiman/google_script_sample; cd $_
+        clasp create
+
+/bin/cat <<eos > main.js
+function test () {
+    console.log('Hello World!');
+}
+eos
+        clasp push
+        clasp open
+    }
+    _sample
+}
+
+#@ install
+function install_lldb () {
+    #
+    # @Description  install lldb
+    # @params       
+    # @Example      install_lldb
+    # @Reference    
+    #
+
+    sudo apt install -y lldb
+}
+
+#@ git
+function github_action () {
+    local -A reference_lst=(
+        qiita01         https://qiita.com/shun198/items/14cdba2d8e58ab96cf95
+    )
+    local target_ref=`array_fzf "$reference_lst[*]"`
+    nohup google-chrome ${reference_lst[$target_ref]} &
+}
+
+#@ install
+function install_markdown () {
+    #
+    # @Description  install markdown preview
+    # @params       
+    # @Example      install_markdown
+    # @Reference    
+    #
+
+    pip install grip
+    cargo install --locked mdcat
+}
+
+#@ $1 git
+function _create_WIPissue () {
+    #
+    # @Description  create Working in progress issue
+    # @params       $1: issue_number
+    # @Example      create_WIPissue 44
+    #               create_WIPissue # interactive mode
+    # @Reference    
+    #
+
+    #set -xe
+    local issue_number=$1
+    if [[ $# == 0 ]]; then
+        issue_number=`gh issue list | fzf --height 100% | awk '{print $1}'`
+    fi
+    gh issue develop $issue_number --base dev --checkout
+}
+
+#@ install
+function install_google_script () {
+    #
+    # @Description  install clasp with google script
+    # @params       
+    # @Example      install_google_script
+    # @Reference    https://tech.arc-one.jp/gas-clasp
+    #
+
+    npm i @google/clasp -g
+    npm install @types/google-apps-script
+}
+
+
+#@ docker
+function _docker () {
+    #
+    # @Description  docker script
+    # @params       
+    # @Example      _docker
+    # @Reference    
+    #
+
+    #@ nest
+    function clean_none () {
+        #
+        # @Description  clean all none images
+        # @params       
+        # @Example      clean_none
+        # @Reference    
+        #
+
+        local -a image_lst=($(docker images | awk '/<none>/{print $3}'))
+        for il in $image_lst; do
+            docker rmi $il
+        done
+    }
+
+    #@ nest interactive
+    function clean_images () {
+        #
+        # @Description  clean images in interactive mode
+        # @params       
+        # @Example      clean_images
+        # @Reference    
+        #
+
+        local target_images=`docker images | awk '{print $3}' | fzf --preview-label="clean images" --preview="docker images" --height 100%`
+        docker rmi $target_images
+    }
+
+    #@ nest
+    function sample () {
+        mkdir -p /tmp/8ucchiman/test_docker; cd $_
+cat << EOF > docker-compose.yml
+web:
+  build: .
+  environment:
+    DISABLE_SPRING: "1" 
+    DB_USERNAME: "root"
+    DB_PASSWORD: "root"
+    DB_HOST: "db"
+  ports:
+    - "3000:3000"
+  volumes:
+    - ".:/var/local/rails5_product"
+  links:
+    - "db"
+
+db:
+  image: mysql:5.6
+  environment:
+    MYSQL_ROOT_PASSWORD: "root"
+EOF
+
+cat << EOF > Dockerfile
+# rails5_product
+FROM ruby:2.3.0
+ENV LANG C.UTF-8
+
+# Install Packages
+RUN apt-get update -y && apt-get upgrade -y
+RUN apt-get install -y \
+      sudo \
+      nodejs \
+      build-essential \
+      mysql-client 
+
+# Application
+ENV app     rails5_product
+ENV deploy  /var/local/\$app
+ENV user    prod_dev
+
+# User
+RUN useradd -d /home/\$user -m -s /bin/bash \$user
+RUN echo "\$user:\$user" | chpasswd
+RUN echo "\$user ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers.d/\$user
+USER \$user
+ENV HOME /home/\$user
+
+# Work Directory
+RUN sudo mkdir -p \$deploy
+RUN sudo chown -R \$user:\$user \$deploy
+WORKDIR \$deploy
+
+# Bundle Install
+RUN sudo gem install bundler
+# ADD Gemfile \$deploy/
+# ADD Gemfile.lock \$deploy/
+# RUN sudo chown \$user:\$user Gemfile
+# RUN sudo chown \$user:\$user Gemfile.lock
+# RUN bundle install
+
+EXPOSE 3000
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+EOF
+        docker-compose build
+    }
+
+    #@ nest
+    function build_image () {
+        #
+        # @Description  build image from base_docker
+        # @params       
+        # @Example      build_image opencv
+        # @Reference    
+        #
+
+        local target_dockerfile=`ls_fzf $HOME/mywork/projects/base_docker`
+        local dockerfile_path=$HOME/mywork/projects/base_docker/$target_dockerfile
+        echo -n "image name> "
+        read image_name
+        #if [[ $image_name == "" ]]; then
+        #fi
+        docker image build -t ${image_name} -f $dockerfile_path .
+
+    }
+
+    #@ nest
+    function run_container () {
+        #
+        # @Description  run container
+        # @params       
+        # @Example      run_container
+        # @Reference    
+        #
+
+        #nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+        #local os
+        #local os_info=`lsb_release --description | awk -F":" '{print $2}'`
+        local OPTS
+        if _has sw_vers; then
+            nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            #echo $OPTS
+        fi
+
+        docker images
+        local username=`echo $USER`
+        local -a image_lst=($(docker images | cut -d' ' -f1 | awk 'NR>=2{print}'))
+        local target_image=`array_fzf "$image_lst[*]"`
+        echo -n "Container Name> "
+        read container_name
+        if [[ $container_name == "" ]]; then
+            container_name="$target_image"
+        fi
+        local uid=`id -u "$USER"`
+
+        # echo "$OPTS"
+        docker run --rm -it --name ${container_name} \
+                   -e USER_NAME=$username \
+                   -e LOCAL_UID=$uid \
+                   -e LOCAL_GID=$uid \
+                   -v ${HOME}:/share \
+                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+                   #--v $HOME/.ssh:/home/bucchiman/.ssh \
+                   #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+
+                   #$OPTS ${target_image} /usr/bin/zsh
+
+        #docker run -it --gpus all \
+        #           --net host \
+        #           --env DISPLAY=$DISPLAY \
+        #           --volume $HOME/.Xauthority:/home/bucchiman/.Xauthority \
+        #           --volume $HOME/.config/snippets:/home/bucchiman/lib \
+        #           --volume $HOME/.ssh:/home/bucchiman/.ssh \
+        #           --volume /tmp/.X11-unix:/tmp/.X11-unix:rw \
+        #           --volume $HOME/common:/home/bucchiman/common \
+        #           --name $container_name \
+        #           $image_name
+    }
+    local -a function_lst=(
+        sample
+        build_image
+        run_container
+        clean_none
+        clean_images
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function
+}
+
+#@ install
+function install_opengl () {
+    #
+    # @Description  install opengl
+    #               background command a
+    #               foreground command b
+    # @params       
+    # @Example      install_opengl
+    # @Reference    
+    #
+
+    sudo port install glfw
+    sudo port install glew
+    sudo port install glm
+}
+
+#@
+function react_set () {
+    #
+    # @Description  make homepage by react framework
+    # @params       
+    # @Example      react_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
+    #@ nest
+    function create_react_app () {
+        #
+        # @Description  create project
+        # @params       $1: project name
+        # @Example      create_react_app webgl
+        # @Reference    
+        #
+
+        npx create-react-app $1
+    }
+
+    #@ nest
+    function start_app () {
+        #
+        # @Description  start app within a project
+        # @params       
+        # @Example      start_app
+        # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+        #
+
+        npm start
+    }
+
+    local -a function_lst=(
+        create_react_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function $@
+}
+
+#@
+function vue_set () {
+    #
+    # @Description  make homepage by vue framework
+    # @params       
+    # @Example      vue_set
+    # @Reference    chatgpt> I wanto make homepage by some framework, such as react, and vue.js.
+    #
+
+    #@ nest
+    function create_vue_app () {
+        vue create $1 $@
+    }
+
+    #@ nest
+    function start_app () {
+    }
+
+    local -a function_lst=(
+        create_vue_app
+        start_app
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+}
+
+#@ install $2
+function install_gb_debugger () {
+    #
+    # @Description  install gb emulator for making it
+    # @params       $1: install path
+    #               $2: bin path
+    # @Example      install_gb_debugger (install_path: $HOME/source/, bin_path:$HOME/bin)
+    #               install_gb_debugger hoge geho
+    # @Reference
+    #
+
+    local install_path=$1
+    local bin_path=$2
+    if [[ $# < 2 ]]; then
+        install_path=$HOME/source
+        bin_path=$HOME/bin
+    fi
+
+    cd $install_path
+    wget https://github.com/LIJI32/SameBoy/releases/download/v0.16/sameboy_cocoa_v0.16.zip && unzip sameboy_cocoa_v0.16.zip
+    ln -sf $PWD/SameBoy.app/Contents/MacOS/SameBoy $HOME/mywork/projects/gb_emulator/bin/
+
+}
+
+#@ $2 git
+function _issue2pullrequest () {
+    #
+    # @Description  Work in progress about issue
+    # @params       $1: issue_number
+    #               $2: PR title
+    # @Example      issue2pullrequest 44 fix bug about open window
+    # @Reference    https://cli.github.com/manual/gh_pr_create
+    #               https://cli.github.com/manual/gh_issue_develop
+    #               ChatGPT: How to make pull request from issue with gh cli?
+    #
+    
+    local issue_number=$1
+    local issue_branch=`gh issue develop --list $issue_number | awk '{print $1}'`
+    shift
+    local title=$@
+    local pr_info=`gh pr create -H $issue_branch -B dev --body "Fixes #$1" --title $title`
+    local pr_number=`echo $pr_info | awk -F "/" '{print $(NF)}'`
+    #gh pr checkout $pr_number
+}
+
+#@
+function install_python_package () {
+    #
+    # torch torchvision torchaudio
+    # opencv-python
+    # scikit-learn scikit-image
+    # pandas
+    # numpy scipy
+    # pytest
+    #
+
+}
+
+#@ git
+function issue2toDo () {
+    #
+    # @Description  issue list of all repositories
+    # @params       
+    # @Example      issuelst
+    # @Reference    
+    #
+
+    local PROJECT_DIR=$HOME/mywork/projects
+    local ISSUELST_PATH=/tmp/8ucchiman/all_issues
+    if [[ -e $ISSUELST_PATH ]]; then
+        rm $ISSUELST_PATH
+    fi
+    touch $ISSUELST_PATH
+    for target_dir in `/bin/ls $PROJECT_DIR`; do
+        cd $PROJECT_DIR/$target_dir
+
+        if [[ -e .git ]]; then
+            local remote_repository=`git config --get remote.origin.url`
+            if [[ $remote_repository =~ "github" ]]; then
+                local issues=("${(@f)$(gh issue list)}")
+                #local issue_info=`gh issue create --title $title -F /tmp/8ucchiman/issues/${i}`
+            else
+                local issues=("${(@f)$(glab issue list)}")
+                #local issue_info=`glab issue create -t "$title" -d "$description"`
+            fi
+            for issue in $issues; do
+                echo "$PROJECT_DIR/$target_dir $issue" >> $ISSUELST_PATH
+            done
+
+            #gh issue list
+        fi
+    done
+}
+
+#@
+function show_issuelst () {
+    local ISSUELST_PATH=/tmp/8ucchiman/all_issues
+    local issue_lst=`file_fzf $ISSUELST_PATH`
+}
+
+#@
+function line_of_command2arr () {
+    #
+    # @Description  convert each line of command's output to array
+    # @params       
+    # @Example      line_of_command2arr
+    # @Reference    https://qiita.com/kawaz/items/6e037631ca68d2dca13c
+    #
+
+}
+
+#@ deploy
+function deploy2script () {
+    #
+    # @Description  This is the deployment from functions of Bmods to shell script 
+    # @params       
+    # @Example      deploy2script
+    # @Reference    
+    #
+
+
+}
+
+##@
+#function show_samples () {
+#    #
+#    # @Description  Show sample images, videos, gifs, or texts
+#    # @params
+#    # @Example      show_samples
+#    # @Reference    
+#    #
+#
+#    fuzzy_settings
+#    $(cd $SAMPLE; fzf)
+#    # echo $sample
+#}
+
+
+#@
+function _show_sample_pics () {
+    #
+    # @Description  show sample pictures
+    # @params       
+    # @dependencies catimg
+    # @Example      show_sample_pics
+    # @Reference    https://www.reddit.com/r/bash/comments/uxds93/add_image_preview_to_fzf/
+    #
+
+    local target_pics=$(cd $HOME/.config/sample/pics; /bin/ls | fzf --preview="
+        if [[ {} =~ ('.jpg'|'.JPG'|'.jpeg'|'.png'|'.PNG')$ ]]; then
+            catimg -r2 -w$COLUMNS {};
+        elif [ -d {} ]; then
+            /bin/ls --color=always --group-directories-first -H {};
+        else
+            nl -pba -w1 -s' ' {};
+        fi")
+}
+
+#@ install
+function install_catimg () {
+    #
+    # @Description  install catimg
+    # @params       
+    # @Example      install_catimg
+    # @Reference    
+    #
+
+    mkdir -p $HOME/source; cd $_
+    git clone https://github.com/posva/catimg.git
+    cd catimg
+    cmake -S . -B build
+    cd build
+    maka install
+    make
+    ln -sf $PWD/bin/catimg $HOME/bin/
+}
+
+
+#@ install
+function install_dust () {
+    #
+    # @Description  alternative to du, disk utility
+    # @params       
+    # @dependencies cargo
+    # @Example      install_dust
+    # @Reference    
+    #
+
+    cargo install --locked du-dust
+}
+
+#@ install
+function install_dropbox () {
+    cd $HOME/bin/
+    wget https://github.com/dropbox/dbxcli/releases/download/v3.0.0/dbxcli-linux-amd64
+    mv dbxcli-linux-amd64 dbxcli
+    chmod u+x dbxcli
+}
+
+#@ install repl rust
+install_repl_rust () {
+    #
+    # @Description  install repl on rust
+    # @params       
+    # @dependencies cargo
+    # @Example      
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    cargo install evcxr_repl
+}
+
+#@ install
+function install_google_cloud_cli () {
+    #
+    # @Description  command a & command b
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt update
+    sudo apt-get install -y apt-transport-https ca-certificates gnupg curl sudo
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.asc] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+    sudo apt-get update && sudo apt-get install -y google-cloud-cli
+    sudo apt-get install google-cloud-cli-app-engine-java
+    gcloud init
+}
+
+##@
+#function gpu_status () {
+#    bus_id=(0 0)
+#    #nvidia-smi --query-compute-apps=pid,gpu_bus_id,process_name --format=csv,noheader
+#    empty_gpu=(`nvidia-smi --query-compute-apps=gpu_bus_id --format=csv,noheader`)
+#
+#    # echo "num: ${#empty_gpu[@]}"
+#    if [[ ${#empty_gpu[@]} > 0 ]]; then
+#        for eg in $empty_gpu; do
+#            if [[ `echo $eg | grep 17` ]]; then
+#                bus_id[1]=$(($bus_id[1]+1))
+#            fi
+#            if [[ `echo $eg | grep 65` ]]; then
+#                bus_id[2]=$(($bus_id[2]+1))
+#            fi
+#        done
+#    fi
+#
+#}
+
+# for gpu detection
+#
+# date "+%Y_%m_%d_%H_%M"
+# source /home/yk.iwabuchi/.zshrc
+# base_path="/home/yk.iwabuchi/projects/RDC/confuciux/src/ConfX"
+# out_dir="/home/yk.iwabuchi/projects/RDC/confuciux/outdir"
+# conda activate confxEnvForce
+# conda deactivate; conda activate confxEnvForce; rehash; which pip python
+# bus_id=(0 0)
+# #nvidia-smi --query-compute-apps=pid,gpu_bus_id,process_name --format=csv,noheader
+# empty_gpu=(`nvidia-smi --query-compute-apps=gpu_bus_id --format=csv,noheader`)
+# echo "num: ${#empty_gpu[@]}"
+# if [[ ${#empty_gpu[@]} > 0 ]]
+#   then
+#   for eg in $empty_gpu
+#   do
+#     if [[ `echo $eg | grep 17` ]]
+#     then
+#       bus_id[1]=$(($bus_id[1]+1))
+#     fi
+#     if [[ `echo $eg | grep 65` ]]
+#     then
+#       bus_id[2]=$(($bus_id[2]+1))
+#     fi
+#   done
+# fi
+# 
+# model="mobilenet_v2"
+# #local -a FITNESS
+# #local -a CSTR
+# #local -a DATAFLOW
+# FITNESS=(latency energy)
+# CSTR=(area power)
+# DATAFLOW=(shi dla eye dpt)
+# 
+# #if [[$bus_id[17] == 0 ]]
+# #then
+# #  export CUDA_VISIBLE_DEVICES="0"
+# #fi
+# if [[ $bus_id[2] < 3 ]]
+# then
+#   export CUDA_VISIBLE_DEVICES="1"
+#   for fitness in $FITNESS
+#   do
+#     for cstr in $CSTR
+#     do
+#       for dataflow in $DATAFLOW
+#       do
+#         dir_name=${model}_F-${fitness}_C-${cstr}_Mul-0.5_DF-${dataflow}_RL_GA_D
+#         if [[ -e ${out_dir}/${dir_name}/result.csv ]] && [[ ${bus_id[2]} < 3 ]]
+#         then
+#         else
+#           cd $base_path
+#           nohup python main.py --outdir outdir --model ${model} --fitness ${fitness} --cstr ${cstr} --mul 0.5 --epochs 500 --df ${dataflow} --alg RL_GA &
+#           bus_id[2]=$(($bus_id[2]+1))
+#         fi
+#         echo "GPU0: $bus_id[1] GPU1: $bus_id[2]"
+#         if [[ $bus_id[2] > 1 ]]
+#         then
+#           exit
+#         fi
+#       done
+#     done
+#   done
+# else
+#   echo "order"
+# fi
+# 
+# return
+
+
+# #@ $3
+# function random_words2file () {
+#     #
+#     # @Description  create file with random words
+#     # @params       $1: output file
+#     #               $2: number of words
+#     # @Example      random_words2file
+#     # @Reference    
+#     #
+# 
+#     local output_file=$1
+#     if [[ $# < 2 ]]; then
+#         output_file=random_words.txt
+#     fi
+#     touch $output_file
+#     local -a random_words=(`random_words_generator $2`)
+# }
+
+
+#@ $1
+function random_words_generator () {
+    #
+    # @Description  random words generator
+    # @params       
+    # @Example      random_words_generator 100
+    # @Reference    https://linuxconfig.org/random-word-generator
+    #
+
+    local num_words=$1
+    if [[ $# == 0 ]]; then
+        num_words=`tr -dc 0-9 < /dev/urandom | fold -w 2 | head -1`
+        num_words=$((num_words%20))
+    fi
+    #echo $num_words
+ 
+    # Constants
+    X=0
+    ALL_NON_RANDOM_WORDS=/usr/share/dict/words
+ 
+    # total number of non-random words available
+    non_random_words=`cat $ALL_NON_RANDOM_WORDS | wc -l`
+ 
+    # while loop to generate random words  
+    # number of random generated words depends on supplied argument 
+    while [[ $X -lt $num_words ]]; do
+        random_number=`od -N3 -An -i /dev/urandom | awk -v f=0 -v r="$non_random_words" '{printf "%i\n", f + r * $num_words / 16777216}'`
+        sed `echo $random_number`"q;d" $ALL_NON_RANDOM_WORDS
+        let "X = X + 1"
+    done
+}
+
+#@ wrapper install
+function install_cargo () {
+    #
+    # @Description  install cargo, rust
+    # @params       
+    # @Example      install_cargo
+    # @Keywords     wrapper
+    #               install
+    # @Reference    https://www.rust-lang.org/tools/install
+    #
+
+    install_rust
+}
+
+#@
+function wsl_chrome_font_settings () {
+    #
+    # @Description  setup google chrome font in linux(wsl)
+    # @params       
+    # @Example      wsl_chrome_font_settings
+    # @Reference    https://lef237.hatenablog.com/entry/2022/12/05/163550
+    #
+
+    sudo apt install -y language-pack-ja
+    sudo apt install -y fonts-ipafont
+    sudo apt install -y fonts-ipaexfont
+    fc-cache -fv
+}
+
+#@ install
+function install_starship () {
+    #
+    # @Description  install starship to set modern commandline
+    # @params       
+    # @dependencies cargo
+    # @Example      install_starship
+    # @Reference    https://starship.rs/
+    #
+
+    cargo install starship --locked
+}
+
+#@ install
+function install_hexyl () {
+    #
+    # @Description  hexyl, alternative to od
+    # @params       
+    # @dependencies cargo
+    # @Example      install_hexyl
+    # @Reference    https://github.com/sharkdp/hexyl
+    #
+
+    cargo install hexyl
+    # sudo apt install -y hexyl
+    # sudo port install hexyl
+}
+
+#@ install
+function install_broot () {
+    #
+    # @Description  alternative to tree
+    # @params       
+    # @dependencies cargo
+    # @Example      install_broot
+    # @Reference    https://dystroy.org/broot/install/
+    #
+    
+    # cd $HOME/bin
+    # wget https://dystroy.org/broot/download/x86_64-linux/broot
+    # chmod u+x broot
+    cargo install --locked broot
+}
+
+#@ install
+function install_exa () {
+    #
+    # @Description  alternative to ls, with icon
+    # @params       
+    # @Example      install_exa
+    # @Reference    https://github.com/ogham/exa
+    #
+
+    cargo install --locked exa
+}
+
+#@ wsl
+function recognize_usb_driver_in_wsl () {
+    #
+    # @Description  recognize usb driver in wsl
+    # @params       
+    # @Example      recognize_usb_driver_in_wsl
+    # @Reference    https://qiita.com/KMNMKT/items/ae0e76a3e420b3ca16e6
+    #               https://qiita.com/ryoma-jp/items/9db6cca5ed10f1aed7ff
+    #               https://zenn.dev/fuyuaice/articles/930d41504818c6
+    #               https://macha795.com/eset-ip-port-num-allow/
+    #
+
+    # on powershell
+    winget install --interactive --exact dorssel.usbipd-win
+
+    # on wsl
+    sudo apt upgrade
+    sudo apt update
+    sudo apt install -y linux-tools-5.4.0-77-generic hwdata
+    sudo update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/5.4.0-77-generic/usbip 20
+
+    # on powershell (admin)
+    usbipd list
+    usbipd bind -b 1-13
+    usbipd attach --wsl --busid 1-13
+
+}
+
+
+#@
+function yamaha_lua () {
+    #
+    # @Description  yamaha lua script
+    # @params       yamaha_lua
+    # @Example      yamaha_lua
+    # @Reference    http://www.rtpro.yamaha.co.jp/RT/manual/rtx830/Users.pdf
+    #               https://network.yamaha.com/setting/router_firewall/monitor/lua_script/manual
+    #
+
+    local -A description_search=(
+        font    "console character en.ascii"
+        copy    "copy usb1:/test.lua /test.lua"
+        show    "show file list /"
+        show_status "show status lan1"
+        run     "lua usb1:/test.lua"
+        set_ip  "ip lan1 address 192.168.6.199"
+        set_ip_lan2 "ip lan2 address 192.168.6.198"
+        set_ip_lan3 "ip lan3 address 192.168.6.197"
+    )
+
+    #@ nest
+    function open_description () {
+        nohup google-chrome http://www.rtpro.yamaha.co.jp/RT/manual/rtx830/Users.pdf &
+    }
+
+    local -a function_lst=(
+        open_description
+    )
+    local target_func=`array_fzf "${function_lst[*]}"`
+    eval $target_func
+}
+
+
+#@
+function library_scratch () {
+    #
+    # @Description  install library, build, compile from scratch
+    # @params       
+    # @Example      library_scratch  glfw
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
+    mkdir -p $HOME/include
+    mkdir -p $HOME/lib
+    cd source
+
+    #@ nest
+    function glfw () {
+        git clone https://github.com/glfw/glfw.git
+        cd glfw;
+        cmake -S . -B build
+        ln -sf $PWD/include/GLFW $HOME/include/
+        ln -sf $PWD/build/src/libglfw3.a $HOME/lib/
+    }
+
+    eval $@
+}
+
+
+#@ educ c
+function c_lang {
+#@ nest
+function ar_static () {
+    #
+    # @Description  ar command (static maker)
+    # @params       
+    # @Example      ar_static
+    # @Reference    https://linuxcommand.net/ar/
+    #
+
+    #@ nest
+    function _r-option () {
+        mkdir $TMP/ar_educ; cd $_;
+cat <<eos > file1.c
+#include<stdio.h>
+void func1 (void) {
+    printf("func1 is here\n");
+}
+eos
+cat <<eos > file2.c
+#include<stdio.h>
+void func2 (void) {
+    printf("func2 is here\n");
+}
+eos
+cat <<eos > file3.c
+#include<stdio.h>
+void func3 (void) {
+    printf("func3 is here\n");
+}
+eos
+        gcc -c file1.c file2.c file3.c      # オプジェクトファイル作成
+        ar r archive.a *.o                  # 静的ファイル追加
+        ar t archive.a                      # 静的ライブラリ一覧表示
+    }
+
+    #@ nest
+    function _d-option () {
+        _r-option
+        ar t archive.a
+        ar d archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function _t-option () {
+        _r-option
+        ar t archive.a
+    }
+
+    #@ nest
+    function _x-option () {
+        _r-option
+        ar t archive.a
+        ar x archive.a file1.o file2.o
+        ls
+    }
+
+    #@ nest
+    function _p-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _s-option () {
+        echo "no description"
+    }
+
+    #@ nest
+    function _q-option () {
+        _r-option
+        ar t archive.a
+cat <<eos > file4.c
+#include<stdio.h>
+void func4 (void) {
+    printf("func4 is here!!\n");
+}
+eos
+        ar q archive.a file4.o
+    }
+
+    #@ nest
+    function _m-option () {
+        _r-option
+        ar t archive.a
+        ar m archive.a file2.o
+        ar t archive.a
+    }
+
+    #@ nest
+    function clean () {
+        rm -r $TMP/ar_educ
+    }
+}
+
+#@ nest
+function gcc_option () {
+    function _I-option () {
+        #
+        # @Description  
+        # @params       
+        # @Example      _I-option
+        # @Reference    https://qiita.com/DQNEO/items/4e5c2eca2761ec08b922
+        #
+        
+        mkdir -p /tmp/8ucchiman/C/header; cd /tmp/8ucchiman/C;
+cat <<eos > main.c
+#include <stdio.h>
+#include <bucchiman.h>
+
+int main(int argc, char** argv) {
+    print_all(argc, argv);
+}
+eos
+        cd header;
+cat <<eos > bucchiman.h
+#include <stdio.h>
+
+void print_all(int argc, char** argv) {
+    for (int i=0; i<argc; i++) {
+        printf("i: %d, arg: %s\n", i, argv[i]);
+    }
+}
+eos
+        cd ..
+        gcc -I ./header main.c
+        ./a.out bucchiman Bucchiman 8ucchiman
+    }
+}
+}
+
+#@
+function mount_usb_from_native_to_wsl () {
+    # echo "sudo mount -t drvfs $1: /mnt/${(L)1}"
+    sudo mount -t drvfs $1: /mnt/${(L)1}
+}
+
+#@
+function umount () {
+    # sudo umount /mnt/d
+}
+
+#@
+function memory_leak () {
+    #
+    # @Description  check memory leak
+    # @params       
+    # @Example      memory_leak
+    # @Reference    chatgpt: How to detect memory leak in c language?
+    #
+
+    function sample () {
+        mkdir -p /tmp/8ucchiman/memory_leak_test; cd $_
+cat << EOF > memory_leak.c
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int main(void) {
+    int *geho;
+    geho = (int*) malloc(50*sizeof(int));
+    // free(geho);
+    return 0;
+}
+EOF
+cat << EOF > no_memory_leak.c
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int main(void) {
+    int *geho;
+    geho = (int*) malloc(50*sizeof(int));
+    free(geho);
+    return 0;
+}
+EOF
+        gcc -g -o memory_leak memory_leak.c
+        gcc -g -o no_memory_leak no_memory_leak.c
+        valgrind --leak-check=full ./memory_leak
+        valgrind --leak-check=full ./no_memory_leak
+    }
+
+    function checker_code () {
+        mkdir -p /tmp/8ucchiman/memory_leak_test; cd $_
+cat << EOF > memchecker.c
+#include <mcheck.h>
+int main() {
+    mtrace();
+    // Your code here
+    muntrace();
+}
+EOF
+    }
+    # sample
+    # checker_code
+}
+
+
+##@ git
+#function all_issues () {
+#    #
+#    # @Description  all issues from various repositories
+#    # @params       
+#    # @Example      all_issues
+#    # @Reference    
+#    #
+#
+#    while read target_repository; do
+#        $(eval "cd $target_repository"; gh issue list | awk '{print $1, }' $target_repository)
+#    done< <(cat /tmp/8ucchiman/target_repositories)
+#
+#
+#}
+
+
+#@ git
+function lst2issues () {
+    #
+    # @Description  convert toDo list to issues
+    # @params       
+    # @Example      lst2issues
+    # @Description  You have to prepare toDolst file in the current directory.
+    # @Reference    https://qiita.com/takech9203/items/b96eff5773ce9d9cc9b3
+    #               https://tech.kurojica.com/archives/25401/
+    #               https://linux.just4fun.biz/?%E9%80%86%E5%BC%95%E3%81%8DUNIX%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89/%E6%8C%87%E5%AE%9A%E3%81%97%E3%81%9F%E7%AF%84%E5%9B%B2%E3%81%AE%E8%A1%8C%E3%82%92%E5%8F%96%E5%BE%97%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95
+    #
+    
+    if [[ ! -e toDolst ]]; then
+        echo "cannot find toDolst"
+        exit 1
+    fi
+    # while read LINE; do
+    #     # echo $LINE
+    #     
+
+    # done< <(cat toDolst)
+    # awk '
+    #     $0 ~ /^-+/  {print $2}
+    #     $0 ~ /^[ ]+-+/  {print $2}
+    # ' toDolst
+    # awk "/i\/o/,/setup/" toDolst
+    local -a num_lines=(`awk '
+        $0 ~ /^-+/  {printf "%d ", NR}
+        END{printf "%d\n", NR+1}
+    ' toDolst`)
+    # echo ${num_lines[*]}
+    # echo ${#num_lines}
+    mkdir -p /tmp/8ucchiman/issues
+    for i in `seq -s " " $((${#num_lines}-1))`; do
+        # echo $num_line
+        cur_num_line=$num_lines[$i]
+        next_num_line=$num_lines[$((i+1))]
+        issue_check=`awk -v nr=${cur_num_line} 'NR==nr{print $(NF-1)}' toDolst`
+        #echo $issue_check
+        if [[ $issue_check == "issue:" ]]; then
+            echo "issue already exists..."
+            echo title ""
+            echo issue is `awk -v nr=${cur_num_line} 'NR==nr{print $(NF)}' toDolst`
+            rm -f /tmp/8ucchiman/issues/${i}
+            continue
+        fi
+        sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst > /tmp/8ucchiman/issues/${i}
+
+        local description=`sed -n "${cur_num_line},$((${next_num_line}-1))p" toDolst`
+        # awk -v nr=${cur_num_line} 'NR=nr{print}' toDolst
+
+        #local title=`sed -n "${cur_num_line}p" toDolst`
+        local title=`awk -v nr=${cur_num_line} 'NR==nr{for(i=2; i<=NF; i++){printf("%s ", $i)}}' toDolst`
+
+        local remote_repository=`git config --get remote.origin.url`
+        if [[ $remote_repository =~ "github" ]]; then
+            local issue_info=`gh issue create --title $title -F /tmp/8ucchiman/issues/${i}`
+        elif [[ $remote_repository =~ "gitlab" ]]; then
+            local issue_info=`glab issue create -t "$title" -d "$description"`
+        elif [[ $remote_repository =~ "192.168.6.2" ]]; then
+            local issue_info=`glab issue create -t "$title" -d "$description"`
+        else
+            echo "cannot detect platform..."
+            exit 1
+        fi
+        issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
+        sed -i  -e "${cur_num_line} s/$/        issue: ${issue_number}/g" toDolst
+        rm -f /tmp/8ucchiman/issues/${i}
+    done
+}
+
+#@ $1 git
+function append_issue () {
+    #
+    # @Description  append an issue (you have to make an issue with )
+    # @params       $1: issue file
+    # @Example      append_issue ./assets/append_01
+    # @Reference    
+    #
+
+    # https://itneko.com/awk-print-index/
+    #echo $@
+    if [[ $# == 0 ]]; then
+        echo "Need a toDo file as an argument."
+        exit 1;
+    fi
+    local title=`awk 'NR==1{for(i=2;i<=NF;i++) printf"%s ", $i}END{printf "\n"}' $1`
+    local remote_repository=`git config --get remote.origin.url`
+    if [[ $remote_repository =~ "github" ]]; then
+        local issue_info=`gh issue create --title $title -F ${1}`
+        #rm -f /tmp/8ucchiman/issues/${i}
+    elif [[ $remote_repository =~ "gitlab" ]]; then
+        local issue_info=`glab issue create -t "$title" -d "$(cat $1)"`
+    else
+        echo "cannot detect platform..."
+        exit 1
+    fi
+    issue_number=`echo $issue_info | awk -F "/" '{print $(NF)}'`
+    sed -i  -e "1 s/$/        issue: ${issue_number}/g" $1
+    cat $1 >> toDolst
+    rm $1
+}
+
+#@
+function systemd_cron () {
+    #
+    # @Description  create cron job on systemd
+    # @params       
+    # @Example      systemd_cron
+    # @Reference    https://vlike-vlife.netlify.app/posts/systemd_scheduling
+    #
+
+    #@ nest
+    function sample () {
+        if [[ ! -L $HOME/.config/cron ]]; then
+            cd $HOME/dotfiles;
+            ./attach_dotfiles.zsh;
+        fi
+        cd $HOME/.config/cron
+#cat << EOF > hello.sh
+##!/bin/bash
+#echo    "Hello, " "$@" "!"
+#EOF
+#        chmod u+x hello.sh
+
+#        systemctl edit --user --force --full demo@.service
+#        systemctl --user start demo@sample.servije
+#        systemctl --user status demo@sample.service
+    }
+    # systemctl disable --user --now demo@schedule.timer
+    # sample
+}
+
+
+#@ install
 function install_system () {
     #
     # @Description  command a & command b
@@ -59,10 +1360,39 @@ function install_system () {
     sudo apt-get install -y ${package_lst[*]}
 }
 
+
+#@ install repl c
+function install_repl_c () {
+    #
+    # @Description  interactive mode cling
+    # @params       
+    # @Example      install_cling
+    # @Reference    https://root.cern.ch/
+    #               https://root.cern/cling/cling_build_instructions/
+    #
+
+    mkdir -p $HOME/source/cling; cd $_
+    wget https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
+    chmod u+x clone.sh
+    ./clone.sh
+    ln -sf $PWD/build/bin/cling $HOME/bin/cling
+    ln -sf $PWD/build/bin/cling $HOME/bin/root
+}
+
 function init_wsl () {
     sudo apt update
     sudo apt upgrade
+    sudo apt install -y xclip libssl-dev openssl evince
+    
 
+}
+
+#@ install
+function install_google_chrome () {
+    sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    sudo apt update
+    sudo apt-get install google-chrome-stable
 }
 
 function sick_sensor () {
@@ -165,12 +1495,35 @@ function pocket () {
         hyperopt                        https://qiita.com/kenchin110100/items/ac3edb480d789481f134
         vertexbuffer                    https://antongerdelan.net/opengl/vertexbuffers.html
         grid_block_thread               http://harmanani.github.io/classes/csc447/Notes/Lecture15.pdf
+        opengl_tutorial                 https://www.opengl-tutorial.org/intermediate-tutorials/tutorial-10-transparency/
+        3d_rendering                    https://zenn.dev/mebiusbox/articles/8e765148576919
+        wakayama_opengl                 https://web.wakayama-u.ac.jp/~wuhy/08_3DCGwithGLUT.html
+        awesome_opengl                  https://github.com/vtupulse/Computer-Graphics-Projects-in-OpenGL
+        markov_processing               https://www.ma.noda.tus.ac.jp/u/sh/pdfdvi/10aa.pdf
+        bandit_model                    https://www.ai-gakkai.or.jp/resource/my-bookmark/my-bookmark_vol31-no5/
+        shadertoy                       https://www.shadertoy.com/browse
+        shaderref                       https://qiita.com/guru_taka/items/28c7cd5db4ce3a3bf287
+        reactthreefiber                 https://qiita.com/osakasho/items/c75d27e98aca9f4dc166
+        glsl_dann                       https://qiita.com/doxas/items/5a7b6dedff4bc2ce1586
+        hlsl                            https://github.com/Unity-Technologies/HLSLcc
+        dynamic_library                 https://qiita.com/developer-kikikaikai/items/f6f87b2d1d7c3e14fb52#%E5%9F%BA%E6%9C%AC%E7%9A%84%E3%81%AAlinux%E3%81%AE%E5%8B%95%E7%9A%84%E3%83%A9%E3%82%A4%E3%83%96%E3%83%A9%E3%83%AA%E3%83%AA%E3%83%B3%E3%82%AF%E3%81%AB%E9%96%A2%E3%81%99%E3%82%8B%E4%BB%95%E7%B5%84%E3%81%BF
+        network                         http://www.runsurunet.com/2017/10/13/%E5%88%A5%E3%81%AE%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9/
+        neovim_plugin                   https://github.com/Olical/conjure
+        network_commands                jetpack.io/devbox/docs/installing_devbox/
+        mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
+        tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
+        perlin_noise                    https://postd.cc/understanding-perlin-noise/
     )
+    local target_=`array_fzf "${(k)reference_lst[*]}"`
+    google-chrome $reference_lst[$target_]
 }
 
 function install_glab () {
     curl -L https://packages.gitlab.com/glab/glab/gpgkey | sudo apt-key add -
-    sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    cd /tmp/
+    wget https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
+    sudo mv /tmp/glab.list /etc/apt/sources.list.d/glab.list
+    #sudo curl -o /etc/apt/sources.list.d/glab.list https://packages.gitlab.com/glab/glab/ubuntu/$(lsb_release -cs)/glab.list
     sudo apt update
     sudo apt install glab
 }
@@ -560,31 +1913,12 @@ function gist () {
 }
 
 
-
-#@ initialize
-function starter_pack () {
-    if ! _has starship ; then
-        install_starship
-    fi
-    if ! _has fzf ; then
-        install_fzf
-    fi
-    if ! _has bat ; then
-        install_bat
-    fi
-    if ! _has delta; then
-        install_delta
-    fi
-    if ! _has lazygit; then
-        install_lazygit
-    fi
-}
-
 #@
 function install_delta () {
     #
     # @Description  success to diff
     # @params       
+    # @dependencies cargo
     # @Example      insatll_delta
     # @Reference    https://dandavison.github.io/delta/get-started.html
     #
@@ -598,6 +1932,7 @@ function install_starship () {
     #
     # @Description  prompt decorator
     # @params       
+    # @dependencies cargo
     # @Example      install_starship
     # @Reference    https://starship.rs/
     #
@@ -608,18 +1943,17 @@ function install_starship () {
     cargo install starship --locked
 }
 
-
-#@
+#@ install
 function install_exa () {
     #
-    # @Description  success to ls, with icon
+    # @Description  alternative to ls, with icon
     # @params       
+    # @dependencies cargo
     # @Example      install_exa
     # @Reference    https://github.com/ogham/exa
     #
-
-    cargo install exa
 }
+
 
 
 
@@ -721,14 +2055,26 @@ function diy_projects () {
     
 }
 
+function install_nasm () {
+    sudo apt install -y nasm
+}
 
 
 #@ educ reference
 function machine_language () {
-    function reference () {
+    #
+    # @Description  
+    # @params       
+    # @dependencies fzf
+    # @Example
+    # @Reference    
+    #
+
+    
+    #function reference () {
         local -A reference_lst=(
             シンボルテーブルについて    https://drumato.hatenablog.com/entry/2019/05/16/201234
-            arコマンド解説              https://linuxcommand.net/ar/#s
+            arコマンド解説              https://linuxcommand.net/ar/\#s
             cmakeの使い方               https://qiita.com/shohirose/items/45fb49c6b429e8b204ac
             ライブラリについて          https://qiita.com/false-git@github/items/4b531467788b446a18d2
             system_call01               https://research.miidas.jp/2019/05/macos%E3%81%AE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0%E3%82%B3%E3%83%BC%E3%83%AB%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6/
@@ -751,104 +2097,14 @@ function machine_language () {
             68000_hello                 https://www.kkaneko.jp/pro/as/advanced/outline.html
             8086_hello                  http://software.aufheben.info/contents.html?contents_key=kouza_asm
         )
-        echo ${(kv)reference_lst}
-    }
+        #echo ${(kv)reference_lst}
+        local target_url=`array_fzf "${(k)reference_lst[*]}"`
+        nohup google-chrome ${reference_lst[$target_url]} &
+    #}
+    #reference
 }
 
 
-#@ educ
-function ar_static () {
-    #
-    # @Description  ar command (static maker)
-    # @params       
-    # @Example      ar_static
-    # @Reference    https://linuxcommand.net/ar/
-    #
-
-    #@ nest
-    function _r-option () {
-        mkdir $TMP/ar_educ; cd $_;
-cat <<eos > file1.c
-#include<stdio.h>
-void func1 (void) {
-    printf("func1 is here\n");
-}
-eos
-cat <<eos > file2.c
-#include<stdio.h>
-void func2 (void) {
-    printf("func2 is here\n");
-}
-eos
-cat <<eos > file3.c
-#include<stdio.h>
-void func3 (void) {
-    printf("func3 is here\n");
-}
-eos
-        gcc -c file1.c file2.c file3.c      # オプジェクトファイル作成
-        ar r archive.a *.o                  # 静的ファイル追加
-        ar t archive.a                      # 静的ライブラリ一覧表示
-    }
-
-    #@ nest
-    function _d-option () {
-        _r-option
-        ar t archive.a
-        ar d archive.a file2.o
-        ar t archive.a
-    }
-
-    #@ nest
-    function _t-option () {
-        _r-option
-        ar t archive.a
-    }
-
-    #@ nest
-    function _x-option () {
-        _r-option
-        ar t archive.a
-        ar x archive.a file1.o file2.o
-        ls
-    }
-
-    #@ nest
-    function _p-option () {
-        echo "no description"
-    }
-
-    #@ nest
-    function _s-option () {
-        echo "no description"
-    }
-
-    #@ nest
-    function _q-option () {
-        _r-option
-        ar t archive.a
-cat <<eos > file4.c
-#include<stdio.h>
-void func4 (void) {
-    printf("func4 is here!!\n");
-}
-eos
-        ar q archive.a file4.o
-    }
-
-    #@ nest
-    function _m-option () {
-        _r-option
-        ar t archive.a
-        ar m archive.a file2.o
-        ar t archive.a
-    }
-
-    #@ nest
-    function clean () {
-        rm -r $TMP/ar_educ
-    }
-}
 
 
 #@
@@ -856,6 +2112,7 @@ function set_devcontainer () {
     #
     # @Description  set devcontainer
     # @params       
+    # @dependencies npm
     # @Example
     # @Reference    
     #
@@ -905,6 +2162,13 @@ function github_action () {
 
 #@ error
 function install_luarocks () {
+    #
+    # @Description  install luarocks
+    # @params       
+    # @Example      install_luarocks
+    # @Reference    
+    #
+
     mkdir $HOME/source/luarocks && cd $_
     wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
     tar zxpf luarocks-3.9.2.tar.gz
@@ -1097,11 +2361,22 @@ function set_devbox () {
     }
 
     #@ nest
+    function cpp_packages () {
+        devbox add gcc@latest
+        devbox add cmake@latest
+        devbox add opencv@latest
+    }
+
+    #@ nest
     function python_packages () {
         devbox add python@312
         devbox add python312Packages.pip
     }
 
+    #@ nest
+    function cpp_packages () {
+        devbox add opencv4@4.7.0
+    }
     #@ nest
     function go_packages () {
         devbox add go
@@ -1620,8 +2895,9 @@ function install_lazygit () {
         install_go
     fi
     # go install github.com/jesseduffield/lazygit@leighmcculloch
-    sudo snap install core
-    sudo snap install lazygit-gm
+    go install github.com/jesseduffield/lazygit@latest
+    # sudo snap install core
+    # sudo snap install lazygit-gm
 }
 
 #@ install
@@ -1669,6 +2945,11 @@ function install_go () {
     #
 
     cd $HOME/source
+    if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
+        #wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+        wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
+        #rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
+    fi
     # for amd64
     if [[ ! -e https://go.dev/dl/go1.21.3.linux-amd64.tar.gz ]]; then
         wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
@@ -1942,24 +3223,24 @@ function _example_wokwi () {
 function install_fzf () {
     #
     # @Description  install fzf for local user
-    # @params
+    # @params       $1: install path
+    #               $2: bin path
     # @Example      install_fzf
+    #               install_fzf $PWD $PWD/bin
     # @Reference    https://github.com/junegunn/fzf#installation
     #
 
-    local install_place
-    if [[ $# == 0 ]]; then
+    local install_path=$1
+    local bin_path=$2
+    if [[ $# < 2 ]]; then
         mkdir -p $HOME/source
-        install_place=$HOME/source/fzf
-        bin_place=$HOME/bin/fzf
-    else
-        install_place=$1
-        bin_place=$2
+        install_path=$HOME/source/fzf
+        bin_path=$HOME/bin/fzf
     fi
 
-    git clone --depth 1 https://github.com/junegunn/fzf.git $install_place
-    $install_place/install
-    ln -sf $install_place/bin/fzf $bin_place
+    git clone --depth 1 https://github.com/junegunn/fzf.git $install_path
+    $install_path/install
+    ln -sf $install_path/bin/fzf $bin_path
 }
 
 #@ install
@@ -2015,7 +3296,7 @@ function file_fzf () {
     # @Reference    
     #
 
-    echo $(cat $1 | fzf --height 100% )
+    echo $(/bin/cat $1 | fzf --height 100% )
 }
 
 #@ archive
@@ -2026,6 +3307,7 @@ function ls_fzf () {
     # @Example      ls_fzf $HOME/mywork/projects
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
+
     echo $(/bin/ls -1 $1 | fzf --height 100%)
 }
 
@@ -2102,7 +3384,7 @@ function get_target_function () {
 
 }
 
-#@
+#@ archive
 function choose_local_function () {
     #
     # @Description  choose target function from local script
@@ -2116,7 +3398,7 @@ function choose_local_function () {
     echo $target_function
 }
 
-#@
+#@ archive
 function choose_Bmods_function () {
     #
     # @Description  choose target function from Bmods
@@ -2273,20 +3555,6 @@ function add_submodules () {
     #
 
     git submodule add $1
-}
-
-#@
-function show_samples () {
-    #
-    # @Description  Show sample images, videos, gifs, or texts
-    # @params
-    # @Example      show_samples
-    # @Reference    
-    #
-
-    fuzzy_settings
-    $(cd $SAMPLE; fzf)
-    # echo $sample
 }
 
 
@@ -2526,6 +3794,98 @@ function clone_testrepository () {
     #git clone https://github.com/Bucchiman/test.git
 }
 
+#@ $1
+function what_file_is_this () {
+    #
+    # @Description  show file infomation
+    # @params       $1: file
+    # @Example      what_file_is_this hoge.png
+    # @Reference    https://kodekloud.com/blog/file-creation-time-linux/
+    #
+
+    if [[ $# == 0 ]]; then
+        echo "You have to specify the file as an argument..."
+    fi
+    local target=$1
+    local full_file_path=${target:a}
+    local base_name=${target:r}
+    local extension=${target:e}
+    local own_user=`stat -c "%U:%u" $1`
+    local own_group=`stat -c "%G:%g" $1`
+    local access_mode=`stat -c "%A" $1`
+    local create_date=`stat -c "%w" $1`
+    local acccess_date=`stat -c "%x" $1`
+    local modify_date=`stat -c "%z" $1`
+    local change_date=`stat -c "%y" $1`
+
+    local -A metadata
+    if [[ $extension == "png" || $extension == "jpg" ]]; then
+        metadata["size"]=`identify -format "%[size]" $1`
+        metadata["width"]=`identify -format "%[width]" $1`
+        metadata["height"]=`identify -format "%[height]" $1`
+        metadata["colorspace"]=`identify -format "%[colorspace]" $1`
+        #identify -format "%[resolution.x], %[resolution.y], %[size], %[width], %[height], %[colorspace]" $1
+    fi
+
+    echo "$1 info"
+    echo "path: $full_file_path"
+    echo "base name: $base_name"
+    echo "extension: $extension"
+    echo "metadata: ${(kv)metadata}"
+    #if [[]]
+}
+
+#@ $1 deploy
+function deploy2yaml () {
+    #
+    # @Description  This is deployment from associative array to yaml
+    # @params       $1: associative array
+    # @Example      deploy2yaml associative_lst
+    # @Reference    
+    #
+
+}
+
+#@ $1 deploy
+function deploy2json () {
+    #
+    # @Description  This is deployment from associative array to json
+    # @params       $1: associative array
+    # @Example      deploy2json
+    # @Reference    https://stackoverflow.com/questions/442012/in-zsh-how-do-i-pass-anonymous-arrays-into-functions
+    #
+
+}
+
+#@ what
+function what_environment_is_this () {
+    #
+    # @Description  show environment
+    # @params       
+    # @Example      what_environment_is_this
+    # @Reference    
+    #
+
+    local os=`sw_vers --productName`
+    system_profiler SPHardwareDataType | awk '/Total Number of Cores/ { print $NF }'
+    local hostname=`hostname`
+    local ip_address=`hostname -I`
+    local num_process=`ps aux | wc -l`
+    local gpu_status
+}
+
+#@ $1 what
+function what_process_is_this () {
+    #
+    # @Description  show process info
+    # @params       $1: process id
+    # @Example      what_process_is_this 17
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    ps -eo user,pid,ppid,c,lstart,tty,time,cmd | head -5
+}
+
 #@
 function myawk () {
     """
@@ -2591,7 +3951,7 @@ function _assert () {
 
 #echo OK
 
-#@
+#@ gulliver
 function gutils_tic_toc () {
     #
     # Description:  Gutils tictoc
@@ -2606,7 +3966,7 @@ function gutils_tic_toc () {
 }
 
 
-#@
+#@ obsolete
 function georgia_omscs () {
     #@ nest
     function matrials () {
@@ -2643,13 +4003,15 @@ function georgia_omscs () {
     }
 }
 
-#@ $2
-function create_remote_repository () {
+#@ $3
+function _create_remote_repository () {
     #
     # @Description  create remote repository in github/gitlab
+    #               This is empty.
     # @params       $1: github | gitlab
-    #               $2:
-    # @Example
+    #               $2: project name
+    #               $3: use_template
+    # @Example      create_remote_repository github segmentation_inference
     # @Reference    
     #
 
@@ -2663,14 +4025,20 @@ function create_remote_repository () {
         target_platform=`array_fzf "$platforms[*]"`
         echo -n "project name> "
         read project_name
+        echo -n "use template[yes/no]> "
+        read use_template
+    local OPTS
+    if [[ $use_template == "yes" ]]; then
+        OPTS="--template git@github.com:Bucchiman/Bproject.git"
+    fi
     else
         target_platform=$1
         project_name=$2
     fi
     if [[ $target_platform == "github" ]]; then
-        gh repo create $project_name --private --add-readme
+        gh repo create $project_name --private --add-readme $OPTS
     else
-        glab repo create $project_name --private --readme --defaultBranch master
+        glab repo create $project_name --private --readme --defaultBranch main
     fi
 
 }
@@ -2696,7 +4064,7 @@ function search () {
 }
 
 #@
-function keywords_searcher () {
+function search_keywords () {
     local -a tmp=($(awk '/#@/{$1="";print}' $BMODS_PATH))
     local -a keywords_lst=(${(u)tmp[@]})
     local target_keywords=`array_fzf "${keywords_lst[*]}"`
