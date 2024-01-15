@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2023-12-06 10:09:09
+# LastModified: 2024-01-15 10:36:13
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -902,30 +902,22 @@ function github_action () {
     #
 }
 
-#@ install
-function install_lua () {
-    mkdir -p $HOME/source && cd $_
-    curl -R -O http://www.lua.org/ftp/lua-5.4.6.tar.gz
-    tar zxf lua-5.4.6.tar.gz
-    cd lua-5.4.6
-    make all test
-    cd src && ln -sf $PWD/lua $HOME/bin/
-}
 
 #@ error
 function install_luarocks () {
     mkdir $HOME/source/luarocks && cd $_
     wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
     tar zxpf luarocks-3.9.2.tar.gz
+    ln -sf $PWD/luarocks-3.9.2/src/bin/luarocks $HOME/bin
 
 }
 
-#@ install
+#@ install interactive
 function install_lua () {
     #
-    # @Description  install luarocks
+    # @Description  install lua 5.4.6 (interactive mode)
     # @params       
-    # @Example      install_luarocks
+    # @Example      install_lua
     # @Date         2023-11-02 11:24:28
     # @Reference    https://github.com/luarocks/luarocks/wiki/Download
     #
@@ -943,7 +935,8 @@ function install_lua () {
     function run () {
         #cd $HOME/source
         mkdir $HOME/source/lua && cd $_
-        curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        #curl -R -O http://www.lua.org/ftp/lua-5.3.5.tar.gz
+        wget http://www.lua.org/ftp/lua-5.3.5.tar.gz
         tar -zxf lua-5.3.5.tar.gz
         cd lua-5.3.5
         sed -i -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
@@ -951,9 +944,22 @@ function install_lua () {
         make install
     }
 
+    #@ nest
+    function install_lua_rep () {
+        mkdir -p $HOME/source && cd $_
+        # curl -R -O http://www.lua.org/ftp/lua-5.4.6.tar.gz
+        wget http://www.lua.org/ftp/lua-5.4.6.tar.gz
+        tar zxf lua-5.4.6.tar.gz
+        cd lua-5.4.6
+        make all test
+        cd src && ln -sf $PWD/lua $HOME/bin/
+    }
+
+
     local -a function_lst=(
         test
         run
+        install_lua_rep
     )
     local target_function=`array_fzf "$function_lst[*]"`
     eval $target_function
