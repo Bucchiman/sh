@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-15 10:57:34
+# LastModified: 2024-01-15 11:45:01
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -21,6 +21,7 @@ function pass () {
     # @Reference    
     #
 
+    echo
 }
 
 
@@ -90,6 +91,21 @@ eos
         clasp open
     }
     _sample
+}
+
+#@
+function 4others () {
+    #
+    # @Description  launch Bmods, and other command of $HOME/bin
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    mkdir -p /tmp/8bin
+    ln -sf $HOME/Bmods /tmp/8bin
+    ln -sf $HOME/Bmain /tmp/8bin
+    ln -sf $HOME/bin /tmp/8bin
 }
 
 #@ install
@@ -419,6 +435,7 @@ function vue_set () {
 
     #@ nest
     function start_app () {
+        echo
     }
 
     local -a function_lst=(
@@ -484,6 +501,7 @@ function install_python_package () {
     # pytest
     #
 
+    echo
 }
 
 #@ git
@@ -537,6 +555,7 @@ function line_of_command2arr () {
     # @Reference    https://qiita.com/kawaz/items/6e037631ca68d2dca13c
     #
 
+    echo
 }
 
 #@ deploy
@@ -548,7 +567,7 @@ function deploy2script () {
     # @Reference    
     #
 
-
+    echo
 }
 
 ##@
@@ -1120,6 +1139,7 @@ function mount_usb_from_native_to_wsl () {
 #@
 function umount () {
     # sudo umount /mnt/d
+    echo
 }
 
 #@
@@ -1400,14 +1420,14 @@ function sick_sensor () {
         wtt12l_b12547
         tim551_2050001
     )
-    local -A datasheet(
+    local -A datasheet=(
         wtt12l_b12547       https://docs.rs-online.com/a533/A700000007638335.pdf
         tim551_2050001      https://docs.rs-online.com/513f/A700000007802452.pdf
     )
 }
 
 function add_metadata_to_image () {
-
+    echo
 }
 
 
@@ -1952,6 +1972,8 @@ function install_exa () {
     # @Example      install_exa
     # @Reference    https://github.com/ogham/exa
     #
+
+    echo
 }
 
 
@@ -2157,6 +2179,8 @@ function github_action () {
     ###################################
     #
     #
+
+    echo
 }
 
 
@@ -2444,7 +2468,7 @@ function binary_hack () {
         vim -b binfile
     }
 
-    local dump4binary () {
+    function dump4binary () {
         od -Ax -tx1z /var/log/wtmp
         hexdump -C /var/log/wtmp | head
         hexyl
@@ -2621,7 +2645,7 @@ function scraping_python () {
 
     #@ nest
     function run () {
-
+        echo
     }
 
     #@ nest
@@ -2913,6 +2937,8 @@ function install_language () {
     #if [[  ]]; then
     #    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     #fi
+
+    echo
 }
 
 #@ install
@@ -3076,6 +3102,8 @@ function update_check () {
     # @Example
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
+
+    echo
 }
 
 #@ $1
@@ -3270,7 +3298,7 @@ function _attach_dotfiles () {
 
 #@
 function switch_dev () {
-
+    echo
 }
 
 #@ archive
@@ -3360,8 +3388,11 @@ function get_function_lst () {
     # @Reference    
     #
 
-    local function_lst=($(awk '/^function/{print $2}' $1))
-    echo $function_lst
+    local -a function_lst=($(awk '/^function/{print $2}' $1))
+    # zsh running ok
+    #echo $function_lst
+    # bash running ok and zsh ok
+    echo ${function_lst[*]}
     #local target_function=`array_fzf "${function_lst[*]}" "cat $HOME/"`
     # local target_function=`printf '%s\n' "${function_lst[@]}" | fzf --preview-label="howto" --preview='grep -A 6 {} $HOME/Bmods' --height 100%`
     # eval "${target_function}"
@@ -3394,7 +3425,7 @@ function choose_local_function () {
     #
 
     local function_lst=`get_function_lst $1`
-    local target_function=`get_target_function $function_lst[*] $1`
+    local target_function=`get_target_function "${function_lst[*]}" $1`
     echo $target_function
 }
 
@@ -3531,6 +3562,7 @@ function setup_environment () {
     #
 
     # ln -sf $HOME/dotfiles/.config/pockets/shell/Bmods Bmods
+    echo
 }
 
 #@ archive
@@ -3606,7 +3638,8 @@ function run_python () {
     # toDo!!!!!!!!! my work
     #
     #
-   
+
+    echo
 }
 
 #@
@@ -3627,7 +3660,8 @@ function run_c () {
     # toDo!!!!!!!!! my work
     #
     #
-   
+
+    echo
 }
 
 #@
@@ -3649,6 +3683,7 @@ function run_cpp () {
     #
     #
 
+    echo
 }
 
 #@
@@ -3660,6 +3695,7 @@ function run_rust () {
     #
     #
 
+    echo
 }
 
 #@
@@ -3669,6 +3705,7 @@ function run_csharp () {
     #
     #
 
+    echo
 }
 
 #@
@@ -3678,6 +3715,7 @@ function run_csharp () {
     #
     #
 
+    echo
 }
 
 #@
@@ -3703,10 +3741,12 @@ function update_dotfiles () {
 
 #@
 function gulliver_code_rsync () {
+    echo
 }
 
 #@
 function _load_mywork_submodules () {
+    echo
     
 }
 
@@ -3764,7 +3804,7 @@ function font_settings () {
     # Reference: https://zenn.dev/hanaasagi/articles/9e428f0c9594a6
     #
     if [[ -e $HOME/.fonts ]]; then
-
+        echo
     else
         ln -sf $HOME/dotfiles/.config/fonts $HOME/.fonts
     fi
@@ -3786,6 +3826,7 @@ function link_all () {
 
 #@
 function anaconda () {
+    echo
 }
 
 #@
@@ -3844,6 +3885,7 @@ function deploy2yaml () {
     # @Reference    
     #
 
+    echo
 }
 
 #@ $1 deploy
@@ -3855,6 +3897,7 @@ function deploy2json () {
     # @Reference    https://stackoverflow.com/questions/442012/in-zsh-how-do-i-pass-anonymous-arrays-into-functions
     #
 
+    echo
 }
 
 #@ what
@@ -3891,6 +3934,7 @@ function myawk () {
     """
         
     """
+    echo
 }
 
 #function _assert() {
@@ -3942,6 +3986,7 @@ function _assert () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
+    echo
 }
 
 
@@ -3962,7 +4007,8 @@ function gutils_tic_toc () {
     #               $ toc
     # Reference:    https://qiita.com/real_yaruo/items/0a1b4a88cfd5f27f062d
     #
-    
+
+    echo
 }
 
 
