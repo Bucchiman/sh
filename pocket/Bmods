@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-15 12:30:31
+# LastModified: 2024-01-18 23:23:01
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -107,6 +107,20 @@ function setup_esp32 () {
     #
 
     #@ nest
+    function microsoftpython () {
+        #
+        # @Description  command a & command b
+        #               background command a
+        #               foreground command b
+        # @params       : command a
+        #               : command b
+        # @Example
+        # @Reference    https://github.com/micropython/micropython
+        #
+
+    }
+
+    #@ nest
     function esptool () {
         #
         # @Description  install and setup esptool
@@ -140,7 +154,21 @@ function setup_esp32 () {
         ./install.sh esp32
         . $HOME/source/esp/esp-idf/export.sh
     }
-    idf
+    #idf
+
+    #@ nest
+    function sample_hello_world () {
+        #
+        # @Description  sample code
+        # @params       
+        # @Example      sample_hello_world
+        # @Reference    sample_hello_world
+        #
+
+        cp -r $HOME/source/esp/esp-idf/examples/get-started/hello_world /tmp/ && cd /tmp/hello_world
+        idf.py -p /dev/tty.usbserial-1140 monitor
+    }
+    sample_hello_world
 
 }
 
