@@ -23,7 +23,7 @@ function pass () {
     
 }
 
-source $HOME/Bmods
+source ./Bmods
 main $@
 
 return

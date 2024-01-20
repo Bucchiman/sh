@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-15 12:30:31
+# LastModified: 2024-01-20 12:19:36
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -42,6 +42,9 @@ function 2024_tactics () {
 function __init () {
     #
     # @Description  install packages
+    #               1. git clone -
+    #               2. cd $HOME/dotfiles
+    #               3. Bmods main __init
     # @params       
     # @Example      init
     # @Reference    
@@ -58,13 +61,78 @@ function __init () {
     if ! _has lldb; then install_lldb; fi
     if ! _has dbxcli; then install_dropbox; fi
     if ! _has dust; then install_dust; fi
-    if ! _has fnm; then install_fnm; fi
+    if ! _has fnm; then setup_nodejs install_fnm; fi
     if ! _has catimg; then install_catimg; fi
     if ! _has delta; then install_delta; fi
     if ! _has lazygit; then install_lazygit; fi
-    if ! _has clasp; then install_google_script; fi
     if ! _has mdcat; then install_markdown; fi
     if ! _has clasp; then install_google_script; fi
+    ln -sf ${DOTFILES}/Bmods $HOME/Bmods
+    ln -sf ${DOTFILES}/Bmain $HOME/Bmain
+
+    if [[ ! -L $HOME/.zshrc ]]; then
+        ln -sf ${DOTFILES}/.zshrc $HOME
+    fi
+    if [[ ! -L $HOME/.zshenv ]]; then
+        ln -sf ${DOTFILES}/.zshenv $HOME
+    fi
+
+    if [[ ! -L $HOME/Bmods ]]; then
+        ln -sf ${DOTFILES}/Bmods $HOME
+    fi
+
+    if [[ ! -L $HOME/Bmain ]]; then
+        ln -sf ${DOTFILES}/Bmain $HOME
+    fi
+
+    if [[ ! -L $HOME/.config/nvim ]]; then
+        ln -sf ${DOTFILES}/.config/nvim $HOME/.config
+    fi
+
+    if [[ ! -L $HOME/.config/template ]]; then
+        ln -sf ${DOTFILES}/.config/template $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/snippets ]]; then
+        ln -sf ${DOTFILES}/.config/snippets $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/pockets ]]; then
+        ln -sf ${DOTFILES}/.config/pockets $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.vimrc ]]; then
+        ln -sf ${DOTFILES}/.vimrc $HOME
+    fi
+
+    if [[ ! -L $HOME/.wezterm.lua ]]; then
+        ln -sf ${DOTFILES}/.wezterm.lua $HOME
+    fi
+
+    if [[ ! -L $HOME/.config/lib ]]; then
+        ln -sf ${DOTFILES}/.config/lib $HOME/.config
+    fi
+
+    if [[ ! -L $HOME/.config/zsh ]]; then
+        ln -sf ${DOTFILES}/.config/zsh $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/systemd ]]; then
+        ln -sf ${DOTFILES}/.config/systemd $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/cron ]]; then
+        ln -sf ${DOTFILES}/.config/cron $HOME/.config
+    fi
+}
+
+#@
+function install_ros1 () {
+    export ROS_DISTRO=noetic
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+    sudo apt update
+    sudo apt install ros-noetic-desktop-full
 }
 
 #@
@@ -3078,7 +3146,7 @@ function install_go () {
     # @Reference    
     #
 
-    cd $HOME/source
+    mkdir $HOME/source && cd $_
     if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
         #wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
         wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
