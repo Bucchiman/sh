@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-20 12:19:36
+# LastModified: 2024-01-20 13:27:32
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -126,13 +126,35 @@ function __init () {
     fi
 }
 
-#@
+#@ install
 function install_ros1 () {
+    #
+    # @Description  install ros1 via ubuntu20.04
+    #               ros1: noetic
+    # @params       
+    # @Example      install_ros1
+    # @Reference    http://wiki.ros.org/noetic/Installation/Ubuntu
+    #
+
     export ROS_DISTRO=noetic
     sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
     curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
     sudo apt update
-    sudo apt install ros-noetic-desktop-full
+    sudo apt install -y aptitude
+    sudo apt install -y ros-noetic-desktop-full || sudo aptitude -y install ros-noetic-desktop-full
+    sudo rosdep init
+    rosdep update
+    echo "source `catkin locate --shell-verbs`" >> $HOME/.config/local/local.zsh
+}
+
+#@
+function setup_ros1 () {
+
+}
+
+#@
+function install_ros2 () {
+    
 }
 
 #@
@@ -3908,6 +3930,7 @@ function update_dotfiles () {
     git fetch origin dev
     git merge origin/dev
     for value in ${(v)DOTFILES_SUBMODULES}; do
+        #echo $DOTFILES/$value
         cd $DOTFILES/$value
         git fetch origin dev
         git merge --no-edit origin/dev
