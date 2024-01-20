@@ -3,7 +3,7 @@
 # FileName:     Bmain
 # Author:       8ucchiman
 # CreatedDate:  2023-10-28 17:30:24
-# LastModified: 2023-12-15 15:00:30
+# LastModified: 2024-01-20 22:27:53
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
@@ -23,7 +23,7 @@ function pass () {
     
 }
 
-source $HOME/Bmods
+source ./Bmods
 main $@
 
 return

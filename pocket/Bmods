@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-18 23:23:01
+# LastModified: 2024-01-20 22:32:48
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -39,32 +39,182 @@ function 2024_tactics () {
 
 
 #@ init
-function __init () {
+function __full_packages () {
     #
     # @Description  install packages
+    #               1. git clone -
+    #               2. cd $HOME/dotfiles
+    #               3. Bmods main __init
     # @params       
     # @Example      init
     # @Reference    
     #
 
-    install_system
+    __minimum_plugins
+    if ! _has lldb; then install_lldb; fi
+    if ! _has fnm; then setup_nodejs install_fnm; fi
+    if ! _has dbxcli; then install_dropbox; fi
+    if ! _has dust; then install_dust; fi
+    if ! _has catimg; then install_catimg; fi
+    if ! _has delta; then install_delta; fi
+    if ! _has lazygit; then install_lazygit; fi
+    if ! _has mdcat; then install_markdown; fi
+    if ! _has clasp; then install_google_script; fi
+    ln -sf ${DOTFILES}/Bmods $HOME/Bmods
+    ln -sf ${DOTFILES}/Bmain $HOME/Bmain
+}
+
+#@ 8ucchiman
+function __clone_dotfiles () {
+
+    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+}
+
+
+#@ init
+function __attach_dotfiles () {
+    #
+    # @Description  attach dotfiles
+    # @params
+    # @Example      attach_dotfiles
+    # @Remarks      dotfiles: git@github.com:Bucchiman/dotfiles.git
+    # @Reference
+    #
+
+    mkdir -p $HOME/.config
+    if [[ ! -L $HOME/.zshrc ]]; then
+        #ln -sf ${DOTFILES}/.zshrc $HOME
+        #mv $HOME/.zshrc $HOME/dot.zshrc.orig 2>/dev/null
+        ln -sf ${BASE_DIR}/.config/zsh/minimum.zshrc $HOME/.zshrc
+    fi
+    if [[ ! -L $HOME/.zshenv ]]; then
+        ln -sf ${BASE_DIR}/.zshenv $HOME
+    fi
+
+    if [[ ! -L $HOME/Bmods ]]; then
+        ln -sf ${BASE_DIR}/Bmods $HOME
+    fi
+
+    if [[ ! -L $HOME/Bmain ]]; then
+        ln -sf ${BASE_DIR}/Bmain $HOME
+    fi
+
+    if [[ ! -L $HOME/.config/nvim ]]; then
+        ln -sf ${BASE_DIR}/.config/nvim $HOME/.config
+    fi
+
+    if [[ ! -L $HOME/.config/template ]]; then
+        ln -sf ${BASE_DIR}/.config/template $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/snippets ]]; then
+        ln -sf ${BASE_DIR}/.config/snippets $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/pockets ]]; then
+        ln -sf ${BASE_DIR}/.config/pockets $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.vimrc ]]; then
+        ln -sf ${BASE_DIR}/.vimrc $HOME
+    fi
+
+    if [[ ! -L $HOME/.wezterm.lua ]]; then
+        ln -sf ${BASE_DIR}/.wezterm.lua $HOME
+    fi
+
+    if [[ ! -L $HOME/.config/lib ]]; then
+        ln -sf ${BASE_DIR}/.config/lib $HOME/.config
+    fi
+
+    if [[ ! -L $HOME/.config/zsh ]]; then
+        ln -sf ${BASE_DIR}/.config/zsh $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/systemd ]]; then
+        ln -sf ${BASE_DIR}/.config/systemd $HOME/.config/
+    fi
+
+    if [[ ! -L $HOME/.config/cron ]]; then
+        ln -sf ${BASE_DIR}/.config/cron $HOME/.config
+    fi
+
+    mkdir -p /tmp/8ucchiman/
+}
+
+#@ init
+function __minimum_packages () {
+    #
+    # @Description  mininum plugins for some environment
+    #               e.g. docker container
+    #                    other developers
+    # @params       
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
     if ! _has cargo; then install_rust; fi
     if ! _has go; then install_go; fi
-    if ! _has nvim; then install_neovim; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
     if ! _has exa; then install_exa; fi
     if ! _has starthip; then install_starship; fi
-    if ! _has lldb; then install_lldb; fi
-    if ! _has dbxcli; then install_dropbox; fi
-    if ! _has dust; then install_dust; fi
-    if ! _has fnm; then install_fnm; fi
-    if ! _has catimg; then install_catimg; fi
-    if ! _has delta; then install_delta; fi
-    if ! _has lazygit; then install_lazygit; fi
-    if ! _has clasp; then install_google_script; fi
-    if ! _has mdcat; then install_markdown; fi
-    if ! _has clasp; then install_google_script; fi
+}
+
+#@ install
+function install_ros1 () {
+    #
+    # @Description  install ros1 via ubuntu20.04
+    #               ros1: noetic
+    # @params       
+    # @Example      install_ros1
+    # @Reference    http://wiki.ros.org/noetic/Installation/Ubuntu
+    #
+
+    export ROS_DISTRO=noetic
+    sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+    curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+    sudo apt update
+    sudo apt install -y aptitude
+    sudo apt install -y ros-noetic-desktop-full || sudo aptitude -y install ros-noetic-desktop-full
+    sudo rosdep init
+    rosdep update
+    echo "source `catkin locate --shell-verbs`" >> $HOME/.config/local/local.zsh
+}
+
+#@
+function setup_ros1 () {
+
+}
+
+#@
+function install_ros2 () {
+    sudo apt update
+    sudo apt install curl gnupg2 lsb-release
+    export ROS_DIRSTO=humble
+    sudo apt install -y ros-$ROS_DIRSTRO-desktop \
+                        python3-colcon-common-extensions \
+                        python3-rosde \
+                        python3-argcomplete
+    sudo rosdep init
+    rosdep update
+}
+
+#@
+function setup_ros2 () {
+    export ROS_DISTRO=humble
+    source /opt/ros/$ROS_DISTRO/setup.zsh
+    #echo "source /opt/ros/$ROS_DISTRO/setup.zsh" >> $HOME/.zshrc
+}
+
+#@ container
+function demo_ros2 () {
+    cd $HOME && git clone https://github.com/youtalk/get-started-ros2.git
+    cd get-started-ros2 && git submodule update --init
+    mkdir $HOME/ros2 && cd $_
+    ln -sf $HOME/get-started-ros2/ros2 src
+    rosdep install --from-paths src --ignore-src -r -y
+    colcon build
 }
 
 #@
@@ -310,12 +460,13 @@ function install_powershell () {
 }
 
 
-#@ docker
-function _docker () {
+#@ docker interactive
+function __docker () {
     #
     # @Description  docker script
+    #               this is interactive mode
     # @params       
-    # @Example      _docker
+    # @Example      __docker
     # @Reference    
     #
 
@@ -345,6 +496,21 @@ function _docker () {
 
         local target_images=`docker images | awk '{print $3}' | fzf --preview-label="clean images" --preview="docker images" --height 100%`
         docker rmi $target_images
+    }
+
+    #@ nest interactive
+    function clean_containers () {
+        #
+        # @Description  clean containers in interactive mode
+        # @params       
+        # @Example      clean_images
+        # @Reference    
+        #
+
+        local target_container=`docker ps -a | awk '{print $NF}' | fzf --preview-label="clean containers" --preview="docker ps -a" --height 100%`
+        docker stop $target_container
+        #echo $target_images
+        docker rm $target_container
     }
 
     #@ nest
@@ -431,7 +597,13 @@ EOF
         #if [[ $image_name == "" ]]; then
         #fi
         docker image build -t ${image_name} -f $dockerfile_path .
+    }
 
+    #@ nest
+    function exec_container () {
+        local target_container=`docker ps -a | awk '{print $NF}' | fzf --preview-label="target containers" --preview="docker ps -a" --height 100%`
+        docker start $target_container
+        docker exec -it --user `id -u "$USER"` ${target_container} /usr/bin/zsh
     }
 
     #@ nest
@@ -465,7 +637,9 @@ EOF
         local uid=`id -u "$USER"`
 
         # echo "$OPTS"
-        docker run --rm -it --name ${container_name} \
+        docker run -it --name ${container_name} \
+                   --net=host \
+                   --ipc=host \
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
@@ -487,12 +661,103 @@ EOF
         #           --name $container_name \
         #           $image_name
     }
+
+    #@ nest
+    function publish () {
+        #
+        # @Description  run container
+        # @params       
+        # @Example      run_container
+        # @Reference    
+        #
+
+        #nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+        #local os
+        #local os_info=`lsb_release --description | awk -F":" '{print $2}'`
+        local OPTS
+        if _has sw_vers; then
+            nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            #echo $OPTS
+        fi
+
+        docker images
+        local username=`echo $USER`
+        local -a image_lst=($(docker images | cut -d' ' -f1 | awk 'NR>=2{print}'))
+        local target_image=`array_fzf "$image_lst[*]"`
+        echo -n "Container Name> "
+        read container_name
+        if [[ $container_name == "" ]]; then
+            container_name="$target_image"
+        fi
+        local uid=`id -u "$USER"`
+
+        # echo "$OPTS"
+        docker run -it --name ${container_name} \
+                   --net=host \
+                   --ipc=host \
+                   -e USER_NAME=$username \
+                   -e LOCAL_UID=$uid \
+                   -e LOCAL_GID=$uid \
+                   -v ${HOME}:/share \
+                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} \
+                   ros2 topic pub /my_topic std_msgs/msg/String '{data: "hello"}'
+    }
+
+    #@ nest
+    function subscribe () {
+        #
+        # @Description  run container
+        # @params       
+        # @Example      run_container
+        # @Reference    
+        #
+
+        #nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+        #local os
+        #local os_info=`lsb_release --description | awk -F":" '{print $2}'`
+        local OPTS
+        if _has sw_vers; then
+            nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            #echo $OPTS
+        fi
+
+        docker images
+        local username=`echo $USER`
+        local -a image_lst=($(docker images | cut -d' ' -f1 | awk 'NR>=2{print}'))
+        local target_image=`array_fzf "$image_lst[*]"`
+        echo -n "Container Name> "
+        read container_name
+        if [[ $container_name == "" ]]; then
+            container_name="$target_image"
+        fi
+        local uid=`id -u "$USER"`
+
+        # echo "$OPTS"
+        docker run -it --name ${container_name} \
+                   --net=host \
+                   --ipc=host \
+                   -e USER_NAME=$username \
+                   -e LOCAL_UID=$uid \
+                   -e LOCAL_GID=$uid \
+                   -v ${HOME}:/share \
+                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} \
+                   ros2 topic echo /my_topic
+    }
+
+
+
+
+
     local -a function_lst=(
         sample
         build_image
         run_container
         clean_none
         clean_images
+        clean_containers
+        exec_container
     )
     local target_function=`array_fzf "${function_lst[*]}"`
     eval $target_function
@@ -3106,7 +3371,7 @@ function install_go () {
     # @Reference    
     #
 
-    cd $HOME/source
+    mkdir -p $HOME/source && cd $_
     if [[ ! -e go1.21.3.linux-arm64.tar.gz ]]; then
         #wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
         wget https://go.dev/dl/go1.21.3.linux-amd64.tar.gz
@@ -3123,6 +3388,7 @@ function install_go () {
     #     wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
     #     rm -rf $HOME/source/go && tar -C $HOME/source/ -xzf go1.21.3.linux-arm64.tar.gz
     # fi
+    mkdir -p $HOME/bin
     ln -sf $PWD/go/bin/go $HOME/bin/
 }
 
@@ -3417,19 +3683,6 @@ function install_bat () {
     #
 
     cargo install --locked bat
-}
-
-#@
-function _attach_dotfiles () {
-    #
-    # @Description  attach dotfiles (for only 8ucchiman)
-    # @params
-    # @Example      attach_dotfiles
-    # @Remarks      dotfiles: git@github.com:Bucchiman/dotfiles.git
-    # @Reference
-    #
-
-    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
 }
 
 #@
@@ -3868,6 +4121,7 @@ function update_dotfiles () {
     git fetch origin dev
     git merge origin/dev
     for value in ${(v)DOTFILES_SUBMODULES}; do
+        #echo $DOTFILES/$value
         cd $DOTFILES/$value
         git fetch origin dev
         git merge --no-edit origin/dev
