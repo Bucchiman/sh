@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-20 22:32:48
+# LastModified: 2024-01-22 00:23:53
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -68,6 +68,18 @@ function __full_packages () {
 function __clone_dotfiles () {
 
     git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+}
+
+#@
+function setup_pico_firmware () {
+    #
+    # @Description  setup pico firmware
+    # @params       
+    # @Example      setup_pico_firmware
+    # @Reference    https://www.hoshicolumn.com/raspberrypipico_kaihatu/
+    #
+
+    curl -O https://micropython.org/download/rp2-pico/rp2-pico-latest.uf2
 }
 
 
@@ -187,6 +199,21 @@ function setup_ros1 () {
 
 }
 
+#@ bug
+function docker_bug () {
+    #
+    # @Description  font bug
+    # @params       
+    # @Example      docker_bug
+    # @Reference    https://qiita.com/kazuyoshikakihara/items/0cf74c11d273b0064c83
+    #
+
+    sudo apt-get update
+    sudo apt-get install locales
+    sudo sh -c 'echo "ja_JP UTF-8" >> /etc/locale.gen'
+    sudo locale-gen
+}
+
 #@
 function install_ros2 () {
     sudo apt update
@@ -207,14 +234,341 @@ function setup_ros2 () {
     #echo "source /opt/ros/$ROS_DISTRO/setup.zsh" >> $HOME/.zshrc
 }
 
-#@ container
+#@
 function demo_ros2 () {
+    #
+    # @Description  demo ros2
+    # @params       
+    # @Example      demo_ros2
+    # @Reference    
+    #
+
+    docker pull ros:humble
+    #@ nest
+    function publish () {
+        docker run -it --rm --name rospub \
+                   --net=host \
+                   --ipc=host \
+                   ros:humble \
+                   ros2 topic pub /my_topic std_msgs/String '{data: "hello"}'
+
+    }
+
+    #@ nest
+    function subscribe () {
+        docker run -it --rm --name rossub \
+                   --net=host \
+                   --ipc=host \
+                   ros:humble \
+                   ros2 topic echo /my_topic std_msgs/String
+    }
+
+    #@ nest container
+    function sample_hello () {
+        mkdir -p $HOME/happy_ws/src/chapter2 && cd $_
+        ros2 pkg create --build-type ament_python --node-name hello_node hello
+        cd $HOME/happy_ws
+        colcon build
+        source install/setup.zsh
+        ros2 run hello hello_node
+    }
+
+    #@ nest container
+    function sample_hello01 () {
+        #mkdir -p $HOME/airobot_ws/src && cd $_
+        #ros2 pkg create --build-type ament_python --node-name happy_node happy
+        #cd $HOME/airobot_ws
+    }
+
+    #@ nest container
+    function sample_happy02 () {
+        mkdir -p $HOME/happy_ws02/src && cd $_
+        ros2 pkg create --build-type ament_python --node-name happy_node02 happy02
+        cd $HOME/happy_ws02/src/happy02/happy02
+        rm happy_node02.py
+/bin/cat <<eos > happy_node02.py
+import rclpy
+from rclpy.node import Node
+
+
+class HappyNode02(Node):
+    def __init__(self):
+        print("generate node")
+        super().__init__("happy_node02")
+        self.timer = self.create_timer(1.0, self.timer_callback)
+
+    def timer_callback(self):
+        self.get_logger().info("happy world02")
+
+def main():
+    print("start program")
+    rclpy.init()
+    node = HappyNode02()
+    rclpy.spin(node)
+    rclpy.shutdown()
+    print("terminate program")
+
+
+if __name__ == "__main__":
+    main()
+eos
+
+        cd $HOME/happy_ws02
+        colcon build
+        source install/setup.zsh
+        ros2 run happy02 happy_node02
+    }
+
+    #@ nest
+    function sample_happy03 () {
+        mkdir -p $HOME/happy_ws03/src && cd $_
+        ros2 pkg create --build-type ament_python --node-name happy_node03 happy03
+        cd $HOME/happy_ws03/src/happy03/happy03
+        rm happy_node03.py
+/bin/cat <<eos > happy_node03.py
+import rclpy
+from rclpy.node import Node
+
+
+class HappyNode03(Node):
+    def __init__(self):
+        print("generate node")
+        super().__init__("happy_node03")
+        self.timer = self.create_timer(1.0, self.timer_callback)
+
+    def timer_callback(self):
+        self.get_logger().info("happy world03")
+
+def main():
+    print("start program")
+    rclpy.init()
+    node = HappyNode03()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("suspend key")
+    rclpy.shutdown()
+    print("terminate program")
+
+
+if __name__ == "__main__":
+    main()
+eos
+
+        cd $HOME/happy_ws03
+        colcon build
+        source $HOME/happy_ws03/install/setup.zsh
+        ros2 run happy03 happy_node03
+    }
+
+    #@ nest
+    function sample_publisher () {
+        mkdir -p $HOME/airobot_ws/src/chapter2 && cd $_
+        ros2 pkg create --build-type ament_python --node-name happy_publisher_node happy_topic
+        cd $HOME/airobot_ws/src/chapter2/happy_topic/happy_topic
+        rm happy_publisher_node.py
+
+cat <<eos > happy_publisher_node.py
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+
+class HappyPublisher(Node):
+    def __init__(self):
+        super().__init__("happy_publisher_node")
+        self.pub = self.create_publisher(String, 'topic', 10)
+        self.timer = self.create_timer(1, self.timer_callback)
+        self.i = 10
+
+    def timer_callback(self):
+        msg = String()
+        if self.i > 0:
+            msg.data = f"happy world {self.i}"
+        else:
+            msg.data = f'ends'
+            self.destroy_timer(self.timer)
+
+        self.pub.publish(msg)
+        self.get_logger().info(f'publish: {msg.data}')
+        self.i -= 1
+
+
+def main():
+    print("start program")
+    rclpy.init()
+    node = HappyPublisher()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("suspend key")
+    rclpy.shutdown()
+    print("terminate program")
+
+
+if __name__ == "__main__":
+    main()
+
+eos
+        cd $HOME/airobot_ws
+        colcon build
+        source $HOME/airobot_ws/install/setup.zsh
+        ros2 run happy_topic happy_publisher_node
+    }
+
+
+    #@ nest
+    function sample_subscriber () {
+        mkdir -p $HOME/airobot_ws/src/chapter2 && cd $_
+        ros2 pkg create --build-type ament_python --node-name happy_subscriber_node happy_topic
+        cd $HOME/airobot_ws/src/chapter2/happy_topic/happy_topic
+        rm happy_subscriber_node.py
+
+cat <<eos > happy_subscriber_node.py
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+
+class HappySubscriber(Node):
+    def __init__(self):
+        super().__init__("happy_subscriber_node")
+        self.sub = self.create_subscription(String, 'topic', self.callback, 10)
+
+    def callback(self, msg):
+        self.get_logger().info(f'subscribe: {msg.data}')
+
+
+def main():
+    print("start program")
+    rclpy.init()
+    node = HappySubscriber()
+    try:
+        rclpy.spin(node)
+    except KeyboardInterrupt:
+        print("suspend key")
+    rclpy.shutdown()
+    print("terminate program")
+
+
+if __name__ == "__main__":
+    main()
+
+eos
+        cd $HOME/airobot_ws
+        colcon build
+        source $HOME/airobot_ws/install/setup.zsh
+        ros2 run happy_topic happy_subscriber_node
+    }
+
+
+    #@ nest container
+    function turtlebot_simulator () {
+        sudo apt-get install -y ros-humble-turtlebot3
+        export TURTLEBOT3_MODEL=waffle_pi
+        ros2 launch turtlebot3_gazebo empty_world.launch.py
+    }
+
+    #@ nest container
+    function turtle_simulator () {
+        local -a command_lst=(
+            "ros2 run turtlesim turtlesim_node"       # show turtle simulator
+            "ros2 run turtlesim turtle_teleop_key"    # implement teleoperation
+            "ros2 node list"
+            "ros2 pkg executables turtlesim"
+            "rqt"
+        )
+        local target_command=`array_fzf "${command_lst[@]}"`
+        eval $target_command
+    }
+
+    #@ nest
+    function tb3_simulation () {
+        sudo apt-get install ros-humble-gazebo-*
+        sudo apt install -y ros-humble-cartographer
+        sudo apt install -y ros-humble-cartographer-ros
+        sudo apt install -y ros-humble-navigation2
+        sudo apt install -y ros-humble-nav2-bringup
+        sudo apt install -y ros-humble-xacro
+        sudo apt remove ros-humble-dynamixel-sdk
+        sudo apt remove ros-humble-turtlebot3-msgs
+        sudo apt remove ros-humble-turtlebot3
+        mkdir -p ~/turtlebot3_ws/src
+        cd ~/turtlebot3_ws/src/
+        git clone -b humble-devel https://github.com/ROBOTIS-GIT/DynamixelSDK.git
+        git clone -b humble-devel https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
+        git clone -b humble-jp-devel https://github.com/ROBOTIS-JAPAN-GIT/turtlebot3_jp_custom.git
+        cd ~/turtlebot3_ws
+        colcon build --symlink-install
+        echo 'source ~/turtlebot3_ws/install/setup.zsh' >> ~/.config/local/local.zsh
+        source ~/.zshrc
+
+
+
+        sudo apt-get install -y ros-humble-realsense2-camera
+        cd ~/turtlebot3_ws/src
+        git clone -b humble-jp-devel https://github.com/ROBOTIS-JAPAN-GIT/realsense-ros_jp_custom
+        git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin
+        cd ~/turtlebot3_ws
+        colcon build --symlink-install
+    }
+
+    local -a function_lst=(
+        sample_hello
+        sample_happy02
+        sample_happy03
+        sample_publisher
+        sample_subscriber
+        turtle_simulator
+        publish
+        subscribe
+        tb3_simulation
+    )
+    local target_function=`array_fzf "${function_lst[*]}"`
+    eval $target_function
+}
+
+#@ obsolete container
+function __demo_ros2 () {
+    #
+    # @Description  demo ros2 in container
+    # @params       
+    # @Example      __demo_ros2
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    
     cd $HOME && git clone https://github.com/youtalk/get-started-ros2.git
     cd get-started-ros2 && git submodule update --init
     mkdir $HOME/ros2 && cd $_
     ln -sf $HOME/get-started-ros2/ros2 src
     rosdep install --from-paths src --ignore-src -r -y
     colcon build
+}
+
+#@ install
+function install_jq () {
+    #
+    # @Description  json query
+    # @params       
+    # @Example      install_jq
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt install -y jq
+}
+
+#@ install raspi
+function install_duf () {
+    #
+    # @Description  install duf for disk utility
+    # @params       
+    # @Example      install_duf
+    # @Reference    https://linuxhint.com/disk-information-duf-raspberry-pi/
+    #
+
+    curl -sS https://gist.githubusercontent.com/arbal/408cfa432082e16b9975dee0e0b3bda2/raw/install-duf-latest-deb.sh | sudo bash
+    sudo apt install -y ./duf-latest.deb
 }
 
 #@
@@ -2594,11 +2948,28 @@ function install_luarocks () {
     # @Reference    
     #
 
-    mkdir $HOME/source/luarocks && cd $_
+    mkdir -p $HOME/source/luarocks && cd $_
     wget https://luarocks.org/releases/luarocks-3.9.2.tar.gz
     tar zxpf luarocks-3.9.2.tar.gz
     ln -sf $PWD/luarocks-3.9.2/src/bin/luarocks $HOME/bin
 
+}
+
+#@ install
+function install_luajit () {
+    #
+    # @Description  install luajit
+    # @params       
+    # @Example      install_luajit
+    # @Reference    https://luajit.org/download.html
+    #               https://luajit.org/install.html
+    #
+
+    mkdir -p $HOME/source && cd $_
+    git clone https://luajit.org/git/luajit.git
+    cd luajit
+    make && make install PREFIX=$PWD/
+    ln -sf $PWD/bin/luajit $HOME/bin/
 }
 
 #@ install interactive
@@ -2631,6 +3002,7 @@ function install_lua () {
         sed -i -e "s/INSTALL_TOP= \/usr\/local/INSTALL_TOP= \$\(HOME\)\/source\/lua/" Makefile
         make linux test
         make install
+        ln -sf $HOME/source/lua/lua-5.3.5/src/lua $HOME/bin/
     }
 
     #@ nest
