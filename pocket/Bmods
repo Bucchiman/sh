@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-22 00:23:53
+# LastModified: 2024-01-27 15:14:06
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -32,9 +32,23 @@ function 2024_tactics () {
         function reference () {
             local -A reference_lst=(
                 hackathon_kyoto https://connpass.com/event/289901/
+                giftech         https://giftech.io/giftech2024spring/
+                qiitahachathon  https://increments.connpass.com/event/305013/
             )
         }
     }
+}
+
+#@ install
+function install_kicad () {
+    #
+    # @Description  kicad install
+    # @params       
+    # @Example      install_kicad
+    # @Reference    https://www.kicad.org/
+    #
+
+    sudo port install kicad
 }
 
 
@@ -166,7 +180,7 @@ function __minimum_packages () {
     #
 
     if ! _has cargo; then install_rust; fi
-    if ! _has go; then install_go; fi
+    # if ! _has go; then install_go; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
     if ! _has exa; then install_exa; fi
@@ -229,9 +243,32 @@ function install_ros2 () {
 
 #@
 function setup_ros2 () {
+    #
+    # @Description  the function is setup ros2
+    # @params       
+    # @Example      setup_ros2
+    # @Reference    
+    #
+
     export ROS_DISTRO=humble
     source /opt/ros/$ROS_DISTRO/setup.zsh
     #echo "source /opt/ros/$ROS_DISTRO/setup.zsh" >> $HOME/.zshrc
+}
+
+#@ install
+function install_arduino_ide () {
+    #
+    # @Description  install arduino ide
+    # @params       
+    # @Example      install_arduino_ide
+    # @Reference    https://support.arduino.cc/hc/en-us/articles/360019833020-Download-and-install-Arduino-IDE?queryID=undefined
+    #
+
+    sudo port selfupdate
+    #sudo port install Arduino arduino-cli
+    sudo port install arduino-cli
+
+    wget https://github.com/micro-ROS/micro_ros_arduino/archive/refs/tags/v2.0.7-humble.zip
 }
 
 #@
@@ -244,23 +281,76 @@ function demo_ros2 () {
     #
 
     docker pull ros:humble
+
+    #@ nest
+    function setup_arduino_esp32 () {
+        #
+        # @Description  
+        # @params       
+        # @Example      setup_arduino_esp32
+        # @Reference    
+        #
+
+        # 1. download esp32 board on arduino ide
+
+        # 2. download micro-ros on arguino ide
+
+        # 3. download micro-ros-agent
+        git clone -b humble https://github.com/micro_ros_setup.git src/micro_ros_setup
+        rosdep update && rosdep install --from-paths src --ignore-src -y
+        colcon build
+        source install/local_setup.zsh
+        ros2 run micro_ros_setup create_agent_ws.sh
+        ros2 run micro_ros_setup build_agent.sh
+        source install/local_setup.sh
+
+
+        # 4. micro-ros sample to esp32 in arduino ide
+        # 4.A connect to micro-ros-agent via wifi
+
+        # 4.B connect to micro-ros-agent via usb
+
+        # 5. launch micro-ros-agent
+        # 5.A connect to micro-ros-agent via wifi
+        ros2 run micro_ros_agent micro_ros_agent udp4 --port [port] -v6
+
+        # 5.B connect to micro-ros-agent via usb
+        ros2 run micro_ros_agent micro_ros_agent serial --dev [/dev/tty] -v6
+
+        # 6. check topic
+        ros2 topic list
+    }
+
     #@ nest
     function publish () {
+        # docker run -it --rm --name rospub \
+        #            --net=host \
+        #            --ipc=host \
+        #            ros:humble \
+        #            ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
+
         docker run -it --rm --name rospub \
                    --net=host \
                    --ipc=host \
-                   ros:humble \
-                   ros2 topic pub /my_topic std_msgs/String '{data: "hello"}'
+                   ros2_humble_new \
+                   ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
 
     }
 
     #@ nest
     function subscribe () {
+        # docker run -it --rm --name rossub \
+        #            --net=host \
+        #            --ipc=host \
+        #            ros:humble \
+        #            ros2 topic echo /my_topic std_msgs/String
+
         docker run -it --rm --name rossub \
                    --net=host \
                    --ipc=host \
-                   ros:humble \
+                   ros2_humble_new \
                    ros2 topic echo /my_topic std_msgs/String
+
     }
 
     #@ nest container
@@ -948,9 +1038,13 @@ EOF
         local dockerfile_path=$HOME/mywork/projects/base_docker/$target_dockerfile
         echo -n "image name> "
         read image_name
+
+        OPTS='--platform linux/amd64'   # Reference: https://stackoverflow.com/questions/66662820/m1-docker-preview-and-keycloak-images-platform-linux-amd64-does-not-match-th
+                                        # https://dev.to/docker/run-x86-containers-on-apple-mac-m1-with-rosetta-2-417a
         #if [[ $image_name == "" ]]; then
         #fi
-        docker image build -t ${image_name} -f $dockerfile_path .
+        docker image build -t ${image_name} -f $dockerfile_path --platform linux/amd64 .
+
     }
 
     #@ nest
@@ -998,6 +1092,7 @@ EOF
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
                    -v ${HOME}:/share \
+                   --platform linux/amd64 \
                    -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
                    #--v $HOME/.ssh:/home/bucchiman/.ssh \
                    #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
