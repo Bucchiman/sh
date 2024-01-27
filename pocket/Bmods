@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-27 15:14:06
+# LastModified: 2024-01-28 07:38:44
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -51,6 +51,21 @@ function install_kicad () {
     sudo port install kicad
 }
 
+#@ init
+function __init () {
+    #
+    # @Description  initialize
+    # @params       
+    # @Example      git clone -b dev --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+    #               cd $HOME/dotfiles
+    #               ./Bmain __init
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    __attach_dotfiles
+    __full_packages
+}
+
 
 #@ init
 function __full_packages () {
@@ -78,10 +93,9 @@ function __full_packages () {
     ln -sf ${DOTFILES}/Bmain $HOME/Bmain
 }
 
-#@ 8ucchiman
+#@ init 8ucchiman
 function __clone_dotfiles () {
-
-    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+    git clone -b dev --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
 }
 
 #@
@@ -100,9 +114,9 @@ function setup_pico_firmware () {
 #@ init
 function __attach_dotfiles () {
     #
-    # @Description  attach dotfiles
+    # @Description  attach dotfiles like copy, symbolic link
     # @params
-    # @Example      attach_dotfiles
+    # @Example      
     # @Remarks      dotfiles: git@github.com:Bucchiman/dotfiles.git
     # @Reference
     #
@@ -180,7 +194,7 @@ function __minimum_packages () {
     #
 
     if ! _has cargo; then install_rust; fi
-    # if ! _has go; then install_go; fi
+    if ! _has go; then install_go; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
     if ! _has exa; then install_exa; fi
@@ -232,10 +246,10 @@ function docker_bug () {
 function install_ros2 () {
     sudo apt update
     sudo apt install curl gnupg2 lsb-release
-    export ROS_DIRSTO=humble
-    sudo apt install -y ros-$ROS_DIRSTRO-desktop \
+    export ROS_DISTRO=humble
+    sudo apt install -y ros-$ROS_DISTRO-desktop \
                         python3-colcon-common-extensions \
-                        python3-rosde \
+                        python3-rosdep \
                         python3-argcomplete
     sudo rosdep init
     rosdep update
