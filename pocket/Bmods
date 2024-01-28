@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-27 17:47:31
+# LastModified: 2024-01-28 10:02:16
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -51,20 +51,35 @@ function install_kicad () {
     sudo port install kicad
 }
 
+#@ init
+function __init () {
+    #
+    # @Description  initialize for 8ucchiman
+    #               1. git clone -b dev --recursive https://github.com/Bucchiman/dotfiles.git $HOME/dotfiles
+    #               2. cd $HOME/dotfiles
+    #               3. ./Bmain __full_packages
+    # @params       
+    # @Example      
+    # @Reference    
+    #
+
+    __full_packages
+    __attach_dotfiles
+}
 
 #@ init
 function __full_packages () {
     #
     # @Description  install packages
-    #               1. git clone -
+    #               1. git clone -b dev --recursive https://github.com/Bucchiman/dotfiles.git $HOME/dotfiles
     #               2. cd $HOME/dotfiles
-    #               3. Bmods main __init
+    #               3. ./Bmain __full_packages
     # @params       
-    # @Example      init
+    # @Example      ./Bmain __full_packages
     # @Reference    
     #
 
-    __minimum_plugins
+    __minimum_packages
     if ! _has lldb; then install_lldb; fi
     if ! _has fnm; then setup_nodejs install_fnm; fi
     if ! _has dbxcli; then install_dropbox; fi
@@ -72,16 +87,15 @@ function __full_packages () {
     if ! _has catimg; then install_catimg; fi
     if ! _has delta; then install_delta; fi
     if ! _has lazygit; then install_lazygit; fi
-    if ! _has mdcat; then install_markdown; fi
+    #if ! _has mdcat; then install_markdown; fi
     if ! _has clasp; then install_google_script; fi
     ln -sf ${DOTFILES}/Bmods $HOME/Bmods
     ln -sf ${DOTFILES}/Bmain $HOME/Bmain
 }
 
-#@ 8ucchiman
+#@ init
 function __clone_dotfiles () {
-
-    git clone --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+    git clone -b dev --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
 }
 
 #@
@@ -175,7 +189,7 @@ function __minimum_packages () {
     #               e.g. docker container
     #                    other developers
     # @params       
-    # @Example
+    # @Example      __minimum_packages
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
@@ -230,13 +244,26 @@ function docker_bug () {
 
 #@
 function install_ros2 () {
+    #
+    # @Description  install ros2(humble)
+    # @params       
+    # @Example      install_ros2
+    # @Reference    hobby robot ros2 tutorial(books)
+    #
+
     sudo apt update
-    sudo apt install curl gnupg2 lsb-release
-    export ROS_DIRSTO=humble
-    sudo apt install -y ros-$ROS_DIRSTRO-desktop \
+    sudo apt install -y curl gnupg2 lsb-release software-properties-common
+    sudo add-apt-repository universe
+
+    sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+
+    export ROS_DISTRO=humble
+    sudo apt install -y ros-$ROS_DISTRO-desktop \
                         python3-colcon-common-extensions \
-                        python3-rosde \
-                        python3-argcomplete
+                        python3-rosdep \
+                        python3-argcomplete \
+                        ros-dev-tools
     sudo rosdep init
     rosdep update
 }
@@ -1467,7 +1494,7 @@ function install_catimg () {
     cd catimg
     cmake -S . -B build
     cd build
-    maka install
+    make install
     make
     ln -sf $PWD/bin/catimg $HOME/bin/
 }
@@ -2810,22 +2837,6 @@ function install_starship () {
 
     cargo install starship --locked
 }
-
-#@ install
-function install_exa () {
-    #
-    # @Description  alternative to ls, with icon
-    # @params       
-    # @dependencies cargo
-    # @Example      install_exa
-    # @Reference    https://github.com/ogham/exa
-    #
-
-    echo
-}
-
-
-
 
 ## #@ lopez
 ## function temporal_fixed () {
