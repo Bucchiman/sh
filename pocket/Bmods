@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-28 07:38:44
+# LastModified: 2024-01-28 09:29:46
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -1208,10 +1208,6 @@ EOF
                    -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} \
                    ros2 topic echo /my_topic
     }
-
-
-
-
 
     local -a function_lst=(
         sample
