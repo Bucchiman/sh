@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-27 15:14:06
+# LastModified: 2024-01-27 17:47:31
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -1086,8 +1086,6 @@ EOF
 
         # echo "$OPTS"
         docker run -it --name ${container_name} \
-                   --net=host \
-                   --ipc=host \
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
