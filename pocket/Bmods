@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-30 16:02:29
+# LastModified: 2024-01-30 16:33:41
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -1146,7 +1146,7 @@ EOF
             OPTS='-e DISPLAY=docker.for.mac.host.internal:0 --platform linux/amd64'    # -v $HOME/.ssh:/home/dockeruser/.ssh
             #echo $OPTS
         else
-            #OPTS='-v /tmp/.X11-unix:/tmp/.X11-unix:rw'
+            #OPTS='-v /tmp/.X11-unix:/tmp/.X11-unix'
             echo 
         fi
 
@@ -1168,7 +1168,7 @@ EOF
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
                    -v ${HOME}:/share \
-                   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+                   -v /tmp/.X11-unix:/tmp/.X11-unix \
                    ${target_image} /usr/bin/zsh
                    #--v $HOME/.ssh:/home/bucchiman/.ssh \
                    #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
