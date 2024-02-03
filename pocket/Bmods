@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-02 12:18:45
+# LastModified: 2024-02-04 00:40:37
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -37,6 +37,47 @@ function 2024_tactics () {
             )
         }
     }
+}
+
+#@ install
+function install_pix2text () {
+    #
+    # @Description  
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    pip install pix2text
+}
+
+#@ install
+function install_pix2tex () {
+    #
+    # @Description  install converter for pix to tex
+    # @params       
+    # @Example      install_pix2tex
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    pip install "pix2tex[gui]"
+}
+
+
+#@ install
+function install_mathpix () {
+    #
+    # @Description  converter image to latex
+    # @params       
+    # @Example      install_mathpix
+    # @Reference    https://mathpix.com/docs/snip/mpx-cli
+    #
+
+    npm install -g @mathpix/mpx-cli
+    mpx login
 }
 
 #@ install
@@ -1150,11 +1191,17 @@ EOF
         #if [[ $image_name == "" ]]; then
         #fi
         docker image build -t ${image_name} -f $dockerfile_path --platform linux/amd64 .
-
     }
 
     #@ nest
     function exec_container () {
+        #
+        # @Description  exec container
+        # @params       
+        # @Example      exec_container
+        # @Reference    
+        #
+
         local target_container=`docker ps -a | awk '{print $NF}' | fzf --preview-label="target containers" --preview="docker ps -a" --height 100%`
         docker start $target_container
         docker exec -it --user `id -u "$USER"` ${target_container} /usr/bin/zsh
@@ -1175,8 +1222,11 @@ EOF
         local OPTS
         if _has sw_vers; then
             nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
-            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0 --platform linux/amd64'    # -v $HOME/.ssh:/home/dockeruser/.ssh
             #echo $OPTS
+        else
+            #OPTS='-v /tmp/.X11-unix:/tmp/.X11-unix'
+            echo 
         fi
 
         docker images
@@ -1190,14 +1240,15 @@ EOF
         fi
         local uid=`id -u "$USER"`
 
-        # echo "$OPTS"
+        # echo "docker run -it --name ${container_name} -e USER_NAME=$username -e LOCAL_UID=$uid -e LOCAL_GID=$uid -v ${HOME}:/share ${OPTS} ${target_image} /usr/bin/zsh"
+
         docker run -it --name ${container_name} \
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
                    -v ${HOME}:/share \
-                   --platform linux/amd64 \
-                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+                   -v /tmp/.X11-unix:/tmp/.X11-unix \
+                   ${target_image} /usr/bin/zsh
                    #--v $HOME/.ssh:/home/bucchiman/.ssh \
                    #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 
