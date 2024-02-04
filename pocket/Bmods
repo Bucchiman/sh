@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-04 00:40:37
+# LastModified: 2024-02-04 19:35:55
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -40,6 +40,11 @@ function 2024_tactics () {
 }
 
 #@ install
+function install_gazebo () {
+    curl -sSL http://get.gazebosim.org | sh
+}
+
+#@ install
 function install_pix2text () {
     #
     # @Description  
@@ -64,6 +69,27 @@ function install_pix2tex () {
     #
 
     pip install "pix2tex[gui]"
+}
+
+#@ install
+function install_ydlidar () {
+    #
+    # @Description  1. setup SDK (ref: https://github.com/YDLIDAR/YDLidar-SDK/blob/master/doc/howto/how_to_build_and_install.md)
+    #               2. setup ydlidar_ros2_driver (ref: https://github.com/YDLIDAR/ydlidar_ros2_driver)
+    # @params       
+    # @Example      install_ydlidar
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt install -y cmake pkg-config
+    sudo apt install -y python swig
+    sudo apt install -y python-pip
+    cd $HOME/git/YDLidar-SDK/build
+    cmake ../
+    make
+    sudo make install
+
+
 }
 
 
