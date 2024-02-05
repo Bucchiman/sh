@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-01-30 16:33:41
+# LastModified: 2024-02-02 10:57:05
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -37,6 +37,18 @@ function 2024_tactics () {
             )
         }
     }
+}
+
+#@ install
+function install_ripgrep () {
+    #
+    # @Description  install ripgrep
+    # @params       
+    # @Example      install_ripgrep
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    cargo install ripgrep
 }
 
 #@ install
@@ -874,12 +886,12 @@ function install_youtube () {
     pip install youtube-dl
 }
 
-#@
+#@ share others
 function 4others () {
     #
     # @Description  launch Bmods, and other command of $HOME/bin
     # @params       
-    # @Example
+    # @Example      4others
     # @Reference    
     #
 
