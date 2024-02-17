@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-06 21:45:32
+# LastModified: 2024-02-17 20:02:29
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -91,6 +91,101 @@ function install_sstp_vpn () {
 }
 
 #@ install
+function install_crash () {
+    #
+    # @Description  install crash (binary analysis command)
+    # @params       
+    # @Example      install_crash
+    # @Reference    https://github.com/crash-utility/crash
+    #
+
+    mkdir -p $HOME/source && cd $_;
+    wget https://github.com/crash-utility/crash/archive/refs/tags/8.0.4.zip
+    unzip 8.0.4.zip && cd crash-8.0.4
+    make
+    ln -sf $PWD/crash $HOME/bin/
+}
+
+#@ install
+function install_ripgrep () {
+    #
+    # @Description  install ripgrep
+    # @params       
+    # @Example      install_ripgrep
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    cargo install ripgrep
+}
+
+#@ install
+function install_gazebo () {
+    curl -sSL http://get.gazebosim.org | sh
+}
+
+#@ install
+function install_pix2text () {
+    #
+    # @Description  
+    #               background command a
+    #               foreground command b
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    pip install pix2text
+}
+
+#@ install
+function install_pix2tex () {
+    #
+    # @Description  install converter for pix to tex
+    # @params       
+    # @Example      install_pix2tex
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    pip install "pix2tex[gui]"
+}
+
+#@ install
+function install_ydlidar () {
+    #
+    # @Description  1. setup SDK (ref: https://github.com/YDLIDAR/YDLidar-SDK/blob/master/doc/howto/how_to_build_and_install.md)
+    #               2. setup ydlidar_ros2_driver (ref: https://github.com/YDLIDAR/ydlidar_ros2_driver)
+    # @params       
+    # @Example      install_ydlidar
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    sudo apt install -y cmake pkg-config
+    sudo apt install -y python swig
+    sudo apt install -y python-pip
+    cd $HOME/git/YDLidar-SDK/build
+    cmake ../
+    make
+    sudo make install
+
+
+}
+
+
+#@ install
+function install_mathpix () {
+    #
+    # @Description  converter image to latex
+    # @params       
+    # @Example      install_mathpix
+    # @Reference    https://mathpix.com/docs/snip/mpx-cli
+    #
+
+    npm install -g @mathpix/mpx-cli
+    mpx login
+}
+
+#@ install
 function install_kicad () {
     #
     # @Description  kicad install
@@ -106,16 +201,15 @@ function install_kicad () {
 function __init () {
     #
     # @Description  initialize for 8ucchiman
-    #               1. git clone -b dev --recursive https://github.com/Bucchiman/dotfiles.git $HOME/dotfiles
-    #               2. cd $HOME/dotfiles
-    #               3. ./Bmain __full_packages
     # @params       
-    # @Example      
+    # @Example      git clone -b dev --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
+    #               cd $HOME/dotfiles
+    #               ./Bmain __init
     # @Reference    
     #
 
-    __full_packages
     __attach_dotfiles
+    __full_packages
 }
 
 #@ init
@@ -144,30 +238,33 @@ function __full_packages () {
     ln -sf ${DOTFILES}/Bmain $HOME/Bmain
 }
 
-#@ init
+#@ init 8ucchiman
 function __clone_dotfiles () {
     git clone -b dev --recursive git@github.com:Bucchiman/dotfiles.git $HOME/dotfiles
 }
 
-#@
-function setup_pico_firmware () {
-    #
-    # @Description  setup pico firmware
-    # @params       
-    # @Example      setup_pico_firmware
-    # @Reference    https://www.hoshicolumn.com/raspberrypipico_kaihatu/
-    #
+#@ pico
+function raspi_pico () {
+    #@ nest
+    function setup_pico_firmware () {
+        #
+        # @Description  setup pico firmware
+        # @params       
+        # @Example      setup_pico_firmware
+        # @Reference    https://www.hoshicolumn.com/raspberrypipico_kaihatu/
+        #
 
-    curl -O https://micropython.org/download/rp2-pico/rp2-pico-latest.uf2
+        curl -O https://micropython.org/download/rp2-pico/rp2-pico-latest.uf2
+    }
 }
 
 
 #@ init
 function __attach_dotfiles () {
     #
-    # @Description  attach dotfiles
+    # @Description  attach dotfiles like copy, symbolic link
     # @params
-    # @Example      attach_dotfiles
+    # @Example      
     # @Remarks      dotfiles: git@github.com:Bucchiman/dotfiles.git
     # @Reference
     #
@@ -245,7 +342,7 @@ function __minimum_packages () {
     #
 
     if ! _has cargo; then install_rust; fi
-    # if ! _has go; then install_go; fi
+    if ! _has go; then install_go; fi
     if ! _has fzf; then install_fzf; fi
     if ! _has bat; then install_bat; fi
     if ! _has exa; then install_exa; fi
@@ -293,6 +390,21 @@ function docker_bug () {
     sudo locale-gen
 }
 
+# #@ install
+# function install_pico_sdk () {
+#     #
+#     # @Description  
+#     # @params       
+#     # @Example      install_pico_sdk
+#     # @Reference    
+#     #
+# 
+#     sudo apt install cmake g++ gcc-arm-none-eabi doxygen libnewlib-arm-none-eabi git python3
+# 
+#     git clone --recurse-submodules https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
+#     echo "export PICO_SDK_PATH=$HOME/pico-sdk" >> $HOME/.config/local/local.zsh
+# }
+
 #@
 function install_ros2 () {
     #
@@ -315,6 +427,7 @@ function install_ros2 () {
                         python3-rosdep \
                         python3-argcomplete \
                         ros-dev-tools
+
     sudo rosdep init
     rosdep update
 }
@@ -375,7 +488,7 @@ function demo_ros2 () {
     # @Reference    
     #
 
-    docker pull ros:humble
+    #docker pull ros:humble
 
     #@ nest
     function setup_arduino_esp32 () {
@@ -417,17 +530,67 @@ function demo_ros2 () {
     }
 
     #@ nest
+    function setup_micro_ros () {
+        #
+        # @Description  setup micro ros on raspbery pi pico
+        # @params       
+        # @Example      setup_micro_ros
+        # @Reference    https://zenn.dev/katsuitoh/articles/0d33c3e95ff466
+        #
+
+        # install pico sdk
+        sudo apt install -y cmake g++ gcc-arm-none-eabi doxygen libnewlib-arm-none-eabi git python3
+        git clone --recurse-submodules https://github.com/raspberrypi/pico-sdk.git $HOME/pico-sdk
+
+        echo "export PICO_SDK_PATH=$HOME/pico-sdk" >> $HOME/.config/local/local.zsh && source $HOME/.config/local/local.zsh
+
+        # write example on pico
+        mkdir -p $HOME/pico && cd $_
+
+        git clone https://github.com/micro-ROS/micro_ros_raspberrypi_pico_sdk.git -b humble && cd micro_ros_raspberrypi_pico_sdk
+        mkdir -p build && cd build
+        cmake ..
+        make
+
+        # cp pico_micro_ros_example.uf2 /media/$USER/RPI-RP2
+
+        mkdir -p $HOME/microros_ws && cd $_
+        git clone -b humble https://github.com/micro-ROS/micro_ros_setup.git src/micro_ros_setup
+
+        sudo apt update && rosdep update
+        rosdep install --from-path src --ignore-src -y
+        sudo apt install -y python3-pip
+
+        colcon build
+        source install/local_setup.zsh
+
+        sudo chmod 666 /dev/ttyACM0
+        ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyACM0
+    }
+
+    #@ nest
     function publish () {
+        # docker run -it --rm --name rospub \
+        #            --net=host \
+        #            --ipc=host \
+        #            ros:humble \
+        #            ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
+
         docker run -it --rm --name rospub \
                    --net=host \
                    --ipc=host \
-                   ros:humble \
+                   ros2_humble_new \
                    ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
-
     }
 
     #@ nest
     function subscribe () {
+        # docker run -it --rm --name rossub \
+        #            --net=host \
+        #            --ipc=host \
+        #            ros:humble \
+        #            ros2 topic echo /my_topic std_msgs/String
+
         docker run -it --rm --name rossub \
                    --net=host \
                    --ipc=host \
@@ -642,19 +805,6 @@ eos
         ros2 launch turtlebot3_gazebo empty_world.launch.py
     }
 
-    #@ nest container
-    function turtle_simulator () {
-        local -a command_lst=(
-            "ros2 run turtlesim turtlesim_node"       # show turtle simulator
-            "ros2 run turtlesim turtle_teleop_key"    # implement teleoperation
-            "ros2 node list"
-            "ros2 pkg executables turtlesim"
-            "rqt"
-        )
-        local target_command=`array_fzf "${command_lst[@]}"`
-        eval $target_command
-    }
-
     #@ nest
     function tb3_simulation () {
         sudo apt-get install ros-humble-gazebo-*
@@ -686,7 +836,53 @@ eos
         colcon build --symlink-install
     }
 
+    #@ nest container
+    function turtle_simulator () {
+        local -a command_lst=(
+            "ros2 run turtlesim turtlesim_node"       # show turtle simulator
+            "ros2 run turtlesim turtle_teleop_key"    # implement teleoperation
+            "ros2 node list"
+            "ros2 pkg executables turtlesim"
+            "rqt"
+        )
+        local target_command=`array_fzf "${command_lst[@]}"`
+        eval $target_command
+    }
+
+    #@ nest
+    function topic_transfer () {
+        mkdir -p $HOME/ros2_ws/src/ && cd $_
+        ros2 pkg create --build-type ament_python py_pubsub
+        cd $HOME/ros2_ws/src/py_pubsub/py_pubsub/
+        touch publisher_member_function.py
+
+    }
+
+
+    #@ nest
+    function talker_listener_sample () {
+        #
+        # @Description  talker listener sample
+        #               1. ros2 run demo_nodes_cpp talker   (first terminal)
+        #               2. ros2 run demo_nodes_cpp listener (second terminal)
+        #               3. rqt_graph                        (third terminal)
+        # @params       
+        #               
+        # @Example
+        # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+        #
+
+        local -a command_lst=(
+            "ros2 run demo_nodes_cpp talker"
+            "ros2 run demo_nodes_cpp listener"
+            "rqt_graph"
+        )
+        local target_command=`array_fzf "${command_lst[@]}"`
+        eval $target_command
+    }
+
     local -a function_lst=(
+        setup_micro_ros
         sample_hello
         sample_happy02
         sample_happy03
@@ -696,6 +892,7 @@ eos
         publish
         subscribe
         tb3_simulation
+        talker_listener_sample
     )
     local target_function=`array_fzf "${function_lst[*]}"`
     eval $target_function
@@ -784,7 +981,7 @@ function setup_esp32 () {
     #
 
     #@ nest
-    function microsoftpython () {
+    function micropython () {
         #
         # @Description  command a & command b
         #               background command a
@@ -889,12 +1086,12 @@ function install_youtube () {
     pip install youtube-dl
 }
 
-#@
+#@ share others
 function 4others () {
     #
     # @Description  launch Bmods, and other command of $HOME/bin
     # @params       
-    # @Example
+    # @Example      4others
     # @Reference    
     #
 
@@ -1127,11 +1324,17 @@ EOF
         #if [[ $image_name == "" ]]; then
         #fi
         docker image build -t ${image_name} -f $dockerfile_path --platform linux/amd64 .
-
     }
 
     #@ nest
     function exec_container () {
+        #
+        # @Description  exec container
+        # @params       
+        # @Example      exec_container
+        # @Reference    
+        #
+
         local target_container=`docker ps -a | awk '{print $NF}' | fzf --preview-label="target containers" --preview="docker ps -a" --height 100%`
         docker start $target_container
         docker exec -it --user `id -u "$USER"` ${target_container} /usr/bin/zsh
@@ -1152,8 +1355,11 @@ EOF
         local OPTS
         if _has sw_vers; then
             nohup socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" & # socatで6000番占有
-            OPTS='-e DISPLAY=docker.for.mac.host.internal:0'    # -v $HOME/.ssh:/home/dockeruser/.ssh
+            OPTS='-e DISPLAY=docker.for.mac.host.internal:0 --platform linux/amd64'    # -v $HOME/.ssh:/home/dockeruser/.ssh
             #echo $OPTS
+        else
+            #OPTS='-v /tmp/.X11-unix:/tmp/.X11-unix'
+            echo 
         fi
 
         docker images
@@ -1167,15 +1373,16 @@ EOF
         fi
         local uid=`id -u "$USER"`
 
-        # echo "$OPTS"
+        # echo "docker run -it --name ${container_name} -e USER_NAME=$username -e LOCAL_UID=$uid -e LOCAL_GID=$uid -v ${HOME}:/share ${OPTS} ${target_image} /usr/bin/zsh"
+
         docker run -it --name ${container_name} \
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
                    --net host \
                    -v ${HOME}:/share \
-                   --platform linux/amd64 \
-                   -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} /usr/bin/zsh
+                   -v /tmp/.X11-unix:/tmp/.X11-unix \
+                   ${target_image} /usr/bin/zsh
                    #--v $HOME/.ssh:/home/bucchiman/.ssh \
                    #--v /tmp/.X11-unix:/tmp/.X11-unix:rw \
 
@@ -1276,10 +1483,6 @@ EOF
                    -e DISPLAY=docker.for.mac.host.internal:0 ${target_image} \
                    ros2 topic echo /my_topic
     }
-
-
-
-
 
     local -a function_lst=(
         sample
