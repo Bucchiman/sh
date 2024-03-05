@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-05 17:39:56
+# LastModified: 2024-03-05 16:55:33
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -37,6 +37,32 @@ function 2024_tactics () {
             )
         }
     }
+}
+
+
+#@
+function attach_camera4wsl () {
+    #
+    # @Description  attach web camera for wsl2
+    # @params       
+    # @Example      attach_camera4wsl
+    # @Reference    https://touch-sp.hatenablog.com/entry/2024/01/07/155445
+    #
+
+    sudo apt install -y build-essential flex bison libssl-dev libelf-dev libncurses-dev autoconf libudev-dev libtool bc dwarves
+    git clone --depth 1 -b linux-msft-wsl-5.15.y https://github.com/microsoft/WSL2-Linux-Kernel.git $HOME/source/WSL2-Linux-Kernel
+    cd $HOME/source/WSL2-Linux-Kernel
+    cp /proc/config.gz config.gz
+    gunzip config.gz
+    mv config .config
+    sudo make menuconfig
+    # Kernel hacking / Compile-time checks and compiler options / General BTF typeinfo (チェックを外す)
+    # Device Drivers > Multimedia support   (チェック)
+    # Device Drivers > Multimedia support > Video4Linux options (全てにチェック)
+    # Device Drivers > Multimedia support > Media drivers > Media USB Adapters  (チェック)
+    # Device Drivers > Multimedia support > Media drivers > Media USB Adapters > USB Video Class(UVC) (チェック)
+    sudo make -j$(nproc) && sudo make modules_install -j$(nproc) && sudo make install -j$(nproc)
+    cp vmlinux /mnt/c/Users/bucchiman/vmlinux
 }
 
 #@ install
