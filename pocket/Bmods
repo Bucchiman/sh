@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-17 20:02:29
+# LastModified: 2024-02-18 15:13:10
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -46,6 +46,7 @@ function 2024_tactics () {
 
 #@ jetson
 function setup_jetson () {
+    sudo apt install -y xrdp xfce4 xfce4-goodies
     
 }
 
@@ -3082,22 +3083,6 @@ function install_delta () {
 }
 
 
-#@
-function install_starship () {
-    #
-    # @Description  prompt decorator
-    # @params       
-    # @dependencies cargo
-    # @Example      install_starship
-    # @Reference    https://starship.rs/
-    #
-
-    ## sudo
-    # curl -sS https://starship.rs/install.sh | sh
-
-    cargo install starship --locked
-}
-
 ## #@ lopez
 ## function temporal_fixed () {
 ##     sed 's/if \[ \$USE_WSL2 == 1 \]/if \[\[ \$USE_WSL2 == 1 \]\]/g' $HOME/bin/gulliver/dot.bashrc
@@ -4368,7 +4353,8 @@ function setup_raspberrypi4 () {
     # @Reference    
     #
 
-    sudo apt-get install -y fuse
+    sudo apt-get install -y fuse eog x11-apps cmake\ 
+                            gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
 }
 
 #@ example
