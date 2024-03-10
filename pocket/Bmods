@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-02-04 22:23:16
+# LastModified: 2024-03-10 14:55:48
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -42,14 +42,120 @@ function setup_lidar_data () {
 function 2024_tactics () {
     #@ nest
     function event () {
-        function reference () {
-            local -A reference_lst=(
-                hackathon_kyoto https://connpass.com/event/289901/
-                giftech         https://giftech.io/giftech2024spring/
-                qiitahachathon  https://increments.connpass.com/event/305013/
-            )
-        }
+        local -A reference_lst=(
+            hackathon_kyoto https://connpass.com/event/289901/
+            giftech         https://giftech.io/giftech2024spring/
+            qiitahachathon  https://increments.connpass.com/event/305013/
+        )
     }
+
+    #@ nest
+    function schedule () {
+        echo
+    }
+
+
+}
+
+#@ jetson
+function setup_jetson () {
+    sudo apt install -y xrdp xfce4 xfce4-goodies
+    
+}
+
+#@ raspi
+function setup_ros24raspi () {
+    #
+    # @Description  setup ros2 for raspi
+    #               distribution humble
+    # @params       
+    #               
+    # @Example
+    # @Reference    hobby robot
+    #
+
+    sudo apt update
+    sudo apt upgrade
+    sudo apt install -y openssh-server
+    sudo apt install -y avahi-daemon
+    # sudo reboot
+
+    sudo apt install software-properties-common
+    sudo add-apt-repository universe
+    sudo apt update && sudo apt install -y curl
+    sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+    sudo apt update
+    sudo apt upgrade
+    sudo apt install -y ros-humble-desktop
+    sudo apt install -y ros-dev-tools
+}
+
+#@ install
+function install_sstp_vpn () {
+    #
+    # @Description  install sstp vpn cli
+    # @params       
+    # @Example      install_sstp_vpn
+    # @Reference    https://ports.macports.org/port/sstp-client/
+    #               https://yasunori.xyz/2022/04/04/softether-server.html
+    #
+
+    sudo port install sstp-client
+}
+
+#@ install
+function install_crash () {
+    #
+    # @Description  install crash (binary analysis command)
+    # @params       
+    # @Example      install_crash
+    # @Reference    https://github.com/crash-utility/crash
+    #
+
+    mkdir -p $HOME/source && cd $_;
+    wget https://github.com/crash-utility/crash/archive/refs/tags/8.0.4.zip
+    unzip 8.0.4.zip && cd crash-8.0.4
+    make
+    ln -sf $PWD/crash $HOME/bin/
+}
+
+
+#@
+function attach_camera4wsl () {
+    #
+    # @Description  attach web camera for wsl2
+    # @params       
+    # @Example      attach_camera4wsl
+    # @Reference    https://touch-sp.hatenablog.com/entry/2024/01/07/155445
+    #
+
+    sudo apt install -y build-essential flex bison libssl-dev libelf-dev libncurses-dev autoconf libudev-dev libtool bc dwarves
+    git clone --depth 1 -b linux-msft-wsl-5.15.y https://github.com/microsoft/WSL2-Linux-Kernel.git $HOME/source/WSL2-Linux-Kernel
+    cd $HOME/source/WSL2-Linux-Kernel
+    cp /proc/config.gz config.gz
+    gunzip config.gz
+    mv config .config
+    sudo make menuconfig
+    # Kernel hacking / Compile-time checks and compiler options / General BTF typeinfo (チェックを外す)
+    # Device Drivers > Multimedia support   (チェック)
+    # Device Drivers > Multimedia support > Video4Linux options (全てにチェック)
+    # Device Drivers > Multimedia support > Media drivers > Media USB Adapters  (チェック)
+    # Device Drivers > Multimedia support > Media drivers > Media USB Adapters > USB Video Class(UVC) (チェック)
+    sudo make -j$(nproc) && sudo make modules_install -j$(nproc) && sudo make install -j$(nproc)
+    cp vmlinux /mnt/c/Users/bucchiman/vmlinux
+}
+
+#@ install
+function install_ripgrep () {
+    #
+    # @Description  install ripgrep
+    # @params       
+    # @Example      install_ripgrep
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    cargo install ripgrep
 }
 
 #@ install
@@ -396,6 +502,23 @@ function install_arduino_ide () {
     wget https://github.com/micro-ROS/micro_ros_arduino/archive/refs/tags/v2.0.7-humble.zip
 }
 
+#@ install raspi
+function install_pigpio () {
+    #
+    # @Description  install pigpio on raspberry pi
+    # @params       
+    # @Example      install_pigpio
+    # @Reference    
+    #
+
+    cd $HOME/ros2_ws
+    wget https://github.com/joan2937/pigpio/archive/master.zip
+    unzip master.zip
+    cd pigpio-master
+    make
+    sudo make install
+}
+
 #@
 function demo_ros2 () {
     #
@@ -493,6 +616,11 @@ function demo_ros2 () {
         #            ros:humble \
         #            ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
 
+        docker run -it --rm --name rospub \
+                   --net=host \
+                   --ipc=host \
+                   ros2_humble_new \
+                   ros2 topic pub /my_topic std_msgs/String '{data: "bucchiman hello"}'
     }
 
     #@ nest
@@ -502,6 +630,12 @@ function demo_ros2 () {
         #            --ipc=host \
         #            ros:humble \
         #            ros2 topic echo /my_topic std_msgs/String
+
+        docker run -it --rm --name rossub \
+                   --net=host \
+                   --ipc=host \
+                   ros2_humble_new \
+                   ros2 topic echo /my_topic std_msgs/String
 
     }
 
@@ -992,12 +1126,12 @@ function install_youtube () {
     pip install youtube-dl
 }
 
-#@
+#@ share others
 function 4others () {
     #
     # @Description  launch Bmods, and other command of $HOME/bin
     # @params       
-    # @Example
+    # @Example      4others
     # @Reference    
     #
 
@@ -1285,6 +1419,7 @@ EOF
                    -e USER_NAME=$username \
                    -e LOCAL_UID=$uid \
                    -e LOCAL_GID=$uid \
+                   --net host \
                    -v ${HOME}:/share \
                    -v /tmp/.X11-unix:/tmp/.X11-unix \
                    ${target_image} /usr/bin/zsh
@@ -2987,22 +3122,6 @@ function install_delta () {
 }
 
 
-#@
-function install_starship () {
-    #
-    # @Description  prompt decorator
-    # @params       
-    # @dependencies cargo
-    # @Example      install_starship
-    # @Reference    https://starship.rs/
-    #
-
-    ## sudo
-    # curl -sS https://starship.rs/install.sh | sh
-
-    cargo install starship --locked
-}
-
 ## #@ lopez
 ## function temporal_fixed () {
 ##     sed 's/if \[ \$USE_WSL2 == 1 \]/if \[\[ \$USE_WSL2 == 1 \]\]/g' $HOME/bin/gulliver/dot.bashrc
@@ -4273,7 +4392,8 @@ function setup_raspberrypi4 () {
     # @Reference    
     #
 
-    sudo apt-get install -y fuse
+    sudo apt-get install -y fuse eog x11-apps cmake\ 
+                            gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
 }
 
 #@ example
