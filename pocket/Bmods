@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-03-11 11:46:01
+# LastModified: 2024-03-19 11:32:57
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -38,6 +38,20 @@ function setup_lidar_data () {
 }
 
 
+#@ install
+function install_radare2 () {
+    #
+    # @Description  radare2 is debug tool for game boy
+    # @params       
+    # @Example      install_radare2
+    # @Reference    https://rada.re/n/radare2.html
+    #
+
+    git clone hggpts://github.com/radareorg/radare2
+    cd radare2; sys/install.sh
+}
+
+
 #@ 2024
 function 2024_tactics () {
     #@ nest
@@ -47,7 +61,7 @@ function 2024_tactics () {
                 hackathon_kyoto https://connpass.com/event/289901/                # Done
                 giftech         https://giftech.io/giftech2024spring/
                 qiitahachathon  https://increments.connpass.com/event/305013/     # Done
-                tokyoaisaihackathon https://www.aisai.tokyo/hanckthon-page
+                tokyoaisaihackathon https://www.aisai.tokyo/hanckthon-page        # Done
             )
         }
     }
@@ -163,6 +177,13 @@ function install_ripgrep () {
 
 #@ install
 function install_gazebo () {
+    #
+    # @Description  gazebo (simulation)
+    # @params       
+    # @Example
+    # @Reference    https://classic.gazebosim.org/tutorials?tut=install_ubuntu
+    #
+
     curl -sSL http://get.gazebosim.org | sh
 }
 
