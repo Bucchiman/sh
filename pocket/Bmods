@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-03-19 11:32:57
+# LastModified: 2024-03-25 14:19:43
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -35,6 +35,20 @@ function setup_lidar_data () {
 
     sudo apt install -y libboost-dev libpcap-dev libpcl-dev libeigen3-dev
     git clone https://github.com/RoboSense-LiDAR/rs_driver -b v1.5.4 --depth 1
+}
+
+#@ install
+function install_zenn () {
+    #
+    # @Description  install zenn cli
+    # @params       
+    # @Example      install_zenn
+    # @Reference    https://zenn.dev/zenn/articles/install-zenn-cli
+    #
+
+    npm init --yes
+    npm install -g zenn-cli
+    npx zenn init
 }
 
 
