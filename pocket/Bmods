@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-03-28 14:22:53
+# LastModified: 2024-04-08 10:36:34
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -11,6 +11,8 @@
 #
 
 # set -ex
+# 4cc (four character code)
+# 32bit整数値
 
 #@ archive
 function pass () {
@@ -73,12 +75,14 @@ function 2024_tactics () {
         function reference () {
             local -A reference_lst=(
                 hackathon_kyoto https://connpass.com/event/289901/                # Done
-                giftech         https://giftech.io/giftech2024spring/
+                giftech         https://giftech.io/giftech2024spring/             # Quit
                 qiitahachathon  https://increments.connpass.com/event/305013/     # Done
                 tokyoaisaihackathon https://www.aisai.tokyo/hanckthon-page        # Done
                 astar_hackathon https://www.astar.network/blog/tag/hackathon
                 asobi_alibaba   https://asobi-hack.tokyo/
                 security_camp2024 https://www.security-camp.or.jp/
+                aichallenge_automotive  https://www.jsae.or.jp/jaaic/2023ver/
+                alcon           http://alcon.itlab.org/
             )
         }
     }
@@ -2750,6 +2754,7 @@ function pocket () {
         mlflow-docker-compose           https://github.com/sachua/mlflow-docker-compose
         tokoilab                        https://marina.sys.wakayama-u.ac.jp/~tokoi/
         perlin_noise                    https://postd.cc/understanding-perlin-noise/
+        hand_gesture                    https://blog.espressif.com/hand-gesture-recognition-on-esp32-s3-with-esp-deep-learning-176d7e13fd37
     )
     local target_=`array_fzf "${(k)reference_lst[*]}"`
     google-chrome $reference_lst[$target_]
