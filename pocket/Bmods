@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-03-10 14:55:48
+# LastModified: 2024-03-10 15:23:13
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -22,6 +22,19 @@ function pass () {
     #
 
     echo
+}
+
+#@
+function install_rgbds () {
+    #
+    # @Description  install rgbds
+    # @params       
+    # @Example
+    # @Reference    https://github.com/gbdev/rgbds
+    #               https://rgbds.gbdev.io
+    #
+
+    pass
 }
 
 #@
