@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-04-12 12:56:51
+# LastModified: 2024-04-27 10:49:42
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -37,6 +37,29 @@ function install_rgbds () {
     #
 
     pass
+}
+
+
+#@
+function blogs () {
+    #
+    # @Description  blogs platform
+    #               qiita
+    #               zenn
+    #               linkedin
+    #               medium
+    # @params       
+    # @Example      xxxxx
+    # @Reference    
+    #
+
+    
+    local -A reference_lst=(
+        linkedin    https://www.linkedin.com/help/linkedin/answer/a526048/-api?lang=ja-JP
+        zenn        https://zenn.dev/zenn/articles/install-zenn-cli
+        medium      https://mediumapi.com/
+        qiita       https://qiita.com/api/v2/docs
+    )
 }
 
 #@
@@ -96,6 +119,8 @@ function 2024_tactics () {
                 security_camp2024 https://www.security-camp.or.jp/
                 aichallenge_automotive  https://www.jsae.or.jp/jaaic/2023ver/
                 alcon           http://alcon.itlab.org/
+                ai_edge_contest https://www.meti.go.jp/policy/mono_info_service/joho/aiedge/index.html  # HOT!!!
+                bot_awards      https://lineapiusecase.com/ja/community/linedc-award-2024.html          # 5/17 deadline
             )
         }
     }
