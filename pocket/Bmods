@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-04-12 12:56:51
+# LastModified: 2024-05-16 13:38:54
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -96,6 +96,7 @@ function 2024_tactics () {
                 security_camp2024 https://www.security-camp.or.jp/
                 aichallenge_automotive  https://www.jsae.or.jp/jaaic/2023ver/
                 alcon           http://alcon.itlab.org/
+                統計データ分析コンペティション2024 https://www.nstac.go.jp/statcompe/?doing_wp_cron=1715834166.1315228939056396484375
             )
         }
     }
