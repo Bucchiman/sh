@@ -1,0 +1,60 @@
+#!/bin/zsh
+
+# Check if command is provided
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <command>"
+    exit 1
+fi
+
+# Command to run
+COMMAND="$@"
+
+# Log file
+LOG_FILE="occupancy.log"
+
+# Run the command and log occupancy
+($COMMAND & echo $! >&3) 3>pid | {
+    PID=$(<&3)
+    while kill -0 $PID >/dev/null 2>&1; do
+        # Get CPU occupancy
+        CPU_OCCUPANCY=$(mpstat 1 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12 }' | tail -n 1)
+
+        # Get GPU occupancy
+        GPU_OCCUPANCY=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | tail -n 1)
+
+        # Log occupancy to file
+        echo "$(date +%s), $CPU_OCCUPANCY, $GPU_OCCUPANCY" >> $LOG_FILE
+
+        # Wait for 0.5 seconds
+        sleep 0.5
+    done
+}
+
+# Process log file and create a graph
+# Example: use Python and Matplotlib
+python3 - <<EOF
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load data from log file
+try:
+    data = np.loadtxt("$LOG_FILE", delimiter=",")
+    if data.size > 0:
+        timestamps, cpu_occupancy, gpu_occupancy = data[:,0], data[:,1], data[:,2]
+
+        # Create a graph
+        plt.figure(figsize=(10, 6))
+        plt.plot(timestamps - timestamps[0], cpu_occupancy, label='CPU Occupancy (%)')
+        plt.plot(timestamps - timestamps[0], gpu_occupancy, label='GPU Occupancy (%)')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Occupancy (%)')
+        plt.title('CPU and GPU Occupancy Over Time')
+        plt.legend()
+        plt.grid(True)
+        plt.savefig('occupancy_graph.png')
+        plt.show()
+    else:
+        print("Log file is empty")
+except Exception as e:
+    print("Error processing log file:", e)
+EOF
