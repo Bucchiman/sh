@@ -1,0 +1,56 @@
+#!/bin/zsh
+
+# Function to log messages to a file
+log_message() {
+    local log_file="$1"
+    shift
+    local message="$*"
+    local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "${timestamp} - ${message}" >> "${log_file}"
+}
+
+# Function to log environment information
+log_env_info() {
+    local log_file="$1"
+    local mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
+    echo "OS: $(uname -s) $(uname -r)" >> "${log_file}"
+    echo "CPU: $(uname -p)" >> "${log_file}"
+    echo "Memory: $((mem_total / 1024 / 1024)) GB" >> "${log_file}"
+    echo "Process ID: $$" >> "${log_file}"
+    echo "Running start time: $(date +"%Y-%m-%d %H:%M:%S")" >> "${log_file}"
+    # Add more environment info here if needed
+}
+
+# Function to log CPU/GPU occupancy
+log_occupancy() {
+    local log_file="$1"
+    local cpu_count=$(nproc)
+    echo "CPU Count: ${cpu_count}" >> "${log_file}"
+    echo "CPU Occupancy: $(top -bn1 | awk 'NR>7{s+=$9} END {print s}') %" >> "${log_file}"
+    
+    if command -v nvidia-smi &> /dev/null; then
+        local gpu_count=$(nvidia-smi -L | wc -l)
+        echo "GPU Count: ${gpu_count}" >> "${log_file}"
+        echo "GPU Occupancy:" >> "${log_file}"
+        nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | awk '{print "GPU", NR-1, ": " $1 "%"}' >> "${log_file}"
+    fi
+}
+
+# Main script
+log_dir="/tmp/logs"
+current_date=`date "+%Y_%m_%d_%H_%M"`
+log_file="${log_dir}/${current_date}.log"
+
+
+mkdir -p "${log_dir}"
+touch "${log_file}"
+
+log_env_info "${log_file}"
+log_occupancy "${log_file}"
+log_message "${log_file}" "Command:" "$@"
+
+# Run the command and log its output
+"$@" >> "${log_file}" 2>&1
+
+# Log end time
+echo "Running end time: $(date +"%Y-%m-%d %H:%M:%S")" >> "${log_file}"

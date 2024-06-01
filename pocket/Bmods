@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-05-14 09:30:21
+# LastModified: 2024-06-01 13:59:43
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -118,11 +118,12 @@ function 2024_tactics () {
                 asobi_alibaba   https://asobi-hack.tokyo/                         # Quit
                 security_camp2024 https://www.security-camp.or.jp/                # ?
                 aichallenge_automotive  https://www.jsae.or.jp/jaaic/2023ver/     # HOT!!
-                alcon           http://alcon.itlab.org/
+                alcon           http://alcon.itlab.org/                             # 06/28 受付スタート
                 signate_career_cup  https://signate.jp/                           # HOT!!
                 nishika_2024_spring https://nishika.com                           # HOT!!
                 ai_edge_contest https://www.meti.go.jp/policy/mono_info_service/joho/aiedge/index.html  # HOT!!!
                 bot_awards      https://lineapiusecase.com/ja/community/linedc-award-2024.html          # 5/17 deadline
+                統計データ分析コンペティション2024 https://www.nstac.go.jp/statcompe/?doing_wp_cron=1715834166.1315228939056396484375
             )
         }
     }
