@@ -1,7 +1,15 @@
 #!/bin/zsh
+#
+# FileName:     RUN
+# Author:       8ucchiman
+# CreatedDate:  2024-06-03 11:30:33
+# LastModified: 2024-06-03 11:41:53
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
 
 # Function to log messages to a file
-log_message() {
+function log_message () {
     local log_file="$1"
     shift
     local message="$*"
@@ -10,7 +18,7 @@ log_message() {
 }
 
 # Function to log environment information
-log_env_info() {
+function log_env_info () {
     local log_file="$1"
     local mem_total=$(awk '/MemTotal/ {print $2}' /proc/meminfo)
     echo "OS: $(uname -s) $(uname -r)" >> "${log_file}"
@@ -22,7 +30,7 @@ log_env_info() {
 }
 
 # Function to log CPU/GPU occupancy
-log_occupancy() {
+function log_occupancy () {
     local log_file="$1"
     local cpu_count=$(nproc)
     echo "CPU Count: ${cpu_count}" >> "${log_file}"
@@ -38,7 +46,7 @@ log_occupancy() {
 
 # Main script
 log_dir="/tmp/logs"
-current_date=`date "+%Y_%m_%d_%H_%M"`
+current_date=`date "+%Y_%m_%d_%H_%M_%S"`
 log_file="${log_dir}/${current_date}.log"
 
 
@@ -47,10 +55,11 @@ touch "${log_file}"
 
 log_env_info "${log_file}"
 log_occupancy "${log_file}"
+if [[ $@ != "" ]]; then
 log_message "${log_file}" "Command:" "$@"
-
 # Run the command and log its output
 "$@" >> "${log_file}" 2>&1
+fi
 
 # Log end time
 echo "Running end time: $(date +"%Y-%m-%d %H:%M:%S")" >> "${log_file}"
