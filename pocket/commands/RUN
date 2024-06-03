@@ -3,7 +3,7 @@
 # FileName:     RUN
 # Author:       8ucchiman
 # CreatedDate:  2024-06-03 11:30:33
-# LastModified: 2024-06-03 11:41:53
+# LastModified: 2024-06-03 12:02:48
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
@@ -44,22 +44,29 @@ function log_occupancy () {
     fi
 }
 
-# Main script
-log_dir="/tmp/logs"
-current_date=`date "+%Y_%m_%d_%H_%M_%S"`
-log_file="${log_dir}/${current_date}.log"
 
 
-mkdir -p "${log_dir}"
-touch "${log_file}"
+function main () {
+    # Main script
+    log_dir="/tmp/logs"
+    current_date=`date "+%Y_%m_%d_%H_%M_%S"`
+    log_file="${log_dir}/${current_date}.log"
 
-log_env_info "${log_file}"
-log_occupancy "${log_file}"
-if [[ $@ != "" ]]; then
-log_message "${log_file}" "Command:" "$@"
-# Run the command and log its output
-"$@" >> "${log_file}" 2>&1
-fi
 
-# Log end time
-echo "Running end time: $(date +"%Y-%m-%d %H:%M:%S")" >> "${log_file}"
+    mkdir -p "${log_dir}"
+    touch "${log_file}"
+
+    log_env_info "${log_file}"
+    log_occupancy "${log_file}"
+    if [[ $@ != "" ]]; then
+    log_message "${log_file}" "Command:" "$@"
+    # Run the command and log its output
+    "$@" >> "${log_file}" 2>&1
+    fi
+
+    # Log end time
+    echo "Running end time: $(date +"%Y-%m-%d %H:%M:%S")" >> "${log_file}"
+}
+
+# eval $@
+main $@
