@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-05-24 13:58:54
+# LastModified: 2024-05-31 11:53:21
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -24,6 +24,19 @@ function pass () {
     #
 
     echo
+}
+
+
+#@ install
+function install_rocker () {
+    #
+    # @Description  install rocker
+    # @params       
+    # @Example      install_rocker
+    # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
+    #
+
+    pip install rocker
 }
 
 #@
