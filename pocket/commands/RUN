@@ -3,7 +3,7 @@
 # FileName:     RUN
 # Author:       8ucchiman
 # CreatedDate:  2024-06-03 11:30:33
-# LastModified: 2024-06-03 13:00:27
+# LastModified: 2024-06-10 11:00:07
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
@@ -14,7 +14,7 @@ function log_message () {
     shift
     local message="$*"
     local timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-    echo "${timestamp} - ${message}" tee -a "${log_file}"
+    echo "${timestamp} - ${message}" | tee -a "${log_file}"
 }
 
 # Function to log environment information
@@ -27,7 +27,6 @@ function log_env_info () {
         echo "CPU: $(uname -p)"
         echo "Memory: $((mem_total / 1024 / 1024)) GB"
         echo "Process ID: $$"
-        echo "Running start time: $(date +"%Y-%m-%d %H:%M:%S")"
     } | tee -a "${log_file}"
 }
 
@@ -40,7 +39,6 @@ function log_occupancy () {
         echo "CPU Occupancy: $(top -bn1 | awk 'NR>7{s+=$9} END {print s}') %"
     } | tee -a "${log_file}"
 
-    
     if command -v nvidia-smi &> /dev/null; then
         gpu_count=$(nvidia-smi --query-gpu=name --format=csv,noheader | wc -l)
         # Loop through each GPU and get the required information
@@ -58,8 +56,6 @@ function log_occupancy () {
                 echo "ID: $i GPU($name), Total memory[$total MiB]"
                 echo "    $used MiB / $total MiB ($occupancy % occupancy)"
             } | tee -a "${log_file}"
-
-
         done
         # Get CUDA version
         cuda_version=$(nvcc --version | grep -o "release [0-9.]*" | awk '{print $2}')
@@ -67,29 +63,55 @@ function log_occupancy () {
     fi
 }
 
-
+function timestamp_to_milliseconds() {
+    local timestamp="$1"
+    date -d "$timestamp" +%s%3N
+}
 
 function main () {
+    # Parse arguments
+    local pick=false
+    local cmd_args=()
+    for arg in "$@"; do
+        if [[ "$arg" == "--pick" ]]; then
+            pick=true
+        else
+            cmd_args+=("$arg")
+        fi
+    done
+
     # Main script
     log_dir="/tmp/logs"
     current_date=`date "+%Y_%m_%d_%H_%M_%S"`
     log_file="${log_dir}/${current_date}.log"
-
-
     mkdir -p "${log_dir}"
     touch "${log_file}"
-
     log_env_info "${log_file}"
     log_occupancy "${log_file}"
-    if [[ $@ != "" ]]; then
-    log_message "${log_file}" "Command:" "$@"
-    # Run the command and log its output
-    "$@" 2>&1 | tee -a "${log_file}"
+    if [[ "${#cmd_args[@]}" -ne 0 ]]; then
+        log_message "${log_file}" "Command:" "${cmd_args[@]}"
+        start_time=$(date +"%Y-%m-%d %H:%M:%S.%3N")
+        echo "Running start time: $start_time" | tee -a "${log_file}"
+        # Run the command and log its output
+        "${cmd_args[@]}" 2>&1 | tee -a "${log_file}"
+        end_time=$(date +"%Y-%m-%d %H:%M:%S.%3N")
     fi
-
     # Log end time
-    echo "Running end time: $(date +"%Y-%m-%d %H:%M:%S")" | tee -a "${log_file}"
+    echo "Running end time: $end_time" | tee -a "${log_file}"
+
+    # Calculate and log the time elapsed
+    start_milliseconds=$(timestamp_to_milliseconds "$start_time")
+    end_milliseconds=$(timestamp_to_milliseconds "$end_time")
+    elapsed_milliseconds=$((end_milliseconds - start_milliseconds))
+    elapsed_time=$(printf "%d.%03d seconds" $((elapsed_milliseconds/1000)) $((elapsed_milliseconds%1000)))
+    echo "Time elapsed: $elapsed_time" | tee -a "${log_file}"
+
+    # Copy log file to ./logs/ if --pick is specified
+    if $pick; then
+        mkdir -p "./logs"
+        cp "${log_file}" "./logs/"
+    fi
 }
 
 # eval $@
-main $@
+main "$@"
