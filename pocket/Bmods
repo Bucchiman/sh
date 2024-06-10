@@ -369,7 +369,7 @@ function __full_packages () {
     if ! _has fnm; then setup_nodejs install_fnm; fi
     if ! _has dbxcli; then install_dropbox; fi
     if ! _has dust; then install_dust; fi
-    if ! _has catimg; then install_catimg; fi
+    #if ! _has catimg; then install_catimg; fi
     if ! _has delta; then install_delta; fi
     if ! _has lazygit; then install_lazygit; fi
     #if ! _has mdcat; then install_markdown; fi
@@ -481,6 +481,8 @@ function __minimum_packages () {
     # @Reference    https://qiita.com/egawa_kun/items/714394609eef6be8e0bf
     #
 
+    set -ex
+    sudo apt install -y curl build-essential cmake    #  https://stackoverflow.com/questions/52445961/how-do-i-fix-the-rust-error-linker-cc-not-found-for-debian-on-windows-10
     if ! _has cargo; then install_rust; fi
     if ! _has go; then install_go; fi
     if ! _has fzf; then install_fzf; fi
