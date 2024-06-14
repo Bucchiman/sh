@@ -3,10 +3,14 @@
 # FileName:     RUN
 # Author:       8ucchiman
 # CreatedDate:  2024-06-03 11:30:33
-# LastModified: 2024-06-10 11:00:07
+# LastModified: 2024-06-13 13:48:24
 # Reference:    8ucchiman.jp
 # Description:  ---
+# CHANGELOG:
+#               2024-06-13 13:30:50     return log file
+#               2024-06-13 13:12:52     add suffix option
 #
+
 
 # Function to log messages to a file
 function log_message () {
@@ -71,19 +75,29 @@ function timestamp_to_milliseconds() {
 function main () {
     # Parse arguments
     local pick=false
+    local suffix=""
     local cmd_args=()
-    for arg in "$@"; do
-        if [[ "$arg" == "--pick" ]]; then
-            pick=true
-        else
-            cmd_args+=("$arg")
-        fi
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --pick)
+                pick=true
+                shift
+                ;;
+            --suffix)
+                suffix="_$2"
+                shift 2
+                ;;
+            *)
+                cmd_args+=("$1")
+                shift
+                ;;
+        esac
     done
 
     # Main script
     log_dir="/tmp/logs"
-    current_date=`date "+%Y_%m_%d_%H_%M_%S"`
-    log_file="${log_dir}/${current_date}.log"
+    current_date=$(date "+%Y_%m_%d_%H_%M_%S")
+    log_file="${log_dir}/${current_date}${suffix}.log"
     mkdir -p "${log_dir}"
     touch "${log_file}"
     log_env_info "${log_file}"
@@ -111,6 +125,9 @@ function main () {
         mkdir -p "./logs"
         cp "${log_file}" "./logs/"
     fi
+
+    # Print the log file path
+    echo "Log file created at: ${log_file}"
 }
 
 # eval $@
