@@ -1,4 +1,14 @@
-#!/bin/zsh
+#!/bin/bash
+#
+# FileName:     TRACE
+# Author:       8ucchiman
+# CreatedDate:  2024-06-18 14:27:07
+# LastModified: 2024-06-18 15:50:31
+# Reference:    8ucchiman.jp
+# Description:
+# CHANGELOG:    fix bug
+#
+
 
 # Check if command is provided
 if [ $# -eq 0 ]; then
@@ -12,29 +22,61 @@ COMMAND="$@"
 # Log file
 LOG_FILE="occupancy.log"
 
+# Clean up previous log file if it exists
+rm -f $LOG_FILE
+touch $LOG_FILE
+
+# Initialize variables for max memory usage
+MAX_MEM_USAGE=0
+MAX_MEM_TOTAL=0
+
 # Run the command and log occupancy
-($COMMAND & echo $! >&3) 3>pid | {
-    PID=$(<&3)
-    while kill -0 $PID >/dev/null 2>&1; do
-        # Get CPU occupancy
-        CPU_OCCUPANCY=$(mpstat 1 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12 }' | tail -n 1)
+$COMMAND &
+PID=$!
+if [ -z "$PID" ]; then
+    echo "Failed to start command."
+    exit 1
+fi
 
-        # Get GPU occupancy
-        GPU_OCCUPANCY=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | tail -n 1)
+while kill -0 $PID >/dev/null 2>&1; do
+    # Get CPU occupancy
+    CPU_OCCUPANCY=$(mpstat 1 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12 }' | tail -n 1)
 
-        # Log occupancy to file
-        echo "$(date +%s), $CPU_OCCUPANCY, $GPU_OCCUPANCY" >> $LOG_FILE
+    # Get GPU occupancy
+    GPU_OCCUPANCY=$(nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits | tail -n 1)
 
-        # Wait for 0.5 seconds
-        sleep 0.5
-    done
-}
+    # Get GPU memory usage and total memory
+    GPU_MEM_USAGE=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits | sort -n | tail -n 1)
+    GPU_MEM_TOTAL=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits | sort -n | tail -n 1)
+
+    # Log occupancy to file
+    echo "$(date +%s), $CPU_OCCUPANCY, $GPU_OCCUPANCY" >> $LOG_FILE
+
+    # Update max memory usage if necessary
+    if [ $GPU_MEM_USAGE -gt $MAX_MEM_USAGE ]; then
+        MAX_MEM_USAGE=$GPU_MEM_USAGE
+    fi
+    if [ $GPU_MEM_TOTAL -gt $MAX_MEM_TOTAL ]; then
+        MAX_MEM_TOTAL=$GPU_MEM_TOTAL
+    fi
+
+    # Wait for 0.5 seconds
+    sleep 0.5
+done
+
+# Log maximum memory usage to file
+# echo "Max GPU Memory Usage: $MAX_MEM_USAGE / $MAX_MEM_TOTAL" >> $LOG_FILE
 
 # Process log file and create a graph
-# Example: use Python and Matplotlib
 python3 - <<EOF
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
+# Check if log file exists
+if not os.path.exists("$LOG_FILE"):
+    print("Error: Log file not found.")
+    exit(1)
 
 # Load data from log file
 try:
@@ -51,8 +93,9 @@ try:
         plt.title('CPU and GPU Occupancy Over Time')
         plt.legend()
         plt.grid(True)
+        plt.text(0, 100, f"GPU Memory Usage: $MAX_MEM_USAGE / $MAX_MEM_TOTAL", fontsize=8, verticalalignment='top', horizontalalignment='left', color='black', bbox=dict(facecolor='white', alpha=0.5))
         plt.savefig('occupancy_graph.png')
-        plt.show()
+        # plt.show()
     else:
         print("Log file is empty")
 except Exception as e:
