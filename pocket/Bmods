@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-06-27 23:54:28
+# LastModified: 2024-06-27 23:56:03
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -123,22 +123,22 @@ function 2024_tactics () {
     function event () {
         function reference () {
             local -A reference_lst=(
-                hackathon_kyoto https://connpass.com/event/289901/                # Done
-                giftech         https://giftech.io/giftech2024spring/             # Quit
-                qiitahachathon  https://increments.connpass.com/event/305013/     # Done
-                tokyoaisaihackathon https://www.aisai.tokyo/hanckthon-page        # Done
-                astar_hackathon https://www.astar.network/blog/tag/hackathon      # Quit
-                asobi_alibaba   https://asobi-hack.tokyo/                         # Quit
-                security_camp2024 https://www.security-camp.or.jp/                # ?
-                aichallenge_automotive  https://www.jsae.or.jp/jaaic/2023ver/     # HOT!!
-                alcon           http://alcon.itlab.org/                             # 06/28 受付スタート
-                signate_career_cup  https://signate.jp/                           # HOT!!
-                nishika_2024_spring https://nishika.com                           # HOT!!
-                ai_edge_contest https://www.meti.go.jp/policy/mono_info_service/joho/aiedge/index.html  # HOT!!!
-                bot_awards      https://lineapiusecase.com/ja/community/linedc-award-2024.html          # 5/17 deadline Quit
-                統計データ分析コンペティション2024 https://www.nstac.go.jp/statcompe/?doing_wp_cron=1715834166.1315228939056396484375    # 08/30 Deadline
-                都知事杯OpenDataHackathon https://odhackathon.metro.tokyo.lg.jp/  # deadline 06/28
-                seccon2024      https://www.seccon.jp/13/seccon_beginners/content.html     # 06/08 受付スタート 06/15,06/16
+                hackathon_kyoto                     https://connpass.com/event/289901/                                                  # Done
+                giftech                             https://giftech.io/giftech2024spring/                                               # Quit
+                qiitahachathon                      https://increments.connpass.com/event/305013/                                       # Done
+                tokyoaisaihackathon                 https://www.aisai.tokyo/hanckthon-page                                              # Done
+                astar_hackathon                     https://www.astar.network/blog/tag/hackathon                                        # Quit
+                asobi_alibaba                       https://asobi-hack.tokyo/                                                           # Quit
+                security_camp2024                   https://www.security-camp.or.jp/                                                    # ?
+                aichallenge_automotive              https://www.jsae.or.jp/jaaic/2023ver/                                               # HOT!!
+                alcon                               http://alcon.itlab.org/                                                             # 06/28 受付スタート
+                signate_career_cup                  https://signate.jp/                                                                 # HOT!!
+                nishika_2024_spring                 https://nishika.com                                                                 # HOT!!
+                ai_edge_contest                     https://www.meti.go.jp/policy/mono_info_service/joho/aiedge/index.html              # HOT!!!
+                bot_awards                          https://lineapiusecase.com/ja/community/linedc-award-2024.html                      # 5/17 deadline
+                統計データ分析コンペティション2024  https://www.nstac.go.jp/statcompe/?doing_wp_cron=1715834166.1315228939056396484375  # 08/30 Deadline
+                都知事杯OpenDataHackathon           https://odhackathon.metro.tokyo.lg.jp/                                              # deadline 06/28
+                seccon_2024_beginners               https://www.seccon.jp/13/seccon_beginners/content.html                              # start 06/14
             )
         }
     }
@@ -579,7 +579,7 @@ function install_ros2 () {
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
-    export ROS_DISTRO=humble
+    export ROS_DISTRO=jazzy     # humble
     sudo apt install -y ros-$ROS_DISTRO-desktop \
                         python3-colcon-common-extensions \
                         python3-rosdep \
