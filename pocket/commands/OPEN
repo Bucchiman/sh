@@ -1,0 +1,20 @@
+#!/usr/bin/zsh
+#
+# FileName:     OPEN
+# Author:       8ucchiman
+# CreatedDate:  2024-06-08 15:26:47
+# LastModified: 2024-06-08 15:26:47
+# Reference:    8ucchiman.jp
+# Description:  ---
+#
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS
+    open "$@"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    # Ubuntu
+    eog "$@"
+else
+    echo "Unsupported OS: $OSTYPE"
+    exit 1
+fi

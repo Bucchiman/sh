@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-06-02 15:20:35
+# LastModified: 2024-06-06 18:57:56
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -122,9 +122,10 @@ function 2024_tactics () {
                 signate_career_cup  https://signate.jp/                           # HOT!!
                 nishika_2024_spring https://nishika.com                           # HOT!!
                 ai_edge_contest https://www.meti.go.jp/policy/mono_info_service/joho/aiedge/index.html  # HOT!!!
-                bot_awards      https://lineapiusecase.com/ja/community/linedc-award-2024.html          # 5/17 deadline
+                bot_awards      https://lineapiusecase.com/ja/community/linedc-award-2024.html          # 5/17 deadline Quit
                 統計データ分析コンペティション2024 https://www.nstac.go.jp/statcompe/?doing_wp_cron=1715834166.1315228939056396484375    # 08/30 Deadline
                 都知事杯OpenDataHackathon https://odhackathon.metro.tokyo.lg.jp/  # deadline 06/28
+                seccon2024      https://www.seccon.jp/13/seccon_beginners/content.html     # 06/08 受付スタート 06/15,06/16
             )
         }
     }
@@ -135,6 +136,21 @@ function 2024_tactics () {
     }
 
 
+}
+
+#@ install
+function install_nvidia_driver () {
+    #
+    # @Description  
+    # @params       
+    # @Example
+    # @Reference    https://www.liberiangeek.net/2024/04/install-cuda-on-ubuntu-24-04/
+    #
+
+    lspci | grep -i nvidia
+    sudo ubuntu-drivers devices
+    sudo apt install -y nvidia-drivers-535
+    sudo apt auto-install
 }
 
 #@ jetson
