@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-06-27 23:56:03
+# LastModified: 2024-06-28 21:40:16
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -382,14 +382,21 @@ function __full_packages () {
 
     __minimum_packages
     if ! _has lldb; then install_lldb; fi
+    rehash
     if ! _has fnm; then setup_nodejs install_fnm; fi
+    rehash
     if ! _has dbxcli; then install_dropbox; fi
+    rehash
     if ! _has dust; then install_dust; fi
+    rehash
     #if ! _has catimg; then install_catimg; fi
     if ! _has delta; then install_delta; fi
+    rehash
     if ! _has lazygit; then install_lazygit; fi
+    rehash
     #if ! _has mdcat; then install_markdown; fi
     if ! _has clasp; then install_google_script; fi
+    rehash
     ln -sf ${DOTFILES}/Bmods $HOME/Bmods
     ln -sf ${DOTFILES}/Bmain $HOME/Bmain
 }
@@ -500,11 +507,17 @@ function __minimum_packages () {
     set -ex
     sudo apt install -y curl build-essential cmake    #  https://stackoverflow.com/questions/52445961/how-do-i-fix-the-rust-error-linker-cc-not-found-for-debian-on-windows-10
     if ! _has cargo; then install_rust; fi
+    rehash
     if ! _has go; then install_go; fi
+    rehash
     if ! _has fzf; then install_fzf; fi
+    rehash
     if ! _has bat; then install_bat; fi
+    rehash
     if ! _has exa; then install_exa; fi
+    rehash
     if ! _has starthip; then install_starship; fi
+    rehash
 }
 
 #@ install
