@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-04-12 12:56:51
+# LastModified: 2024-07-04 23:04:21
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -26,6 +26,40 @@ function pass () {
     echo
 }
 
+#@ install
+function install_docker () {
+    #
+    # @Description  install docker on ubuntu
+    # @params       
+    # @Example      install_docker
+    # @Reference    https://qiita.com/DQNEO/items/da5df074c48b012152ee
+    #               https://docs.docker.com/engine/install/ubuntu/
+    #
+    # Add Docker's official GPG key:
+    sudo apt-get update
+    sudo apt-get install -y ca-certificates curl
+    sudo install -m 0755 -d /etc/apt/keyrings
+    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+    sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+    # Add the repository to Apt sources:
+    echo \
+      "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+      $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+      sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+
+    sudo groupadd docker
+
+    sudo gpasswd -a $USER docker
+
+    sudo systemctl restart docker
+
+}
+
 #@
 function install_rgbds () {
     #
@@ -37,6 +71,24 @@ function install_rgbds () {
     #
 
     pass
+}
+
+
+function install_picoprobe () {
+    #
+    # @Description  pico debugger
+    # @params       
+    # @Example
+    # @Reference    
+    #
+
+    sudo apt install -y automake autoconf build-essential texinfo libtool libftdi-dev libusb-1.0-0-dev minicom
+    git clone https://github.com/raspberrypi/openocd.git --branch rp2040-v0.12.0 --depth=1
+    cd openocd
+    ./bootstrap
+    ./configure
+    make -j4
+    sudo make install
 }
 
 #@
@@ -1193,8 +1245,8 @@ function 4others () {
     # @Reference    
     #
 
-    mkdir -p /tmp/8bin
-    /bin/rsync -rav --delete $HOME/dotfiles/ /tmp/8bin/
+    mkdir -p /tmp/bucchiman
+    /bin/rsync -rav --delete $HOME/dotfiles /tmp/bucchiman/dotfiles
     #ln -sf $HOME/Bmods /tmp/8bin
     #ln -sf $HOME/Bmain /tmp/8bin
     #ln -sf $HOME/bin /tmp/8bin
@@ -3821,6 +3873,35 @@ function help_rsync () {
     echo "--size-only               サイズが同じファイルは処理しない"
     echo "-c | --checksum           更新日とサイズではなく、チェックサムで変更の有無をチェックする"
     echo "--daemon                  デーモンとして動作（「--daemon --help」でデーモン時に使用できるオプションが確認できる）"
+}
+
+#@ educ
+function rsync_educ () {
+    #
+    # @Description  education of rsync
+    # @params       
+    # @Example      rsync_educ .
+    # @Reference    
+    #
+
+    set -x
+    mkdir -p /tmp/educ/rsync
+    cd $_
+    #@ nest
+    function type01 () {
+        mkdir -p type01
+        cd $_
+        mkdir -p from/from_subA to/
+        cp $HOME/dotfiles/.config/sample/text/sample.txt from/A.txt
+        cp $HOME/dotfiles/.config/sample/text/sample.txt from/from_subA/AA.txt
+        rsync -av from/ to/
+    }
+
+    #@ nest
+    function clean () {
+        rm -r *
+    }
+    type01
 }
 
 #@ python
