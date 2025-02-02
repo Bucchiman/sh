@@ -3,7 +3,7 @@
 # FileName:     {{_file_name_}}
 # Author:       {{_author_}}
 # CreatedDate:  {{_date_}}
-# LastModified: 2023-01-23 14:11:45 +0900
+# LastModified: 2024-07-02 09:33:59
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
@@ -114,7 +114,8 @@ function main01 () {
     if [[ $@ == "" ]]; then
         default
     elif [[ $@ == "." ]]; then
-        local target_func=`choose_local_function $BASE_DIR/Brun`
+        # local target_func=`choose_local_function $BASE_DIR/Brun`
+        local target_func=`choose_local_function $BASE_DIR/local`
         eval $target_func
     else
         eval $@
