@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2024-06-27 23:56:03
+# LastModified: 2024-09-08 15:46:01
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -37,6 +37,18 @@ function install_rocker () {
     #
 
     pip install rocker
+}
+
+#@
+function install_jira () {
+    #
+    # @Description  jira is task manager
+    # @params       
+    # @Example
+    # @Reference    https://8ucchiman.atlassian.net/jira/your-work
+    #
+    sudo port selfupdate
+    sudo port install jira-cli
 }
 
 #@
@@ -411,6 +423,19 @@ function raspi_pico () {
         #
 
         curl -O https://micropython.org/download/rp2-pico/rp2-pico-latest.uf2
+    }
+    function raspi_setup () {
+        #
+        # @Description  command a & command b
+        #               background command a
+        #               foreground command b
+        # @params       : command a
+        #               : command b
+        # @Example
+        # @Reference    https://kamuycikap.hatenablog.com/entry/2021/09/12/001639
+        #
+
+        wget https://raw.githubusercontent.com/raspberrypi/pico-setup/master/pico_setup.sh
     }
 }
 
