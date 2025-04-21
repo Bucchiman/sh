@@ -26,6 +26,11 @@ function pass () {
     echo
 }
 
+function __project () {
+    ln -sf $HOME/.config/lib/codes/shell/pocket/Brun .
+    cp $HOME/.config/lib/codes/shell/pocket/local .
+}
+
 #@ install
 function install_pyenv () {
     git clone https://github.com/pyenv/pyenv.git ~/.pyenv
@@ -2782,6 +2787,7 @@ function install_system () {
 #@ install repl c
 function install_repl_c () {
     #
+    # @ TOOO OLD
     # @Description  interactive mode cling
     # @params       
     # @Example      install_cling
@@ -2789,12 +2795,23 @@ function install_repl_c () {
     #               https://root.cern/cling/cling_build_instructions/
     #
 
+    # mkdir -p $HOME/source/cling; cd $_
+    # wget https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
+    # chmod u+x clone.sh
+    # ./clone.sh
+    # ln -sf $PWD/build/bin/cling $HOME/bin/cling
+    # ln -sf $PWD/build/bin/cling $HOME/bin/root
+
     mkdir -p $HOME/source/cling; cd $_
-    wget https://raw.github.com/Axel-Naumann/cling-all-in-one/master/clone.sh
-    chmod u+x clone.sh
-    ./clone.sh
+    git clone https://github.com/root-project/llvm-project.git
+    cd llvm-project
+    git checkout cling-latest
+    cd ..
+    git clone https://github.com/root-project/cling.git
+    mkdir cling-build && cd cling-build
+    cmake -DLLVM_EXTERNAL_PROJECTS=cling -DLLVM_EXTERNAL_CLING_SOURCE_DIR=../cling/ -DLLVM_ENABLE_PROJECTS="clang" -DLLVM_TARGETS_TO_BUILD="host;NVPTX" -DCMAKE_BUILD_TYPE=Release ../llvm-project/llvm
+    cmake --build . --target cling
     ln -sf $PWD/build/bin/cling $HOME/bin/cling
-    ln -sf $PWD/build/bin/cling $HOME/bin/root
 }
 
 function init_wsl () {

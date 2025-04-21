@@ -80,7 +80,7 @@ function build () {
 
 #@ archive
 function run () {
-    lrun
+    lrun $@
 }
 
 #@ archive
@@ -101,7 +101,7 @@ function default () {
     echo "this is default setting"
     echo "you can run this function without no arguments."
     #build
-    run
+    run $@
 }
 
 
