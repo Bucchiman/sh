@@ -473,11 +473,11 @@ function __full_packages () {
     #if ! _has catimg; then install_catimg; fi
     if ! _has delta; then install_delta; fi
     rehash
-    if ! _has lazygit; then install_lazygit; fi
-    rehash
+    # if ! _has lazygit; then install_lazygit; fi
+    # rehash
     #if ! _has mdcat; then install_markdown; fi
-    if ! _has clasp; then install_google_script; fi
-    rehash
+    # if ! _has clasp; then install_google_script; fi
+    # rehash
     ln -sf ${DOTFILES}/Bmods $HOME/Bmods
     ln -sf ${DOTFILES}/Bmain $HOME/Bmain
 }
@@ -602,16 +602,22 @@ function __minimum_packages () {
     sudo apt install -y curl build-essential cmake    #  https://stackoverflow.com/questions/52445961/how-do-i-fix-the-rust-error-linker-cc-not-found-for-debian-on-windows-10
     if ! _has cargo; then install_rust; fi
     rehash
+    hash -r
     if ! _has go; then install_go; fi
     rehash
+    hash -r
     if ! _has fzf; then install_fzf; fi
     rehash
+    hash -r
     if ! _has bat; then install_bat; fi
     rehash
+    hash -r
     if ! _has exa; then install_exa; fi
     rehash
+    hash -r
     if ! _has starthip; then install_starship; fi
     rehash
+    hash -r
 }
 
 #@ install
