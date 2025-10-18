@@ -62,6 +62,11 @@ function create_devbox () {
 }
 
 #@
+function init () {
+    linit
+}
+
+#@
 function open () {
     lopen
 }
