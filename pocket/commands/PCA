@@ -1,0 +1,438 @@
+#!/bin/bash
+
+# PC Upgrade Analyzer
+# システムスペックを分析し、アップグレード提案を行うスクリプト
+
+set -e
+
+# 色の定義
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# 出力関数
+print_header() {
+    echo -e "\n${BOLD}${BLUE}========================================${NC}"
+    echo -e "${BOLD}${BLUE}$1${NC}"
+    echo -e "${BOLD}${BLUE}========================================${NC}\n"
+}
+
+print_section() {
+    echo -e "\n${BOLD}${CYAN}## $1${NC}\n"
+}
+
+print_good() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_alert() {
+    echo -e "${RED}🔴 $1${NC}"
+}
+
+print_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+# スコアリング用の変数
+CPU_SCORE=0
+MEMORY_SCORE=0
+STORAGE_SCORE=0
+UPGRADE_PRIORITY=()
+
+# ========================================
+# システム情報収集
+# ========================================
+
+print_header "PC スペック & アップグレード分析"
+
+# 1. CPU情報
+print_section "1. CPU情報"
+
+CPU_MODEL=$(lscpu | grep "Model name:" | cut -d: -f2 | xargs)
+CPU_CORES=$(lscpu | grep "^Core(s) per socket:" | awk '{print $4}')
+CPU_THREADS=$(lscpu | grep "^Thread(s) per core:" | awk '{print $4}')
+CPU_TOTAL_THREADS=$((CPU_CORES * CPU_THREADS))
+CPU_MAX_MHZ=$(lscpu | grep "CPU max MHz:" | awk '{print $4}' | cut -d. -f1)
+
+echo "CPU: ${CPU_MODEL}"
+echo "コア数: ${CPU_CORES}コア / ${CPU_TOTAL_THREADS}スレッド"
+echo "最大クロック: ${CPU_MAX_MHZ} MHz"
+
+# CPUスコア判定
+if [ "$CPU_CORES" -lt 4 ]; then
+    print_alert "コア数が少ない (${CPU_CORES}コア) - マルチタスクに制限あり"
+    CPU_SCORE=3
+elif [ "$CPU_CORES" -lt 8 ]; then
+    print_warning "コア数は標準的 (${CPU_CORES}コア)"
+    CPU_SCORE=1
+else
+    print_good "コア数は十分 (${CPU_CORES}コア)"
+    CPU_SCORE=0
+fi
+
+# 2. メモリ情報
+print_section "2. メモリ情報"
+
+MEMORY_TOTAL_KB=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+MEMORY_TOTAL_GB=$((MEMORY_TOTAL_KB / 1024 / 1024))
+MEMORY_AVAILABLE_KB=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
+MEMORY_AVAILABLE_GB=$((MEMORY_AVAILABLE_KB / 1024 / 1024))
+MEMORY_USED_GB=$((MEMORY_TOTAL_GB - MEMORY_AVAILABLE_GB))
+
+SWAP_TOTAL_KB=$(grep SwapTotal /proc/meminfo | awk '{print $2}')
+SWAP_FREE_KB=$(grep SwapFree /proc/meminfo | awk '{print $2}')
+SWAP_USED_KB=$((SWAP_TOTAL_KB - SWAP_FREE_KB))
+SWAP_USED_MB=$((SWAP_USED_KB / 1024))
+
+echo "総メモリ: ${MEMORY_TOTAL_GB} GB"
+echo "使用中: ${MEMORY_USED_GB} GB"
+echo "空き: ${MEMORY_AVAILABLE_GB} GB"
+echo "スワップ使用: ${SWAP_USED_MB} MB"
+
+# メモリスコア判定
+MEMORY_SCORE=0
+if [ "$MEMORY_TOTAL_GB" -lt 8 ]; then
+    print_alert "メモリが非常に少ない (${MEMORY_TOTAL_GB}GB) - 増設必須"
+    MEMORY_SCORE=5
+    UPGRADE_PRIORITY+=("メモリ増設:最優先")
+elif [ "$MEMORY_TOTAL_GB" -lt 16 ]; then
+    if [ "$SWAP_USED_MB" -gt 1000 ]; then
+        print_alert "メモリ不足 (${MEMORY_TOTAL_GB}GB) + スワップ使用大 (${SWAP_USED_MB}MB) - 早急に増設"
+        MEMORY_SCORE=4
+        UPGRADE_PRIORITY+=("メモリ増設:緊急")
+    elif [ "$SWAP_USED_MB" -gt 500 ]; then
+        print_warning "メモリやや不足 (${MEMORY_TOTAL_GB}GB) + スワップ使用中 (${SWAP_USED_MB}MB) - 増設推奨"
+        MEMORY_SCORE=3
+        UPGRADE_PRIORITY+=("メモリ増設:推奨")
+    else
+        print_warning "メモリは標準的 (${MEMORY_TOTAL_GB}GB)"
+        MEMORY_SCORE=1
+    fi
+elif [ "$MEMORY_TOTAL_GB" -lt 32 ]; then
+    if [ "$SWAP_USED_MB" -gt 500 ]; then
+        print_warning "メモリは十分だがスワップ使用中 (${SWAP_USED_MB}MB) - 増設を検討"
+        MEMORY_SCORE=2
+        UPGRADE_PRIORITY+=("メモリ増設:検討")
+    else
+        print_good "メモリは十分 (${MEMORY_TOTAL_GB}GB)"
+        MEMORY_SCORE=0
+    fi
+else
+    print_good "メモリは非常に十分 (${MEMORY_TOTAL_GB}GB)"
+    MEMORY_SCORE=0
+fi
+
+# スワップ活動状況を確認
+if [ "$SWAP_USED_MB" -gt 0 ]; then
+    echo ""
+    echo "スワップ活動状況を確認中..."
+    SWAP_IO=$(vmstat 1 3 | tail -1 | awk '{print $7,$8}')
+    SWAP_IN=$(echo $SWAP_IO | awk '{print $1}')
+    SWAP_OUT=$(echo $SWAP_IO | awk '{print $2}')
+
+    if [ "$SWAP_IN" -gt 100 ] || [ "$SWAP_OUT" -gt 100 ]; then
+        print_alert "スワップの入出力が頻繁 (si:${SWAP_IN} so:${SWAP_OUT}) - パフォーマンス低下中"
+        MEMORY_SCORE=$((MEMORY_SCORE + 2))
+    elif [ "$SWAP_IN" -gt 0 ] || [ "$SWAP_OUT" -gt 0 ]; then
+        print_warning "スワップの入出力あり (si:${SWAP_IN} so:${SWAP_OUT})"
+        MEMORY_SCORE=$((MEMORY_SCORE + 1))
+    else
+        print_info "スワップは静的（アクティブな入出力なし）"
+    fi
+fi
+
+# 3. ストレージ情報
+print_section "3. ストレージ情報"
+
+echo "=== 接続済みストレージ ==="
+lsblk -o NAME,SIZE,TYPE,MOUNTPOINT,FSTYPE,MODEL | grep -E "disk|part" | head -20
+
+# NVMe SSD確認
+NVME_COUNT=$(lsblk -d -o NAME,ROTA | grep "nvme" | wc -l)
+echo ""
+echo "NVMe SSD数: ${NVME_COUNT}"
+
+# SATA SSD/HDD確認
+SATA_SSD_COUNT=$(lsblk -d -o NAME,ROTA | grep "^sd" | awk '$2==0' | wc -l)
+SATA_HDD_COUNT=$(lsblk -d -o NAME,ROTA | grep "^sd" | awk '$2==1' | wc -l)
+echo "SATA SSD数: ${SATA_SSD_COUNT}"
+echo "SATA HDD数: ${SATA_HDD_COUNT}"
+
+# ディスク使用率
+echo ""
+echo "=== ディスク使用率 ==="
+df -h | grep -E "^/dev" | awk '{print $1 "\t" $2 "\t" $3 "\t" $5 "\t" $6}' | column -t
+
+# ストレージスコア判定
+STORAGE_SCORE=0
+if [ "$NVME_COUNT" -eq 0 ]; then
+    print_alert "NVMe SSDなし - 追加でパフォーマンス向上"
+    STORAGE_SCORE=3
+    UPGRADE_PRIORITY+=("NVMe SSD追加:推奨")
+elif [ "$NVME_COUNT" -eq 1 ]; then
+    print_info "NVMe SSD 1台 - 追加スロットがあればキャッシュ用に追加検討"
+    STORAGE_SCORE=1
+else
+    print_good "NVMe SSD ${NVME_COUNT}台 - 十分"
+    STORAGE_SCORE=0
+fi
+
+# ルートパーティションの使用率チェック
+ROOT_USAGE=$(df -h / | tail -1 | awk '{print $5}' | sed 's/%//')
+if [ "$ROOT_USAGE" -gt 80 ]; then
+    print_alert "ルートパーティション使用率が高い (${ROOT_USAGE}%) - 容量拡張必要"
+    STORAGE_SCORE=$((STORAGE_SCORE + 2))
+    UPGRADE_PRIORITY+=("ストレージ容量拡張:必要")
+elif [ "$ROOT_USAGE" -gt 70 ]; then
+    print_warning "ルートパーティション使用率がやや高い (${ROOT_USAGE}%)"
+    STORAGE_SCORE=$((STORAGE_SCORE + 1))
+fi
+
+# 4. GPU情報
+print_section "4. GPU情報"
+
+GPU_INFO=$(lspci | grep -E "VGA|3D|Display" | cut -d: -f3 | xargs)
+echo "GPU: ${GPU_INFO}"
+
+if echo "$GPU_INFO" | grep -qi "intel.*uhd\|intel.*hd"; then
+    print_info "内蔵GPU - ゲームや動画編集には専用GPU推奨"
+elif echo "$GPU_INFO" | grep -qi "nvidia\|amd.*radeon"; then
+    print_good "専用GPU搭載"
+else
+    print_info "GPU: ${GPU_INFO}"
+fi
+
+# 5. システム情報
+print_section "5. システム情報"
+
+# マシン名
+PRODUCT_NAME=$(cat /sys/class/dmi/id/product_name 2>/dev/null || echo "不明")
+BOARD_NAME=$(cat /sys/class/dmi/id/board_name 2>/dev/null || echo "不明")
+
+echo "製品名: ${PRODUCT_NAME}"
+echo "マザーボード: ${BOARD_NAME}"
+
+# OS情報
+OS_NAME=$(grep PRETTY_NAME /etc/os-release | cut -d'"' -f2)
+KERNEL_VERSION=$(uname -r)
+echo "OS: ${OS_NAME}"
+echo "カーネル: ${KERNEL_VERSION}"
+
+# ========================================
+# 負荷分析
+# ========================================
+
+print_section "6. 現在の負荷状況"
+
+# CPU使用率
+echo "CPU使用率（5秒間の平均）..."
+CPU_IDLE=$(vmstat 1 5 | tail -1 | awk '{print $15}')
+CPU_USAGE=$((100 - CPU_IDLE))
+echo "CPU使用率: ${CPU_USAGE}%"
+
+if [ "$CPU_USAGE" -gt 80 ]; then
+    print_alert "CPU使用率が高い (${CPU_USAGE}%) - CPU負荷が高い"
+elif [ "$CPU_USAGE" -gt 50 ]; then
+    print_warning "CPU使用率がやや高い (${CPU_USAGE}%)"
+else
+    print_good "CPU使用率は正常 (${CPU_USAGE}%)"
+fi
+
+# メモリプレッシャー
+MEMORY_PRESSURE=$((MEMORY_USED_GB * 100 / MEMORY_TOTAL_GB))
+echo "メモリ使用率: ${MEMORY_PRESSURE}%"
+
+if [ "$MEMORY_PRESSURE" -gt 90 ]; then
+    print_alert "メモリプレッシャーが非常に高い (${MEMORY_PRESSURE}%)"
+elif [ "$MEMORY_PRESSURE" -gt 75 ]; then
+    print_warning "メモリプレッシャーが高い (${MEMORY_PRESSURE}%)"
+else
+    print_good "メモリ使用率は正常 (${MEMORY_PRESSURE}%)"
+fi
+
+# トッププロセス
+echo ""
+echo "=== メモリ使用上位プロセス ==="
+ps aux --sort=-%mem | head -6 | awk '{printf "%-20s %5s%% %10s\n", $11, $4, $6}'
+
+# ========================================
+# アップグレード提案
+# ========================================
+
+print_header "アップグレード提案"
+
+TOTAL_SCORE=$((MEMORY_SCORE * 3 + CPU_SCORE * 2 + STORAGE_SCORE))
+
+# 優先順位付け
+echo -e "${BOLD}優先順位（スコア: ${TOTAL_SCORE}）${NC}\n"
+
+if [ ${#UPGRADE_PRIORITY[@]} -eq 0 ]; then
+    print_good "現在のスペックは十分です。アップグレードの必要性は低いです。"
+else
+    echo "推奨されるアップグレード（優先順位順）:"
+    echo ""
+
+    # 配列をソート（優先度の高い順）
+    IFS=$'\n' sorted=($(sort -r <<<"${UPGRADE_PRIORITY[*]}"))
+    unset IFS
+
+    priority_num=1
+    for item in "${sorted[@]}"; do
+        upgrade_type=$(echo "$item" | cut -d: -f1)
+        priority_level=$(echo "$item" | cut -d: -f2)
+        echo "${priority_num}. ${upgrade_type} [${priority_level}]"
+        priority_num=$((priority_num + 1))
+    done
+fi
+
+echo ""
+print_section "具体的な提案"
+
+# メモリアップグレード提案
+if [ "$MEMORY_SCORE" -ge 2 ]; then
+    echo -e "${BOLD}【メモリアップグレード】${NC}"
+    echo ""
+
+    if [ "$MEMORY_TOTAL_GB" -lt 8 ]; then
+        RECOMMENDED_MEMORY=16
+    elif [ "$MEMORY_TOTAL_GB" -lt 16 ]; then
+        RECOMMENDED_MEMORY=32
+    else
+        RECOMMENDED_MEMORY=64
+    fi
+
+    echo "現在: ${MEMORY_TOTAL_GB} GB"
+    echo "推奨: ${RECOMMENDED_MEMORY} GB"
+    echo ""
+    echo "【購入すべきもの】"
+    echo "  - DDR4-3200 または DDR5-4800 SO-DIMM"
+    echo "  - 容量: $(($RECOMMENDED_MEMORY / 2))GB × 2枚セット"
+    echo "  - 推奨ブランド: Crucial, Samsung, Kingston"
+    echo ""
+    echo "【期待される効果】"
+    echo "  ✅ スワップ使用が大幅に減少（${SWAP_USED_MB}MB → ほぼ0）"
+    echo "  ✅ マルチタスク性能が向上"
+    echo "  ✅ 仮想マシン・コンテナが快適に動作"
+    echo "  ✅ 大容量ファイルの処理が高速化"
+    echo ""
+    echo "【用途別の推奨】"
+    echo "  - 一般用途・ファイルサーバー: 16-32GB"
+    echo "  - 開発・VM・Docker: 32GB"
+    echo "  - 動画編集・データ分析: 32-64GB"
+    echo ""
+fi
+
+# ストレージアップグレード提案
+if [ "$STORAGE_SCORE" -ge 2 ]; then
+    echo -e "${BOLD}【ストレージアップグレード】${NC}"
+    echo ""
+
+    if [ "$NVME_COUNT" -eq 0 ]; then
+        echo "【購入すべきもの】"
+        echo "  - NVMe SSD (M.2 2280)"
+        echo "  - 容量: 500GB - 1TB（システム用）"
+        echo "  - 推奨: Samsung 980 Pro, WD Black SN770, Crucial P3 Plus"
+    else
+        echo "【購入すべきもの】"
+        echo "  - NVMe SSD (M.2 2280) - キャッシュ用"
+        echo "  - 容量: 256GB - 512GB"
+        echo "  - または: 大容量HDD/SSDでストレージ拡張"
+    fi
+
+    echo ""
+    echo "【期待される効果】"
+    echo "  ✅ 起動・アプリ起動が劇的に高速化"
+    echo "  ✅ ファイルアクセスが高速化"
+    echo "  ✅ データベース・VM性能が向上"
+    echo ""
+    echo "【用途別の推奨】"
+    echo "  - システム用（OS・アプリ）: 500GB - 1TB NVMe"
+    echo "  - キャッシュ用: 256GB - 512GB NVMe"
+    echo "  - データ保管用: 2TB以上 SATA SSD or HDD"
+    echo ""
+fi
+
+# CPUアップグレード提案
+if [ "$CPU_SCORE" -ge 3 ]; then
+    echo -e "${BOLD}【CPU関連】${NC}"
+    echo ""
+    echo "⚠️  CPUは交換が困難です（マザーボード固定/ノートPC）"
+    echo ""
+    echo "【代替案】"
+    echo "  - メモリ増設でマルチタスク性能を改善"
+    echo "  - SSD追加でI/O待ち時間を短縮"
+    echo "  - 外部GPUでグラフィック処理をオフロード"
+    echo ""
+fi
+
+# ========================================
+# 総合評価
+# ========================================
+
+print_section "総合評価"
+
+if [ "$TOTAL_SCORE" -ge 10 ]; then
+    print_alert "このシステムは大幅なアップグレードが必要です"
+    echo "推奨: メモリ増設を最優先に実施してください"
+elif [ "$TOTAL_SCORE" -ge 5 ]; then
+    print_warning "このシステムはアップグレードで大幅に改善できます"
+    echo "推奨: 予算に応じてメモリまたはストレージを増設してください"
+elif [ "$TOTAL_SCORE" -ge 2 ]; then
+    print_info "このシステムは十分ですが、一部改善の余地があります"
+    echo "推奨: 必要に応じて段階的にアップグレードを検討してください"
+else
+    print_good "このシステムは現在のスペックで十分です"
+    echo "アップグレードの緊急性は低いです"
+fi
+
+# ========================================
+# 購入前チェックリスト
+# ========================================
+
+if [ ${#UPGRADE_PRIORITY[@]} -gt 0 ]; then
+    print_section "購入前チェックリスト"
+
+    echo "メモリ購入時:"
+    echo "  □ DDR4 or DDR5 を確認（マザーボード仕様を確認）"
+    echo "  □ SO-DIMM（ノートPC）or DIMM（デスクトップ）を確認"
+    echo "  □ 対応速度を確認（DDR4-3200, DDR5-4800など）"
+    echo "  □ 同じメーカー・型番の2枚セットを購入"
+    echo ""
+    echo "SSD購入時:"
+    echo "  □ M.2スロットの空きを確認"
+    echo "  □ M.2のサイズを確認（2280が一般的）"
+    echo "  □ PCIe Gen3 or Gen4 対応を確認"
+    echo "  □ NVMe接続であることを確認（SATA M.2ではない）"
+    echo ""
+fi
+
+# ========================================
+# 追加情報
+# ========================================
+
+print_section "参考情報"
+
+echo "【このスクリプトについて】"
+echo "  - 実行場所: $(pwd)"
+echo "  - 実行日時: $(date '+%Y-%m-%d %H:%M:%S')"
+echo ""
+echo "【詳細情報の確認コマンド】"
+echo "  メモリ詳細: sudo dmidecode -t memory"
+echo "  CPU詳細: lscpu -e"
+echo "  ストレージ詳細: lsblk -f"
+echo "  PCI デバイス: lspci -v"
+echo ""
+
+print_header "分析完了"
+
+echo -e "${BOLD}このレポートを保存する場合:${NC}"
+echo "  $0 > pc_analysis_report_\$(date +%Y%m%d).txt"
+echo ""
