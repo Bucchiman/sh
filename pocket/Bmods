@@ -3,7 +3,7 @@
 # FileName:     Bmods
 # Author:       8ucchiman
 # CreatedDate:  2023-07-27 13:10:49
-# LastModified: 2025-02-16 10:59:43
+# LastModified: 2025-12-30 13:56:56
 # Reference:    https://unix.stackexchange.com/questions/33255/how-to-define-and-load-your-own-shell-function-in-zsh
 #               https://sig9.org/archives/1120
 #               https://qiita.com/icoxfog417/items/adbbf445d357c924b8fc
@@ -29,6 +29,30 @@ function pass () {
 function __project () {
     ln -sf $HOME/.config/lib/codes/shell/pocket/Brun .
     cp $HOME/.config/lib/codes/shell/pocket/local .
+}
+
+#@ install
+function install_claude () {
+    curl -fsSL https://claude.ai/install.sh | bash
+}
+
+#@ install
+function install_chatgpt () {
+    npm i -g @openai/codex
+}
+
+
+#@ install
+function install_platformio () {
+    #
+    # @Description  install platformio for embedded device
+    # @params       : command a
+    #               : command b
+    # @Example
+    # @Reference    https://docs.platformio.org/en/latest/core/installation/methods/installer-script.html
+    #
+    curl -fsSL -o get-platformio.py https://raw.githubusercontent.com/platformio/platformio-core-installer/master/get-platformio.py
+    python3 get-platformio.py
 }
 
 #@ install
@@ -4578,7 +4602,8 @@ function install_neovim () {
     #
 
     cd $HOME/source/
-    wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+    # wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+    wget https://github.com/neovim/neovim/releases/download/v0.11.5/nvim-linux-x86_64.tar.gz
     tar xzvf nvim-linux64.tar.gz
     ln -sf $PWD/nvim-linux64/bin/nvim $HOME/bin/nvim
     # sudo apt install -y snapd
