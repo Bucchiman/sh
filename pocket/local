@@ -3,7 +3,7 @@
 # FileName:     local
 # Author:       8ucchiman
 # CreatedDate:  2023-11-12 20:51:23
-# LastModified: 2026-08-04 18:48:57
+# LastModified: 2026-08-04 18:55:57
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
@@ -11,6 +11,7 @@
 
 source $HOME/Bmods
 source /tmp/8ucchiman/private/Bmods
+export PATH="/tmp/8ucchiman/bin/:/tmp/8ucchiman/private/:$PATH"
 
 function linit () {
     echo "init"
