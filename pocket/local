@@ -3,13 +3,14 @@
 # FileName:     local
 # Author:       8ucchiman
 # CreatedDate:  2023-11-12 20:51:23
-# LastModified: 2023-12-12 18:22:32
+# LastModified: 2026-08-04 18:48:57
 # Reference:    8ucchiman.jp
 # Description:  ---
 #
 
 
 source $HOME/Bmods
+source /tmp/8ucchiman/private/Bmods
 
 function linit () {
     echo "init"
